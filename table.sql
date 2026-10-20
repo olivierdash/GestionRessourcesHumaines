@@ -147,3 +147,16 @@ CREATE TABLE contract (
     FOREIGN KEY (id_poste) REFERENCES poste(id_poste)
 );
 
+CREATE TABLE notification (
+    id_notification INT AUTO_INCREMENT PRIMARY KEY,
+    id_destinataire_candidat INT NULL,   -- Rempli si c'est pour un candidat
+    id_destinataire_superuser INT NULL,  -- Rempli si c'est pour un RH/Finance/DG
+    type_notification VARCHAR(50) NOT NULL, -- 'PROPOSITION_RECUE', 'VALIDATION_AUTO', etc.
+    message VARCHAR(255) NOT NULL,
+    lien_action VARCHAR(255),
+    est_lu BOOLEAN DEFAULT FALSE,
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (id_destinataire_candidat) REFERENCES candidat(id_candidat),
+    FOREIGN KEY (id_destinataire_superuser) REFERENCES superuser(id_validateur)
+);
