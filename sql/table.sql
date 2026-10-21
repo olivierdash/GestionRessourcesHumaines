@@ -1,6 +1,13 @@
 -- ============================================================
 -- 1. UTILISATEURS ET RÔLES
 -- ============================================================
+ DROP TABLE IF EXISTS type_notification              CASCADE;
+ DROP TABLE IF EXISTS type_evaluation                CASCADE;
+ DROP TABLE IF EXISTS type_contrat                   CASCADE;
+ DROP TABLE IF EXISTS statut_candidature             CASCADE;
+ DROP TABLE IF EXISTS statut_proposition             CASCADE;
+ DROP TABLE IF EXISTS statut_offre_emploie           CASCADE;
+ DROP TABLE IF EXISTS statut_demande_recrutement     CASCADE;
  DROP TABLE IF EXISTS candidat                       CASCADE;
  DROP TABLE IF EXISTS candidature                    CASCADE;
  DROP TABLE IF EXISTS contract                       CASCADE;
@@ -19,6 +26,42 @@
  DROP TABLE IF EXISTS roles                          CASCADE;
  DROP TABLE IF EXISTS utilisateur                    CASCADE;
  DROP TABLE IF EXISTS validation_proposition         CASCADE;
+
+
+--- status 
+CREATE TABLE type_notification(
+    id_type_notification SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE 
+);
+CREATE TABLE type_evaluation(
+    id_type_evaluation SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE type_contrat(
+    id_type_contrat SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE 
+);
+CREATE TABLE statut_candidature(
+    id_statut_candidature SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE statut_proposition(
+    id_statut_proposition SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE statut_offre_emploie(
+    id_statut_offre_emploie SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE statut_demande_recrutement(
+    id_statut_demande_recrutement SERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE
+);
+
+
+
+
+
 
 CREATE TABLE roles (
     id_role SERIAL PRIMARY KEY,
@@ -100,9 +143,10 @@ CREATE TABLE demande_recrutement (
     date_souhaitee DATE,
     effectif INTEGER NOT NULL,
     motif TEXT,
-    statut VARCHAR(50) NOT NULL DEFAULT 'BROUILLON',
+    id_statut_demande_recrutement INT NOT NULL,
     FOREIGN KEY (id_manager) REFERENCES utilisateur(id_utilisateur),
-    FOREIGN KEY (id_poste) REFERENCES poste(id_poste)
+    FOREIGN KEY (id_poste) REFERENCES poste(id_poste),
+    FOREIGN KEY (id_statut_demande_recrutement) REFERENCES statut_demande_recrutement(id_statut_demande_recrutement)
 );
 
 CREATE TABLE historique_demande_recrutement (
@@ -127,8 +171,9 @@ CREATE TABLE offre_emploi (
     description TEXT,
     date_publication TIMESTAMP,
     date_cloture TIMESTAMP,
-    statut VARCHAR(50) NOT NULL DEFAULT 'BROUILLON',
+    id_statut_offre_emploie INT NOT NULL,
     FOREIGN KEY (id_demande_recrutement) REFERENCES demande_recrutement(id_demande_recrutement),
+    FOREIGN KEY (id_statut_offre_emploie) REFERENCES statut_offre_emploie(id_statut_offre_emploie),
     CONSTRAINT uk_offre_demande UNIQUE (id_demande_recrutement)
 );
 
@@ -137,24 +182,26 @@ CREATE TABLE candidature (
     id_candidat INTEGER NOT NULL,
     id_demande_recrutement INTEGER NOT NULL,
     date_depot_candidature TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    statut_candidature VARCHAR(50) NOT NULL DEFAULT 'RECU',
+    id_statut_candidature INT NOT NULL,
     id_offre INT NOT NULL,
     FOREIGN KEY (id_candidat) REFERENCES candidat(id_candidat),
     FOREIGN KEY (id_demande_recrutement) REFERENCES demande_recrutement(id_demande_recrutement),
     CONSTRAINT uk_candidat_demande UNIQUE (id_candidat, id_demande_recrutement),
-    FOREIGN KEY (id_offre) REFERENCES offre_emploi(id_offre)
+    FOREIGN KEY (id_offre) REFERENCES offre_emploi(id_offre),
+    FOREIGN KEY (id_statut_candidature) REFERENCES statut_candidature(id_statut_candidature)
 );
 
 CREATE TABLE evaluation (
     id_evaluation SERIAL PRIMARY KEY,
     id_candidature INTEGER NOT NULL,
     id_evaluateur INTEGER NOT NULL,
-    type_evaluation VARCHAR(50) NOT NULL,
+    id_type_evaluation INT NOT NULL,
     evaluation TEXT,
     note NUMERIC(5,2),
     date_evaluation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_candidature) REFERENCES candidature(id_candidature) ON DELETE CASCADE,
-    FOREIGN KEY (id_evaluateur) REFERENCES utilisateur(id_utilisateur)
+    FOREIGN KEY (id_evaluateur) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_type_evaluation) REFERENCES type_evaluation(id_type_evaluation)
 );
 
 -- ============================================================
@@ -167,21 +214,23 @@ CREATE TABLE proposition_embauche (
     salaire_final NUMERIC(10,2),
     date_proposition TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_expiration TIMESTAMP NOT NULL,
-    statut_proposition VARCHAR(50) NOT NULL,
+    id_statut_proposition INT NOT NULL,
     date_decision TIMESTAMP,
-    FOREIGN KEY (id_candidature) REFERENCES candidature(id_candidature)
+    FOREIGN KEY (id_candidature) REFERENCES candidature(id_candidature),
+    FOREIGN KEY (id_statut_proposition) REFERENCES statut_proposition(id_statut_proposition)
 );
 
 CREATE TABLE validation_proposition (
     id_validation_proposition SERIAL PRIMARY KEY,
     id_proposition INTEGER NOT NULL,
     id_validateur INTEGER NOT NULL,
-    departement_role VARCHAR(100),
+    id_departement INT NOT NULL,
     decision VARCHAR(50) NOT NULL,
     date_validation_proposition TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     commentaire TEXT,
     FOREIGN KEY (id_proposition) REFERENCES proposition_embauche(id_proposition) ON DELETE CASCADE,
-    FOREIGN KEY (id_validateur) REFERENCES utilisateur(id_utilisateur)
+    FOREIGN KEY (id_validateur) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_departement) REFERENCES departement(id_departement)
 );
 
 -- ============================================================
@@ -200,13 +249,14 @@ CREATE TABLE contract (
     id_contract SERIAL PRIMARY KEY,
     id_employer INTEGER NOT NULL,
     id_poste INTEGER NOT NULL,
-    type_contrat VARCHAR(50) NOT NULL,
+    id_type_contrat INTEGER NOT NULL,
     date_debut DATE NOT NULL,
     date_fin DATE,
     salaire_mensuel NUMERIC(10,2) NOT NULL,
     status VARCHAR(50) NOT NULL,
     FOREIGN KEY (id_employer) REFERENCES employer(id_employer) ON DELETE CASCADE,
-    FOREIGN KEY (id_poste) REFERENCES poste(id_poste)
+    FOREIGN KEY (id_poste) REFERENCES poste(id_poste),
+    FOREIGN KEY (id_type_contrat) REFERENCES type_contrat(id_type_contrat)
 );
 
 -- ============================================================
@@ -216,11 +266,12 @@ CREATE TABLE notification (
     id_notification SERIAL PRIMARY KEY,
     id_destinataire_candidat INTEGER NULL,
     id_destinataire_utilisateur INTEGER NULL,
-    type_notification VARCHAR(50) NOT NULL,
+    id_type_notification INTEGER NOT NULL,
     message VARCHAR(255) NOT NULL,
     lien_action VARCHAR(255),
     est_lu BOOLEAN DEFAULT FALSE,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_destinataire_candidat) REFERENCES candidat(id_candidat),
-    FOREIGN KEY (id_destinataire_utilisateur) REFERENCES utilisateur(id_utilisateur)
+    FOREIGN KEY (id_destinataire_utilisateur) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_type_notification) REFERENCES type_notification(id_type_notification)
 );
