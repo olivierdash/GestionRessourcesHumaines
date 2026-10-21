@@ -11,7 +11,7 @@ CREATE TABLE utilisateur (
     id_utilisateur SERIAL PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    motDePasse VARCHAR(255) NOT NULL,
+    mot_de_passe VARCHAR(255) NOT NULL,
     id_role INT NOT NULL,
     FOREIGN KEY (id_role) REFERENCES roles(id_role)
 );
@@ -81,7 +81,7 @@ CREATE TABLE demande_recrutement (
     id_demande_recrutement SERIAL PRIMARY KEY,
     id_manager INT NOT NULL,
     id_poste INT NOT NULL,
-    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_souhaitee DATE,                   -- date d'entrée souhaitée (Gestion.md)
     effectif INT NOT NULL,
     motif TEXT,
@@ -95,7 +95,7 @@ CREATE TABLE historique_demande_recrutement (
     id_demande_recrutement INT NOT NULL,
     id_etat_demande INT NOT NULL,
     id_validateur INT NOT NULL,
-    date_changement DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_changement TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_demande_recrutement) REFERENCES demande_recrutement(id_demande_recrutement) ON DELETE CASCADE,
     FOREIGN KEY (id_etat_demande) REFERENCES etat_demande(id_etat_demande),
     FOREIGN KEY (id_validateur) REFERENCES utilisateur(id_utilisateur)
@@ -109,7 +109,7 @@ CREATE TABLE candidature (
     id_candidature SERIAL PRIMARY KEY,
     id_candidat INT NOT NULL,
     id_demande_recrutement INT NOT NULL,
-    date_depot_candidature DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_depot_candidature TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     statut_candidature VARCHAR(50) NOT NULL DEFAULT 'RECU',
     -- 'RECU', 'EN_EVALUATION', 'RETENU', 'REFUSE'
     FOREIGN KEY (id_candidat) REFERENCES candidat(id_candidat),
@@ -124,7 +124,7 @@ CREATE TABLE evaluation (
     type_evaluation VARCHAR(50) NOT NULL,          -- 'TEST_TECHNIQUE', 'ENTRETIEN_RH', 'ENTRETIEN_MANAGER'
     evaluation TEXT,                               -- compte-rendu
     note DECIMAL(5,2),
-    date_evaluation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_evaluation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_candidature) REFERENCES candidature(id_candidature) ON DELETE CASCADE,
     FOREIGN KEY (id_evaluateur) REFERENCES utilisateur(id_utilisateur)
 );
@@ -138,10 +138,10 @@ CREATE TABLE proposition_embauche (
     id_candidature INT NOT NULL,
     salaire_propose DECIMAL(10,2) NOT NULL,
     salaire_final DECIMAL(10,2),
-    date_proposition DATETIME DEFAULT CURRENT_TIMESTAMP,
-    date_expiration DATETIME NOT NULL,
+    date_proposition TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    date_expiration TIMESTAMP NOT NULL,
     statut_proposition VARCHAR(50) NOT NULL,       -- 'EN_ATTENTE', 'ACCEPTE', 'REFUSE', 'EXPIRE'
-    date_decision DATETIME,
+    date_decision TIMESTAMP,
     FOREIGN KEY (id_candidature) REFERENCES candidature(id_candidature)
 );
 
@@ -151,7 +151,7 @@ CREATE TABLE validation_proposition (
     id_validateur INT NOT NULL,
     departement_role VARCHAR(100),
     decision VARCHAR(50) NOT NULL,                 -- 'APPROUVE', 'REFUSE'
-    date_validation_proposition DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_validation_proposition TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     commentaire TEXT,
     FOREIGN KEY (id_proposition) REFERENCES proposition_embauche(id_proposition) ON DELETE CASCADE,
     FOREIGN KEY (id_validateur) REFERENCES utilisateur(id_utilisateur)
@@ -195,7 +195,7 @@ CREATE TABLE notification (
     message VARCHAR(255) NOT NULL,
     lien_action VARCHAR(255),
     est_lu BOOLEAN DEFAULT FALSE,
-    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_destinataire_candidat) REFERENCES candidat(id_candidat),
     FOREIGN KEY (id_destinataire_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
