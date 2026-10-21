@@ -1,6 +1,24 @@
 -- ============================================================
 -- 1. UTILISATEURS ET RÔLES
 -- ============================================================
+ DROP TABLE IF EXISTS candidat                       CASCADE
+ DROP TABLE IF EXISTS candidature                    CASCADE
+ DROP TABLE IF EXISTS contract                       CASCADE
+ DROP TABLE IF EXISTS demande_recrutement            CASCADE
+ DROP TABLE IF EXISTS departement                    CASCADE
+ DROP TABLE IF EXISTS employer                       CASCADE
+ DROP TABLE IF EXISTS etat_demande                   CASCADE
+ DROP TABLE IF EXISTS evaluation                     CASCADE
+ DROP TABLE IF EXISTS grille_salarial                CASCADE
+ DROP TABLE IF EXISTS historique_demande_recrutement CASCADE
+ DROP TABLE IF EXISTS notification                   CASCADE
+ DROP TABLE IF EXISTS poste                          CASCADE
+ DROP TABLE IF EXISTS poste_mission                  CASCADE
+ DROP TABLE IF EXISTS proposition_embauche           CASCADE
+ DROP TABLE IF EXISTS roles                          CASCADE
+ DROP TABLE IF EXISTS utilisateur                    CASCADE
+ DROP TABLE IF EXISTS validation_proposition         CASCADE
+
 CREATE TABLE roles (
     id_role SERIAL PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL UNIQUE
@@ -190,3 +208,18 @@ CREATE TABLE notification (
     CONSTRAINT fk_notif_candidat FOREIGN KEY (id_destinataire_candidat) REFERENCES candidat(id_candidat),
     CONSTRAINT fk_notif_utilisateur FOREIGN KEY (id_destinataire_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
+
+CREATE TABLE offre_emploi (
+    id_offre SERIAL PRIMARY KEY,
+    id_demande_recrutement INT NOT NULL,
+    titre VARCHAR(255) NOT NULL,
+    description TEXT,
+    date_publication TIMESTAMP,
+    date_cloture TIMESTAMP,
+    statut VARCHAR(50) NOT NULL DEFAULT 'BROUILLON',
+    FOREIGN KEY (id_demande_recrutement) REFERENCES demande_recrutement(id_demande_recrutement),
+    CONSTRAINT uk_offre_demande UNIQUE (id_demande_recrutement)
+);
+
+ALTER TABLE candidature ADD COLUMN id_offre INT;
+ALTER TABLE candidature ADD CONSTRAINT fk_candidature_offre FOREIGN KEY (id_offre) REFERENCES offre_emploi(id_offre);
