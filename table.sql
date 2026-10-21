@@ -1,12 +1,13 @@
-CREATE TABLE superuser(
-    id_validateur INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(50),
-    statut VARCHAR(50)
+CREATE TABLE direction_general(
+    id_dg INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(50) NOT NULL,
+    pass VARCHAR(255) NOT NULL,
 );
 
 CREATE TABLE manager (
     id_manager INT AUTO_INCREMENT PRIMARY KEY,
-    nom_prenom VARCHAR(255) NOT NULL
+    nom VARCHAR(255) NOT NULL,
+    pass VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE departement (
@@ -73,11 +74,11 @@ CREATE TABLE historique_demande_recrutement (
     id_historique_demande_recrutement INT AUTO_INCREMENT PRIMARY KEY,
     id_demande_recrutement INT NOT NULL,
     id_etat_demande INT NOT NULL,
-    id_validateur INT NOT NULL,
+    id_dg INT NOT NULL,
     date_changement DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_demande_recrutement) REFERENCES demande_recrutement(id_demande_recrutement),
     FOREIGN KEY (id_etat_demande) REFERENCES etat_demande(id_etat_demande),
-    FOREIGN KEY (id_validateur) REFERENCES superuser(id_validateur)
+    FOREIGN KEY (id_dg) REFERENCES direction_general(id_dg)
 );
 
 -- 4. Bloc 2 & 3 : Recrutement, Sélection et Proposition
@@ -115,13 +116,13 @@ CREATE TABLE proposition_embauche (
 CREATE TABLE validation_proposition (
     id_validation_proposition INT AUTO_INCREMENT PRIMARY KEY,
     id_proposition INT NOT NULL,
-    id_validateur INT NOT NULL,
+    id_dg INT NOT NULL,
     departement_role VARCHAR(100),
     decision VARCHAR(50) NOT NULL, -- 'APPROUVE', 'REJETE'
     date_validation_proposition DATETIME DEFAULT CURRENT_TIMESTAMP,
     commentaire TEXT,
     FOREIGN KEY (id_proposition) REFERENCES proposition_embauche(id_proposition),
-    FOREIGN KEY (id_validateur) REFERENCES superuser(id_validateur) 
+    FOREIGN KEY (id_dg) REFERENCES direction_general(id_dg) 
 );
 
 -- 5. Fin du Bloc 3 & Bloc 4 : Embauche et Contrat
@@ -150,7 +151,7 @@ CREATE TABLE contract (
 CREATE TABLE notification (
     id_notification INT AUTO_INCREMENT PRIMARY KEY,
     id_destinataire_candidat INT NULL,   -- Rempli si c'est pour un candidat
-    id_destinataire_superuser INT NULL,  -- Rempli si c'est pour un RH/Finance/DG
+    id_direction_general INT NULL,  -- Rempli si c'est pour un RH/Finance/DG
     type_notification VARCHAR(50) NOT NULL, -- 'PROPOSITION_RECUE', 'VALIDATION_AUTO', etc.
     message VARCHAR(255) NOT NULL,
     lien_action VARCHAR(255),
@@ -158,5 +159,5 @@ CREATE TABLE notification (
     date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (id_destinataire_candidat) REFERENCES candidat(id_candidat),
-    FOREIGN KEY (id_destinataire_superuser) REFERENCES superuser(id_validateur)
+    FOREIGN KEY (id_direction_general) REFERENCES direction_general(id_dg)
 );
