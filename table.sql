@@ -3,12 +3,12 @@
 -- ============================================================
 
 CREATE TABLE roles (
-    id_role INT AUTO_INCREMENT PRIMARY KEY,
+    id_role SERIAL PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL UNIQUE   -- 'MANAGER', 'RH', 'FINANCE', 'DG'
 );
 
 CREATE TABLE utilisateur (
-    id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
+    id_utilisateur SERIAL PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     motDePasse VARCHAR(255) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE utilisateur (
 );
 
 CREATE TABLE departement (
-    id_departement INT AUTO_INCREMENT PRIMARY KEY,
+    id_departement SERIAL PRIMARY KEY,
     titre VARCHAR(255) NOT NULL,
     id_manager INT NULL,
     FOREIGN KEY (id_manager) REFERENCES utilisateur(id_utilisateur)
@@ -28,7 +28,7 @@ CREATE TABLE departement (
 -- ============================================================
 
 CREATE TABLE candidat (
-    id_candidat INT AUTO_INCREMENT PRIMARY KEY,
+    id_candidat SERIAL PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
     prenom VARCHAR(255) NOT NULL,
     telephone VARCHAR(20),
@@ -37,7 +37,7 @@ CREATE TABLE candidat (
 );
 
 CREATE TABLE etat_demande (
-    id_etat_demande INT AUTO_INCREMENT PRIMARY KEY,
+    id_etat_demande SERIAL PRIMARY KEY,
     intitule VARCHAR(100) NOT NULL UNIQUE  -- 'BROUILLON', 'VALIDE_RH', 'VALIDE_FINANCE', 'VALIDE_DG'
 );
 
@@ -46,7 +46,7 @@ CREATE TABLE etat_demande (
 -- ============================================================
 
 CREATE TABLE poste (
-    id_poste INT AUTO_INCREMENT PRIMARY KEY,
+    id_poste SERIAL PRIMARY KEY,
     id_departement INT NOT NULL,
     date_effet DATE,
     intitule VARCHAR(255) NOT NULL,
@@ -56,14 +56,14 @@ CREATE TABLE poste (
 );
 
 CREATE TABLE poste_mission (
-    id_mission INT AUTO_INCREMENT PRIMARY KEY,
+    id_mission SERIAL PRIMARY KEY,
     id_poste INT NOT NULL,
     titre VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_poste) REFERENCES poste(id_poste) ON DELETE CASCADE
 );
 
 CREATE TABLE grille_salarial (
-    id_grille INT AUTO_INCREMENT PRIMARY KEY,
+    id_grille SERIAL PRIMARY KEY,
     id_poste INT NOT NULL,
     id_departement INT NOT NULL,
     salaire_min DECIMAL(10,2) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE grille_salarial (
 -- ============================================================
 
 CREATE TABLE demande_recrutement (
-    id_demande_recrutement INT AUTO_INCREMENT PRIMARY KEY,
+    id_demande_recrutement SERIAL PRIMARY KEY,
     id_manager INT NOT NULL,
     id_poste INT NOT NULL,
     date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -91,7 +91,7 @@ CREATE TABLE demande_recrutement (
 );
 
 CREATE TABLE historique_demande_recrutement (
-    id_historique_demande_recrutement INT AUTO_INCREMENT PRIMARY KEY,
+    id_historique_demande_recrutement SERIAL PRIMARY KEY,
     id_demande_recrutement INT NOT NULL,
     id_etat_demande INT NOT NULL,
     id_validateur INT NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE historique_demande_recrutement (
 -- ============================================================
 
 CREATE TABLE candidature (
-    id_candidature INT AUTO_INCREMENT PRIMARY KEY,
+    id_candidature SERIAL PRIMARY KEY,
     id_candidat INT NOT NULL,
     id_demande_recrutement INT NOT NULL,
     date_depot_candidature DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -118,7 +118,7 @@ CREATE TABLE candidature (
 );
 
 CREATE TABLE evaluation (
-    id_evaluation INT AUTO_INCREMENT PRIMARY KEY,
+    id_evaluation SERIAL PRIMARY KEY,
     id_candidature INT NOT NULL,
     id_evaluateur INT NOT NULL,                    -- qui a évalué (RH, Manager, etc.)
     type_evaluation VARCHAR(50) NOT NULL,          -- 'TEST_TECHNIQUE', 'ENTRETIEN_RH', 'ENTRETIEN_MANAGER'
@@ -134,7 +134,7 @@ CREATE TABLE evaluation (
 -- ============================================================
 
 CREATE TABLE proposition_embauche (
-    id_proposition INT AUTO_INCREMENT PRIMARY KEY,
+    id_proposition SERIAL PRIMARY KEY,
     id_candidature INT NOT NULL,
     salaire_propose DECIMAL(10,2) NOT NULL,
     salaire_final DECIMAL(10,2),
@@ -146,7 +146,7 @@ CREATE TABLE proposition_embauche (
 );
 
 CREATE TABLE validation_proposition (
-    id_validation_proposition INT AUTO_INCREMENT PRIMARY KEY,
+    id_validation_proposition SERIAL PRIMARY KEY,
     id_proposition INT NOT NULL,
     id_validateur INT NOT NULL,
     departement_role VARCHAR(100),
@@ -162,7 +162,7 @@ CREATE TABLE validation_proposition (
 -- ============================================================
 
 CREATE TABLE employer (
-    id_employer INT AUTO_INCREMENT PRIMARY KEY,
+    id_employer SERIAL PRIMARY KEY,
     id_candidature INT UNIQUE NOT NULL,
     matricule VARCHAR(50) UNIQUE NOT NULL,
     hiring_date DATE NOT NULL,
@@ -171,7 +171,7 @@ CREATE TABLE employer (
 );
 
 CREATE TABLE contract (
-    id_contract INT AUTO_INCREMENT PRIMARY KEY,
+    id_contract SERIAL PRIMARY KEY,
     id_employer INT NOT NULL,
     id_poste INT NOT NULL,
     type_contrat VARCHAR(50) NOT NULL,             -- 'CE', 'CDD', 'CDI', 'STAGE'
@@ -188,7 +188,7 @@ CREATE TABLE contract (
 -- ============================================================
 
 CREATE TABLE notification (
-    id_notification INT AUTO_INCREMENT PRIMARY KEY,
+    id_notification SERIAL PRIMARY KEY,
     id_destinataire_candidat INT NULL,
     id_destinataire_utilisateur INT NULL,
     type_notification VARCHAR(50) NOT NULL,
