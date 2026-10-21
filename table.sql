@@ -11,7 +11,7 @@ CREATE TABLE utilisateur (
     id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    mot_de_passe VARCHAR(255) NOT NULL,
+    motDePasse VARCHAR(255) NOT NULL,
     id_role INT NOT NULL,
     FOREIGN KEY (id_role) REFERENCES roles(id_role)
 );
