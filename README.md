@@ -65,3 +65,5 @@ public class CandidatDTO { // J'utilise DTO ici, je t'explique pourquoi plus bas
     private String telephone;
 }
 ```
+
+pour consulter le truc c'est localhost:8080/bloc2/offres 
