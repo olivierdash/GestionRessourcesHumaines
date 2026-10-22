@@ -21,6 +21,8 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/utilisateur/login") // <-- Indique à Spring d'utiliser TA page
                 .loginProcessingUrl("/utilisateur/login") // L'URL vers laquelle le formulaire POST
+                .usernameParameter("email")
+                .passwordParameter("motDePasse")
                 .defaultSuccessUrl("/utilisateur/dashboard", true) // Où aller après connexion
                 .permitAll()
             )
