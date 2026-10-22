@@ -17,8 +17,10 @@ import com.example.sirh.repository.TypeEvaluationRepository;
 import com.example.sirh.repository.UtilisateurRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service 
+@AllArgsConstructor 
 public class EvaluationService {
     
     private EvaluationRepository evaluationRepo;

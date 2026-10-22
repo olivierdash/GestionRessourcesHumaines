@@ -38,10 +38,12 @@ public class OffreEmploiController {
                              @RequestParam String description,
                              RedirectAttributes redirectAttributes) {
         try {
-            offreService.createNewOffer(idDemande, titre, description, 1); // 1 = BROUILLON
+            offreService.createNewOffer(idDemande, titre, description, 1); 
             redirectAttributes.addFlashAttribute("success", "Offre créée en brouillon.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur : Une offre existe déjà pour cette demande.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Erreur : " + e.getMessage());
         }
         return "redirect:/bloc2/offres";
     }
