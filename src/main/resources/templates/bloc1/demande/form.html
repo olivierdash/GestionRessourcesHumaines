@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRH - Nouvelle Demande</title>
+    
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <style>
+        /* Style pour la zone de recherche du select */
+        .search-select-container {
+            position: relative;
+        }
+        .search-select-container .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            color: #6c757d;
+        }
+        .search-select-container input {
+            padding-left: 35px;
+        }
+        /* Ajustement de la taille du select pour qu'il affiche plusieurs options */
+        #posteSelect {
+            height: 150px; /* Affiche environ 4-5 options */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar (identique) -->
+        <div class="sidebar" id="sidebar-wrapper">
+            <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
+            <div class="list-group list-group-flush mt-3">
+                <a th:href="@{/dashboard}" class="list-group-item list-group-item-action">Tableau de bord</a>
+                <a th:href="@{/demandes}" class="list-group-item list-group-item-action active">Demandes de recrutement</a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100">
+            <div class="container-fluid px-4 py-4">
+                
+                <!-- Fil d'ariane & Titre -->
+                <div class="mb-4">
+                    <a th:href="@{/demandes}" class="text-decoration-none text-muted mb-2 d-inline-block">
+                        &larr; Retour à la liste
+                    </a>
+                    <h2 class="fw-bold m-0">Nouvelle demande de recrutement</h2>
+                    <p class="text-muted">Remplissez les informations ci-dessous pour initier le processus.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-4">
+                                
+                                <!-- Formulaire -->
+                                <form th:action="@{/demandes}" method="post" class="needs-validation" novalidate id="demandeForm">
+                                    
+                                    <!-- Manager (Utilisateur) -->
+                                    <div class="mb-3">
+                                        <label for="idManager" class="form-label fw-medium">Manager demandeur <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="idManager" name="idManager" required>
+                                            <option value="" disabled selected>Sélectionnez un manager...</option>
+                                            <option th:each="manager : ${managers}" 
+                                                    th:value="${manager.idUtilisateur}" 
+                                                    th:text="${manager.nom + ' (' + manager.role.libelle + ')'}">
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback">Veuillez sélectionner un manager.</div>
+                                    </div>
+
+                                    <!-- Poste (Recherche + Liste) -->
+                                    <div class="mb-3">
+                                        <label for="posteSearch" class="form-label fw-medium">Poste concerné <span class="text-danger">*</span></label>
+                                        <div class="search-select-container mb-2">
+                                            <span class="search-icon">🔍</span>
+                                            <input type="text" class="form-control" id="posteSearch" placeholder="Tapez pour rechercher un poste..." autocomplete="off">
+                                        </div>
+                                        <select class="form-select" id="posteSelect" name="idPoste" required size="5">
+                                            <option th:each="poste : ${postes}" 
+                                                    th:value="${poste.idPoste}" 
+                                                    th:text="${poste.intitule + ' - ' + poste.departement.titre}">
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback">Veuillez sélectionner un poste dans la liste.</div>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Date Souhaitée -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="dateSouhaitee" class="form-label fw-medium">Date d'entrée souhaitée <span class="text-danger">*</span></label>
+                                            <!-- input type="date" force le format YYYY-MM-DD en base, mais l'UI affiche le format local -->
+                                            <input type="date" class="form-control" id="dateSouhaitee" name="dateSouhaitee" required>
+                                            <div class="invalid-feedback">Veuillez choisir une date.</div>
+                                        </div>
+
+                                        <!-- Effectif -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="effectif" class="form-label fw-medium">Effectif requis <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="effectif" name="effectif" min="1" step="1" required placeholder="Ex: 2">
+                                            <div class="invalid-feedback">L'effectif doit être supérieur à 0.</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Motif -->
+                                    <div class="mb-4">
+                                        <label for="motif" class="form-label fw-medium">Motif de la demande</label>
+                                        <textarea class="form-control" id="motif" name="motif" rows="4" placeholder="Expliquez brièvement la raison de ce recrutement (remplacement, expansion, etc.)..."></textarea>
+                                    </div>
+
+                                    <!-- Boutons d'action -->
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a th:href="@{/demandes}" class="btn btn-light border">Annuler</a>
+                                        <button type="submit" class="btn btn-primary px-4">Créer la demande</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    
+    <!-- Scripts personnalisés pour ce formulaire -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            
+            // 1. Validation Bootstrap 5 native
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    // On vérifie si un poste est sélectionné dans le select
+                    const posteSelect = document.getElementById('posteSelect');
+                    if (posteSelect.value === "") {
+                        posteSelect.setCustomValidity("Veuillez sélectionner un poste");
+                    } else {
+                        posteSelect.setCustomValidity("");
+                    }
+
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+
+            // 2. Recherche dynamique dans le <select> des postes
+            const searchInput = document.getElementById('posteSearch');
+            const posteSelect = document.getElementById('posteSelect');
+
+            searchInput.addEventListener('input', function () {
+                const filter = this.value.toLowerCase();
+                const options = posteSelect.options;
+                let visibleCount = 0;
+
+                for (let i = 0; i < options.length; i++) {
+                    const text = options[i].text.toLowerCase();
+                    if (text.includes(filter)) {
+                        options[i].style.display = ""; // Afficher
+                        visibleCount++;
+                    } else {
+                        options[i].style.display = "none"; // Cacher
+                    }
+                }
+
+                // Si la recherche ne donne rien, on peut ajouter un style ou un message
+                if (visibleCount === 0) {
+                    // Optionnel : Afficher un message "Aucun résultat"
+                }
+                
+                // Désélectionner l'option courante si elle a été masquée
+                if (posteSelect.selectedIndex >= 0 && options[posteSelect.selectedIndex].style.display === "none") {
+                    posteSelect.selectedIndex = -1;
+                }
+            });
+
+            // Réinitialiser la recherche si on change de page ou vide le champ
+            searchInput.addEventListener('search', function() {
+                if(this.value === "") {
+                    const options = posteSelect.options;
+                    for (let i = 0; i < options.length; i++) {
+                        options[i].style.display = "";
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

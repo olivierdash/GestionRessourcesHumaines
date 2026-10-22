@@ -1,0 +1,150 @@
+:root {
+    --primary-blue: #1E3A8A;
+    --primary-blue-hover: #1e40af;
+    --accent-yellow: #F59E0B;
+    --bg-light: #F8FAFC;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ================= SIDEBAR ================= */
+#wrapper {
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: var(--primary-blue);
+    color: white;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+.sidebar-heading {
+    padding: 1.5rem 1.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.text-yellow {
+    color: var(--accent-yellow);
+}
+
+.sidebar .list-group-item {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    border: none;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.sidebar .list-group-item:hover, 
+.sidebar .list-group-item.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left: 4px solid var(--accent-yellow);
+}
+
+/* ================= TOPBAR ================= */
+.search-bar {
+    background-color: var(--bg-light);
+    border: none;
+    border-radius: 20px;
+    padding-left: 20px;
+    width: 300px;
+}
+
+.notification-icon {
+    position: relative;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.notification-icon .badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background-color: var(--primary-blue) !important;
+}
+
+.fs-7 {
+    font-size: 0.875rem;
+}
+
+/* ================= CARDS & TABLES ================= */
+.card-kpi {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.card-kpi:hover {
+    transform: translateY(-5px);
+}
+
+.border-left-yellow {
+    border-left: 4px solid var(--accent-yellow) !important;
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+    border-radius: 6px;
+}
+
+/* Bouton primaire */
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-blue-hover);
+    border-color: var(--primary-blue-hover);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .sidebar {
+        margin-left: -260px;
+    }
+    .sidebar.active {
+        margin-left: 0;
+    }
+}

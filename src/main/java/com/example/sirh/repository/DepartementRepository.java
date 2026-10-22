@@ -6,4 +6,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DepartementRepository extends JpaRepository<Departement, Integer> {
+    
+    // Pour la création
+    boolean existsByTitreIgnoreCase(String titre);
+    
+    // Pour la modification (on vérifie que le titre n'est pas utilisé par un AUTRE département)
+    boolean existsByTitreIgnoreCaseAndIdDepartementNot(String titre, Integer idDepartement);
 }
