@@ -28,3 +28,4 @@ Pour les promotions internes:
 Budjet:
 - si difference entre le budjet annuelle 
 
+La direction generale a tout les droits
