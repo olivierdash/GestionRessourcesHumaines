@@ -2,17 +2,12 @@ package com.example.sirh.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "candidature", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"id_candidat", "id_demande_recrutement"}))
+@Entity @Table(name = "candidature")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Candidature {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_candidature")
     private Integer idCandidature;
 
@@ -24,10 +19,15 @@ public class Candidature {
     @JoinColumn(name = "id_demande_recrutement", nullable = false)
     private DemandeRecrutement demandeRecrutement;
 
-    @CreationTimestamp
-    @Column(name = "date_depot_candidature", updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_offre", nullable = false)
+    private OffreEmploi offre;
+
+    @Column(name = "date_depot_candidature", insertable = false, updatable = false)
     private LocalDateTime dateDepotCandidature;
 
-    @Column(name = "statut_candidature", nullable = false, length = 50)
-    private String statutCandidature;
+    
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_statut_candidature", nullable = false)
+    private StatutCandidature statutCandidature;
 }

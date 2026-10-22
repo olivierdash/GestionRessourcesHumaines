@@ -89,7 +89,7 @@ public class DemandeRecrutementController {
         model.addAttribute("postes", posteRepository.findAll());
         // On ne propose que les utilisateurs ayant le rôle MANAGER (filtrage basique en Java)
         List<Utilisateur> managers = utilisateurRepository.findAll().stream()
-                .wrapper(u -> "MANAGER".equals(u.getRole()))
+                .filter(u -> "MANAGER".equals(u.getRole()))
                 .toList();
         model.addAttribute("managers", managers);
         
@@ -123,7 +123,7 @@ public class DemandeRecrutementController {
 
         // Création de l'état initial (BROUILLON)
         etatDemandeRepository.findAll().stream()
-                .wrapper(e -> "BROUILLON".equals(e.getIntitule()))
+                .filter(e -> "BROUILLON".equals(e.getIntitule()))
                 .findFirst()
                 .ifPresent(etat -> {
                     HistoriqueDemandeRecrutement hist = HistoriqueDemandeRecrutement.builder()
@@ -148,7 +148,7 @@ public class DemandeRecrutementController {
 
         // Récupération et tri de l'historique (du plus récent au plus ancien)
         List<HistoriqueDemandeRecrutement> historique = historiqueRepository.findAll().stream()
-                .wrapper(h -> h.getDemandeRecrutement().getIdDemandeRecrutement().equals(id))
+                .filter(h -> h.getDemandeRecrutement().getIdDemandeRecrutement().equals(id))
                 .sorted(Comparator.comparing(HistoriqueDemandeRecrutement::getDateChangement).reversed())
                 .toList();
 

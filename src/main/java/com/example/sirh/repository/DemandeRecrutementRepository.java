@@ -17,7 +17,7 @@ public interface DemandeRecrutementRepository extends JpaRepository<DemandeRecru
     @Query("""
         SELECT new com.example.sirh.dto.DemandeRecrutementLib(
             d.idDemandeRecrutement, d.dateCreation, d.effectif, d.motif,
-            m.nomPrenom, p.intitule, dep.titre
+            m.nom, p.intitule, dep.titre
         )
         FROM DemandeRecrutement d
         JOIN d.manager m

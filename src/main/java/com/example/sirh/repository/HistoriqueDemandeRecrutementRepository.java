@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface HistoriqueDemandeRecrutementRepository 
-        extends JpaRepository<HistoriqueDemandeRecrutement, Integer> {
+public interface HistoriqueDemandeRecrutementRepository extends JpaRepository<HistoriqueDemandeRecrutement, Integer> {
 
     @Query("""
         SELECT h FROM HistoriqueDemandeRecrutement h 
