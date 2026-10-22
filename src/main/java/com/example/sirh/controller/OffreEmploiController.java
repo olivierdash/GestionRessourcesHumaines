@@ -1,0 +1,60 @@
+package com.example.sirh.controller;
+
+
+import com.example.sirh.service.OffreEmploieService;
+import com.example.sirh.repository.DemandeRecrutementRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/bloc2/offres")
+@RequiredArgsConstructor 
+public class OffreEmploiController {
+
+    private final OffreEmploieService offreService;
+    private final DemandeRecrutementRepository demandeRepo;
+
+    
+    @GetMapping
+    public String listeOffres(Model model) {
+        model.addAttribute("offres", offreService.listAllEmploie());
+        return "bloc2/offres/liste";
+    }
+
+    // TÂCHE 9 : Formulaire de création
+    @GetMapping("/creer")
+    public String formCreerOffre(Model model) {
+        model.addAttribute("demandes", demandeRepo.findAll());
+        return "bloc2/offres/form";
+    }
+
+    // TÂCHE 9 : Enregistrement de l'offre
+    @PostMapping("/creer")
+    public String creerOffre(@RequestParam Integer idDemande, 
+                             @RequestParam String titre, 
+                             @RequestParam String description,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            offreService.createNewOffer(idDemande, titre, description, 1); // 1 = BROUILLON
+            redirectAttributes.addFlashAttribute("success", "Offre créée en brouillon.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/bloc2/offres";
+    }
+
+    // TÂCHE 9 bis : Publication de l'offre
+    @PostMapping("/{id}/publier")
+    public String publierOffre(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            offreService.publicationOffre(id);
+            redirectAttributes.addFlashAttribute("success", "Offre publiée avec succès !");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/bloc2/offres";
+    }
+}

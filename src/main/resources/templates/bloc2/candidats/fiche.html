@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche Candidat</title>
+    <style>table, th, td { border: 1px solid #333; border-collapse: collapse; padding: 8px; } th { background-color: #f2f2f2; }</style>
+</head>
+<body>
+    <h2>Fiche Candidat</h2>
+    <a th:href="@{/bloc2/offres}">← Retour aux offres</a>
+    <br><br>
+
+    <div style="border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
+        <h3>Informations Personnelles</h3>
+        <p><strong>Nom complet :</strong> <span th:text="${candidat.nom + ' ' + candidat.prenom}"></span></p>
+        <p><strong>Email :</strong> <span th:text="${candidat.email}"></span></p>
+        <p><strong>Téléphone :</strong> <span th:text="${candidat.telephone}"></span></p>
+        <p><strong>CV :</strong> <a th:href="${candidat.cvUrl}" target="_blank">📎 Télécharger le CV</a></p>
+    </div>
+
+    <br>
+    <h3>Historique de ses candidatures</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Offre d'emploi</th>
+                <th>Date de dépôt</th>
+                <th>Statut actuel</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="cand : ${candidatures}">
+                <td th:text="${cand.offre.titre}"></td>
+                <td th:text="${cand.dateDepotCandidature}"></td>
+                <td th:text="${cand.statutCandidature.libelle}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

@@ -20,7 +20,6 @@ public class Evaluation {
     @JoinColumn(name = "id_evaluateur", nullable = false)
     private Utilisateur evaluateur;
 
-    // 🔥 Relation normalisée
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_type_evaluation", nullable = false)
     private TypeEvaluation typeEvaluation;
