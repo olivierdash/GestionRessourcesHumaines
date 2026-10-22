@@ -22,33 +22,33 @@ SET row_security = off;
 -- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO roles (id_role, libelle) VALUES (1, 'MANAGER');
-INSERT INTO roles (id_role, libelle) VALUES (2, 'RH');
-INSERT INTO roles (id_role, libelle) VALUES (3, 'FINANCE');
-INSERT INTO roles (id_role, libelle) VALUES (4, 'DG');
+INSERT INTO public.roles (id_role, libelle) VALUES (1, 'MANAGER');
+INSERT INTO public.roles (id_role, libelle) VALUES (2, 'RH');
+INSERT INTO public.roles (id_role, libelle) VALUES (3, 'FINANCE');
+INSERT INTO public.roles (id_role, libelle) VALUES (4, 'DG');
 
 
 --
 -- Data for Name: utilisateur; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO utilisateur (id_utilisateur, nom, email, mot_de_passe, id_role) VALUES (1, 'Alice RH', 'alice@sirh.com', '123', 2);
-INSERT INTO utilisateur (id_utilisateur, nom, email, mot_de_passe, id_role) VALUES (2, 'Bob Manager', 'bob@sirh.com', '123', 1);
-INSERT INTO utilisateur (id_utilisateur, nom, email, mot_de_passe, id_role) VALUES (3, 'Claire DG', 'claire@sirh.com', '123', 4);
+INSERT INTO public.utilisateur (id_utilisateur, nom, email, mot_de_passe, id_role) VALUES (1, 'Alice RH', 'alice@sirh.com', '123', 2);
+INSERT INTO public.utilisateur (id_utilisateur, nom, email, mot_de_passe, id_role) VALUES (2, 'Bob Manager', 'bob@sirh.com', '123', 1);
+INSERT INTO public.utilisateur (id_utilisateur, nom, email, mot_de_passe, id_role) VALUES (3, 'Claire DG', 'claire@sirh.com', '123', 4);
 
 
 --
 -- Name: roles_id_role_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('roles_id_role_seq', 1, false);
+SELECT pg_catalog.setval('public.roles_id_role_seq', 1, false);
 
 
 --
 -- Name: utilisateur_id_utilisateur_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('utilisateur_id_utilisateur_seq', 1, false);
+SELECT pg_catalog.setval('public.utilisateur_id_utilisateur_seq', 1, false);
 
 
 --
