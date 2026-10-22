@@ -1,0 +1,16 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------------------< [0;36mcom.example:sirh[0;1m >--------------------------[m
+[[1;34mINFO[m] [1mBuilding  0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-clean-plugin:3.5.0:clean[m [1m(default-clean)[m @ [36msirh[0;1m ---[m
+[[1;34mINFO[m] Deleting /home/olivierdashgd/ITU/L3_ITU/s5/Mrs_Tovo/GestionRessourcesHumaines/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.5.0:resources[m [1m(default-resources)[m @ [36msirh[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 7 resources from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.15.0:compile[m [1m(default-compile)[m @ [36msirh[0;1m ---[m
+[[1;34mINFO[m] Recompiling the module because of [1mchanged source code[m.
+[[1;34mINFO[m] Compiling 57 source files with javac [debug parameters release 21] to target/classes
