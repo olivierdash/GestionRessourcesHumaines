@@ -36,5 +36,4 @@ public class SecurityConfig {
             );
         return http.build();
     }
-        model.addAttribute("idDepartement", idDepartement);
 }
