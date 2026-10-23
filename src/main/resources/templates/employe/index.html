@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- Header page avec le bouton d'ajout -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+            <div>
+                <h2 class="page-title">Liste des employés</h2>
+                <p class="text-outline mt-1 mb-0">Gérez les employés de l'entreprise.</p>
+            </div>
+            <a th:href="@{/employes/create}" class="btn-brand">
+                <span class="ms" style="font-size: 18px;">add</span> Ajouter un employé
+            </a>
+        </div>
+
+        <!-- Tableau des employés -->
+        <div class="card-x">
+            <div class="table-responsive">
+                <table class="table table-x">
+                    <thead>
+                        <tr>
+                            <th>Réf.</th>
+                            <th>Matricule</th>
+                            <th>Date d'embauche</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Si la liste est vide -->
+                        <tr th:if="${employes.content.isEmpty()}">
+                            <td colspan="3" class="text-center py-5 text-outline">
+                                Aucun employé enregistré pour le moment.
+                            </td>
+                        </tr>
+
+                        <!-- Boucle sur les employés -->
+                        <tr th:each="employe : ${employes.content}">
+                            <td class="ref" th:text="'#' + ${employe.idEmployer}">#1</td>
+                            <td class="fw-medium" th:text="${employe.matricule}">MAT-2024-001</td>
+                            <td class="text-outline" th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}">01/01/2024</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-3" th:if="${employes.totalPages > 1}">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                    <span class="text-outline" style="font-size: 13px;">
+                        Affichage de <span class="fw-medium text-body" th:text="${employes.number * employes.size + 1}"></span> à 
+                        <span class="fw-medium text-body" th:text="${employes.number * employes.size + employes.numberOfElements}"></span> sur 
+                        <span class="fw-medium text-body" th:text="${employes.totalElements}"></span> employés
+                    </span>
+
+                    <nav class="d-flex align-items-center gap-1">
+                        <!-- Précédent -->
+                        <a class="page-btn" th:classappend="${employes.first} ? 'disabled'"
+                           th:href="@{/employes(page=${employes.number - 1}, size=${employes.size}, idDepartement=${idDepartement})}">
+                            Précédent
+                        </a>
+
+                        <!-- Page actuelle / Total -->
+                        <span class="page-btn current">
+                            Page&nbsp;<span th:text="${employes.number + 1}"></span>&nbsp;/&nbsp;<span th:text="${employes.totalPages}"></span>
+                        </span>
+
+                        <!-- Suivant -->
+                        <a class="page-btn" th:classappend="${employes.last} ? 'disabled'"
+                           th:href="@{/employes(page=${employes.number + 1}, size=${employes.size}, idDepartement=${idDepartement})}">
+                            Suivant
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

@@ -20,6 +20,6 @@ public class UtilisateurController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        return "pages/dashboard"; // Renvoie templates/dashboard.html
+        return "dashboard"; // Renvoie templates/dashboard.html
     }
 }

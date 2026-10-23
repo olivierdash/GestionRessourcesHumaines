@@ -31,7 +31,7 @@ public class DepartementController {
     @GetMapping
     public String index(Model model) {
         model.addAttribute("departements", departementRepository.findAll());
-        return "bloc1/departement/index";
+        return "departement/index";
     }
 
     @GetMapping("/create")
@@ -41,7 +41,7 @@ public class DepartementController {
                 .toList();
         model.addAttribute("managers", managers);
         model.addAttribute("departement", new Departement());
-        return "bloc1/departement/form";
+        return "departement/form";
     }
 
     @PostMapping
@@ -59,7 +59,7 @@ public class DepartementController {
             Departement dep = new Departement();
             dep.setTitre(titre);
             model.addAttribute("departement", dep);
-            return "bloc1/departement/form"; // Retour au formulaire avec l'erreur
+            return "departement/form"; // Retour au formulaire avec l'erreur
         }
 
         Departement departement = new Departement();
@@ -86,7 +86,7 @@ public class DepartementController {
         model.addAttribute("departement", departement);
         model.addAttribute("nombreEmployes", nombreEmployes);
 
-        return "bloc1/departement/show";
+        return "departement/show";
     }
 
     @GetMapping("/{id}/edit")
@@ -97,7 +97,7 @@ public class DepartementController {
                 .filter(u -> "MANAGER".equalsIgnoreCase(u.getRole().getLibelle()))
                 .toList());
         model.addAttribute("departement", departement);
-        return "bloc1/departement/form";
+        return "departement/form";
     }
 
     @PutMapping("/{id}")
@@ -119,7 +119,7 @@ public class DepartementController {
             // On garde les modifications temporaires pour ne pas perdre la saisie
             departement.setTitre(titre);
             model.addAttribute("departement", departement);
-            return "bloc1/departement/form";
+            return "departement/form";
         }
 
         departement.setTitre(titre.trim());

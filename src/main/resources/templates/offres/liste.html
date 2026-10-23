@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <h2 class="page-title">Liste des offres d'emploi</h2>
+            <a th:href="@{/bloc2/offres/creer}" class="btn-brand">+ Créer une nouvelle offre</a>
+        </div>
+
+        <!-- Messages de succès ou d'erreur -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Tableau -->
+        <div class="card-x">
+            <div class="table-responsive">
+                <table class="table table-x">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Titre</th>
+                            <th>Statut</th>
+                            <th>Date de publication</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="offre : ${offres}">
+                            <td class="ref" th:text="${offre.idOffre}"></td>
+                            <td class="fw-medium" th:text="${offre.titre}"></td>
+                            <td>
+                                <span class="pill"
+                                      th:classappend="${offre.statut.id == 1 ? 'st-brouillon' : 'st-publie'}"
+                                      th:text="${offre.statut.libelle}"></span>
+                            </td>
+                            <td th:classappend="${offre.datePublication == null} ? 'text-outline'"
+                                th:text="${offre.datePublication != null ? offre.datePublication : 'En attente'}"></td>
+                            <td class="text-end text-nowrap">
+                                <!-- Bouton Publier -->
+                                <form th:if="${offre.statut.id == 1}" 
+                                      th:action="@{/bloc2/offres/{id}/publier(id=${offre.idOffre})}" 
+                                      method="post" class="d-inline">
+                                    <button type="submit" class="btn-brand btn-sm-x">Publier</button>
+                                </form>
+
+                                <!-- Lien vers les candidatures -->
+                                <a th:href="@{/bloc2/offres/{id}/candidatures(id=${offre.idOffre})}" class="btn-soft btn-sm-x ms-1">Voir Candidatures</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${offres.isEmpty()}">
+                            <td colspan="5" class="text-center py-5 text-outline">Aucune offre disponible.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

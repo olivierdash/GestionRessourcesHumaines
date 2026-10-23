@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/bloc2/offres")
+@RequestMapping("/offres")
 @RequiredArgsConstructor 
 public class OffreEmploiController {
 
@@ -21,14 +21,14 @@ public class OffreEmploiController {
     @GetMapping
     public String listeOffres(Model model) {
         model.addAttribute("offres", offreService.listAllEmploie());
-        return "bloc2/offres/liste";
+        return "offres/liste";
     }
 
     // TÂCHE 9 : Formulaire de création
     @GetMapping("/creer")
     public String formCreerOffre(Model model) {
         model.addAttribute("demandes", demandeRepo.findAll());
-        return "bloc2/offres/form";
+        return "offres/form";
     }
 
     // TÂCHE 9 : Enregistrement de l'offre

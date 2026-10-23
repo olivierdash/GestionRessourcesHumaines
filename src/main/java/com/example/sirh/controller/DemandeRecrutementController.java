@@ -76,7 +76,7 @@ public class DemandeRecrutementController {
                 model.addAttribute("departements", departementRepository.findAll());
                 model.addAttribute("managers", utilisateurRepository.findAll());
 
-                return "bloc1/demande/index";
+                return "demande/index";
         }
 
         // -----------------------------------------------------------------
@@ -92,7 +92,7 @@ public class DemandeRecrutementController {
                                 .toList();
                 model.addAttribute("managers", managers);
 
-                return "bloc1/demande/form";
+                return "demande/form";
         }
 
         // -----------------------------------------------------------------
@@ -144,6 +144,6 @@ public class DemandeRecrutementController {
                 model.addAttribute("demande", demande);
                 model.addAttribute("historique", historique);
 
-                return "bloc1/demande/show";
+                return "demande/show";
         }
 }

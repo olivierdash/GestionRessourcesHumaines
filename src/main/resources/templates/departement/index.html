@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h2 class="page-title">Départements</h2>
+                <p class="text-outline mt-1 mb-0">Gérez la structure de l'entreprise.</p>
+            </div>
+            <a th:href="@{/departements/create}" class="btn-brand">+ Nouveau Département</a>
+        </div>
+
+        <!-- Tableau -->
+        <div class="card-x">
+            <div class="table-responsive">
+                <table class="table table-x">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Nom du département</th>
+                            <th style="width: 30%;">Manager</th>
+                            <th style="width: 30%;" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Si la liste est vide -->
+                        <tr th:if="${#lists.isEmpty(departements)}">
+                            <td colspan="3" class="text-center py-5 text-outline">
+                                Aucun département n'a été créé pour le moment.
+                            </td>
+                        </tr>
+
+                        <!-- Boucle sur les départements -->
+                        <tr th:each="dept : ${departements}">
+                            <td class="fw-semibold fs-6" th:text="${dept.titre}">
+                                Ressources Humaines
+                            </td>
+                            <td>
+                                <!-- Affichage du Manager -->
+                                <div th:if="${dept.manager != null}" class="d-flex align-items-center gap-2">
+                                    <div class="avatar">
+                                        <span th:text="${#strings.substring(dept.manager.nom, 0, 1)}">J</span>
+                                    </div>
+                                    <span class="fw-medium" th:text="${dept.manager.nom}">Jean Dupont</span>
+                                </div>
+                                <span th:if="${dept.manager == null}" class="pill st-autre">
+                                    Non assigné
+                                </span>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a th:href="@{/departements/{id}(id=${dept.idDepartement})}" 
+                                   class="btn-soft btn-sm-x me-1" title="Voir la fiche">
+                                    Voir
+                                </a>
+                                <a th:href="@{/departements/{id}/edit(id=${dept.idDepartement})}" 
+                                   class="btn-brand btn-sm-x" title="Modifier">
+                                    Modifier
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

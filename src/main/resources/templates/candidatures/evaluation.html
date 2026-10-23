@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête -->
+        <div class="mb-4">
+            <a th:href="@{/bloc2/offres}" class="back-link">&larr; Retour aux offres</a>
+            <h2 class="page-title">
+                Évaluer le candidat : <span style="color: var(--primary-container);" th:text="${candidature.candidat.nom + ' ' + candidature.candidat.prenom}"></span>
+            </h2>
+        </div>
+
+        <!-- Messages d'alerte -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="row g-4">
+
+            <!-- Historique des évaluations -->
+            <div class="col-lg-7">
+                <div class="card-x h-100">
+                    <h5 class="card-head">Historique du parcours d'évaluation</h5>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-x">
+                            <thead>
+                                <tr>
+                                    <th>Type d'évaluation</th>
+                                    <th>Note</th>
+                                    <th>Compte-rendu</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="eval : ${evaluations}">
+                                    <td class="fw-medium" th:text="${eval.typeEvaluation.libelle}"></td>
+                                    <td>
+                                        <span th:text="${eval.note != null ? eval.note + ' / 20' : 'N/A'}" 
+                                              th:classappend="${eval.note == null ? 'text-outline' : (eval.note >= 10 ? 'text-success fw-bold' : 'text-danger fw-bold')}">
+                                        </span>
+                                    </td>
+                                    <td th:text="${eval.evaluation}"></td>
+                                    <td class="text-outline text-nowrap" th:text="${#temporals.format(eval.dateEvaluation, 'dd/MM/yyyy HH:mm')}"></td>
+                                </tr>
+                                <tr th:if="${evaluations.isEmpty()}">
+                                    <td colspan="4" class="text-center py-5 text-outline">
+                                        Aucune évaluation pour le moment.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire d'ajout d'évaluation -->
+            <div class="col-lg-5">
+                <div class="card-x h-100">
+                    <h5 class="card-head">Ajouter une nouvelle évaluation</h5>
+                    <div class="card-pad mt-2">
+                        <form th:action="@{/bloc2/candidatures/{id}/evaluer(id=${candidature.idCandidature})}" method="post">
+
+                            <div class="mb-4">
+                                <label for="idTypeEvaluation" class="form-label">Type de l'évaluation <span class="req">*</span></label>
+                                <select name="idTypeEvaluation" id="idTypeEvaluation" class="form-select" required>
+                                    <option value="">-- Choisissez un type --</option>
+                                    <option th:each="type : ${typesEvaluation}" 
+                                            th:value="${type.id}" 
+                                            th:text="${type.libelle}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="note" class="form-label">Note (sur 20)</label>
+                                <input type="number" name="note" id="note" class="form-control" step="0.5" min="0" max="20" placeholder="Ex: 15">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="commentaire" class="form-label">Commentaire / Compte-rendu <span class="req">*</span></label>
+                                <textarea name="commentaire" id="commentaire" class="form-control" rows="4" required placeholder="Points forts, points faibles, décision..."></textarea>
+                            </div>
+
+                            <div class="d-grid mt-5">
+                                <button type="submit" class="btn-brand">Enregistrer l'évaluation</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
