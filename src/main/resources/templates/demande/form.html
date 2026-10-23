@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{dashboard :: layout(content=~{::mainContent})}">
-
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
 <body>
 
     <main th:fragment="mainContent" class="app-page">
@@ -9,18 +9,15 @@
         <div class="mb-4">
             <a th:href="@{/demandes}" class="back-link">&larr; Retour à la liste</a>
             <h2 class="page-title">Nouvelle demande de recrutement</h2>
-            <p class="text-muted text-small mt-1 mb-0">Remplissez les informations ci-dessous pour initier le processus.
-            </p>
+            <p class="text-outline mt-1 mb-0">Remplissez les informations ci-dessous pour initier le processus.</p>
         </div>
 
         <div class="row">
             <div class="col-lg-8">
                 <div class="card-x">
-                    <div class="card-pad">
+                    <div class="p-4">
 
-                        <!-- Ajout de la classe needs-validation -->
-                        <form th:action="@{/demandes}" method="post" id="demandeForm" class="needs-validation"
-                            novalidate>
+                        <form th:action="@{/demandes}" method="post" id="demandeForm">
 
                             <!-- Manager -->
                  git reset --soft origin/main           <div class="mb-4">
@@ -28,8 +25,9 @@
                                         class="text-error">*</span></label>
                                 <select class="form-select" id="idManager" name="idManager" required>
                                     <option value="" disabled selected>Sélectionnez un manager...</option>
-                                    <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
-                                        th:text="${manager.nom + ' (' + manager.role.libelle + ')'}">
+                                    <option th:each="manager : ${managers}" 
+                                            th:value="${manager.idUtilisateur}" 
+                                            th:text="${manager.nom + ' (' + manager.role.libelle + ')'}">
                                     </option>
                                 </select>
                                 <div class="invalid-feedback">Veuillez sélectionner un manager.</div>
@@ -40,31 +38,33 @@
        mlns:th="http:                         <label for="posteSearch" class="form-label">Poste concerné <span
                                         class="text-error">*</span></label>
                                 <div class="custom-select-wrapper">
-                                    <input type="text" class="form-control" id="posteSearch"
-                                        placeholder="Tapez pour rechercher un poste..." autocomplete="off" required>
+                                    <!-- Le champ visible -->
+                                    <input type="text" class="form-control" id="posteSearch" placeholder="Tapez pour rechercher un poste..." autocomplete="off" required>
+                                    
+                                    <!-- La liste flottante (générée via JS) -->
                                     <div class="custom-dropdown" id="posteDropdown"></div>
-                                    <!-- Le select caché n'a pas besoin d'être requis côté HTML car le JS gère -->
+                                    
+                                    <!-- Le vrai select caché -->
                                     <select class="d-none" id="posteSelect" name="idPoste" required>
                                         <option value=""></option>
-                                        <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
-                                            th:text="${poste.intitule + ' - ' + poste.departement.titre}">
+                                        <option th:each="poste : ${postes}" 
+                                                th:value="${poste.idPoste}" 
+                                                th:text="${poste.intitule + ' - ' + poste.departement.titre}">
                                         </option>
                                     </select>
                                 </div>
-                                <div class="invalid-feedback" id="posteError">Veuillez sélectionner un poste dans la
-                                    liste.</div>
+                                <div class="invalid-feedback" id="posteError">Veuillez sélectionner un poste dans la liste.</div>
                             </div>
 
                             <div class="row g-4 mb-4">
                                 <div class="col-md-6">
-                                    <label for="dateSouhaitee" class="form-label">Date d'entrée souhaitée <span
-                                            class="text-error">*</span></label>
-                                    <input type="date" class="form-control" id="dateSouhaitee" name="dateSouhaitee"
-                                        required>
+                                    <label for="dateSouhaitee" class="form-label">Date d'entrée souhaitée <span class="req">*</span></label>
+                                    <input type="date" class="form-control" id="dateSouhaitee" name="dateSouhaitee" required>
                                     <div class="invalid-feedback">Veuillez choisir une date.</div>
                                 </div>
 
                                 <div class="col-md-6">
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -80,23 +80,23 @@
 >>>>>>> 4b2498f (integration SPA fonctionnelle)
 =======
 >>>>>>> e345d44 (factorisation css)
+=======
+                                    <label for="effectif" class="form-label">Effectif requis <span class="req">*</span></label>
+                                    <input type="number" class="form-control" id="effectif" name="effectif" min="1" step="1" required placeholder="Ex: 2">
+>>>>>>> df0901f (integration SPA fonctionnelle)
                                     <div class="invalid-feedback">L'effectif doit être supérieur à 0.</div>
                                 </div>
                             </div>
 
                             <div class="mb-4">
                                 <label for="motif" class="form-label">Motif de la demande</label>
-                                <!-- Le textarea sera corrigé via le CSS -->
-                                <textarea class="form-control" id="motif" name="motif" rows="4"
-                                    placeholder="Expliquez brièvement la raison de ce recrutement..."></textarea>
+                                <textarea class="form-control" id="motif" name="motif" rows="4" placeholder="Expliquez brièvement la raison de ce recrutement..."></textarea>
                             </div>
 
-                            <!-- Actions -->
-                            <div class="form-actions">
-                                <a th:href="@{/demandes}" class="btn-soft">Annuler</a>
+                            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top" style="border-color: var(--surface-high) !important;">
+                                <a th:href="@{/demandes}" class="btn-soft me-3">Annuler</a>
                                 <button type="submit" class="btn-brand">Créer la demande</button>
                             </div>
-
                         </form>
 
                     </div>
@@ -104,47 +104,57 @@
             </div>
         </div>
 
-        <!-- SCRIPT UNIFIÉ ET FACTORISÉ POUR LA PAGE -->
+        <!-- Script pour la liste flottante -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                // 1. Récupération des éléments du DOM
-                const form = document.getElementById('demandeForm');
                 const searchInput = document.getElementById('posteSearch');
                 const hiddenSelect = document.getElementById('posteSelect');
                 const dropdown = document.getElementById('posteDropdown');
+                const form = document.getElementById('demandeForm');
 
-                // 2. Fonctions utilitaires (Logique métier)
+                const options = Array.from(hiddenSelect.options).filter(opt => opt.value !== "");
 
-                function initDropdown() {
-                    // Génère les divs personnalisés à partir du select caché
-                    const options = Array.from(hiddenSelect.options).filter(opt => opt.value !== "");
+                options.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'custom-option';
+                    div.textContent = opt.text;
+                    div.dataset.value = opt.value;
 
-                    options.forEach(opt => {
-                        const div = document.createElement('div');
-                        div.className = 'custom-option';
-                        div.textContent = opt.text;
-                        div.dataset.value = opt.value;
-
-                        // Au clic sur une option, on la sélectionne
-                        div.addEventListener('click', () => selectOption(opt, div));
-                        dropdown.appendChild(div);
+                    div.addEventListener('click', () => {
+                        searchInput.value = opt.text;
+                        hiddenSelect.value = opt.value;
+                        dropdown.classList.remove('show');
+                        searchInput.classList.remove('is-invalid');
                     });
-                }
+                    dropdown.appendChild(div);
+                });
 
-                function selectOption(opt, divElement) {
-                    searchInput.value = opt.text;
-                    hiddenSelect.value = opt.value;
-                    searchInput.classList.remove('is-invalid');
-                    closeDropdown();
-                }
+                searchInput.addEventListener('focus', () => {
+                    dropdown.classList.add('show');
+                    filterList(); 
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('show');
+                        validateSelection(); 
+                    }
+                });
+
+                searchInput.addEventListener('input', () => {
+                    hiddenSelect.value = ""; 
+                    filterList();
+                    dropdown.classList.add('show');
+                });
 
                 function filterList() {
-                    const query = searchInput.value.toLowerCase();
-                    const items = dropdown.querySelectorAll('.custom-option:not(.no-result)');
+                    const filter = searchInput.value.toLowerCase();
+                    const items = dropdown.querySelectorAll('.custom-option');
                     let hasVisible = false;
 
                     items.forEach(item => {
-                        if (item.textContent.toLowerCase().includes(query)) {
+                        if (item.classList.contains('no-result')) return;
+                        if (item.textContent.toLowerCase().includes(filter)) {
                             item.style.display = 'block';
                             hasVisible = true;
                         } else {
@@ -152,13 +162,8 @@
                         }
                     });
 
-                    toggleNoResultMessage(!hasVisible);
-                }
-
-                function toggleNoResultMessage(show) {
                     let noResultDiv = dropdown.querySelector('.no-result');
-
-                    if (show) {
+                    if (!hasVisible) {
                         if (!noResultDiv) {
                             noResultDiv = document.createElement('div');
                             noResultDiv.className = 'custom-option no-result';
@@ -171,22 +176,13 @@
                     }
                 }
 
-                function openDropdown() {
-                    dropdown.classList.add('show');
-                    filterList(); // Applique le filtre à l'ouverture
-                }
-
-                function closeDropdown() {
-                    dropdown.classList.remove('show');
-                }
-
-                function isFormValid() {
-                    // Vérification personnalisée : un poste a-t-il été sélectionné ?
+                function validateSelection() {
                     if (hiddenSelect.value === "") {
                         searchInput.classList.add('is-invalid');
                         return false;
                     } else {
                         searchInput.classList.remove('is-invalid');
+<<<<<<< HEAD
 <<<<<<< HEAD
                                         }
 =======
@@ -195,42 +191,20 @@
 
                     // Vérification HTML5 standard (champs required, types email, etc.)
                     return form.checkValidity();
+=======
+                        return true;
+                    }
+>>>>>>> df0901f (integration SPA fonctionnelle)
                 }
 
-                // 3. Attachement des événements (Listeners)
-
-                searchInput.addEventListener('focus', openDropdown);
-
-                searchInput.addEventListener('input', () => {
-                    hiddenSelect.value = ""; // Réinitialise la sélection cachée lors de la saisie
-                    openDropdown();
-                });
-
-                // Fermer le dropdown si on clique n'importe où ailleurs sur la page
-                document.addEventListener('click', (e) => {
-                    if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-                        closeDropdown();
-                        // Si on quitte le champ alors qu'il est vide, on affiche l'erreur
-                        if (hiddenSelect.value === "") {
-                            searchInput.classList.add('is-invalid');
-                        }
+                form.addEventListener('submit', (e) => {
+                    if (!validateSelection()) {
+                        e.preventDefault(); 
                     }
                 });
-
-                form.addEventListener('submit', function (e) {
-                    if (!isFormValid()) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                });
-
-                // 4. Initialisation au chargement de la page
-                initDropdown();
             });
         </script>
 
     </main>
 </body>
-
 </html>
