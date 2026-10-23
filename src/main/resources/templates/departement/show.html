@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête de la page -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <a th:href="@{/departements}" class="back-link">&larr; Retour aux départements</a>
+                <h2 class="page-title d-flex flex-wrap align-items-center gap-2">
+                    <span th:text="${departement.titre}">Ressources Humaines</span>
+                    <span class="pill pill-id" th:text="'#' + ${departement.idDepartement}">#1</span>
+                </h2>
+            </div>
+            <div>
+                <a th:href="@{/departements/{id}/edit(id=${departement.idDepartement})}" class="btn-brand">Modifier</a>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="row g-4">
+
+            <!-- Colonne de gauche (Infos générales) -->
+            <div class="col-lg-7">
+                <div class="card-x h-100">
+                    <h5 class="card-head">Informations du département</h5>
+                    <div class="card-pad">
+
+                        <span class="lbl">Titre du département</span>
+                        <div class="fw-bold" style="font-size: 20px; letter-spacing: -.015em;" th:text="${departement.titre}">Informatique</div>
+
+                        <hr class="divider">
+
+                        <div class="mb-4">
+                            <span class="lbl mb-2">Manager assigné</span>
+
+                            <!-- Si un manager existe -->
+                            <div th:if="${departement.manager != null}" class="bg-light rounded p-3 d-flex align-items-center gap-3">
+                                <div class="avatar avatar-lg" style="width: 44px; height: 44px; font-size: 18px;">
+                                    <span th:text="${#strings.substring(departement.manager.nom, 0, 1)}">J</span>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold" th:text="${departement.manager.nom}">Jean Dupont</div>
+                                    <span class="text-outline" style="font-size: 13px;" th:text="${departement.manager.email}">jean.dupont@sirh.com</span>
+                                </div>
+                            </div>
+
+                            <!-- Si aucun manager -->
+                            <div th:if="${departement.manager == null}" class="alert alert-warning m-0" style="font-size: 13px; border: none; border-radius: .5rem;">
+                                Aucun manager n'est actuellement assigné à ce département.
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="lbl">Effectif actuel</span>
+                            <span class="val"><span th:text="${nombreEmployes}">0</span> employé(s) dans ce département</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne de droite (Actions) -->
+            <div class="col-lg-5">
+                <div class="card-x">
+                    <h6 class="card-head">Actions rapides</h6>
+                    <div class="card-pad">
+                        <div class="d-grid gap-2">
+                            <!-- Lien vers la liste des employés filtrée -->
+                            <a th:href="@{/employes(idDepartement=${departement.idDepartement})}" class="btn-soft justify-content-start">
+                                Accéder à la liste des employés
+                            </a>
+                            <a th:href="@{/demandes}" class="btn-soft justify-content-start">
+                                Voir les demandes de recrutement
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

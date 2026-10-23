@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/bloc2")
 @RequiredArgsConstructor
 public class CandidatureController {
 
@@ -24,7 +23,7 @@ public class CandidatureController {
     public String listeCandidatures(@PathVariable Integer idOffre, Model model) {
         model.addAttribute("offre", offreService.getOffreEmploiById(idOffre));
         model.addAttribute("candidatures", candidatureService.listeCandidatureByOffre(idOffre));
-        return "bloc2/candidatures/liste";
+        return "candidatures/liste";
     }
 
     // TÂCHE 11 : Fiche Candidat
@@ -35,7 +34,7 @@ public class CandidatureController {
         
         model.addAttribute("candidat", candidat);
         model.addAttribute("candidatures", candidatureService.listeCandidatureByCandidat(idCandidat));
-        return "bloc2/candidats/fiche";
+        return "candidats/fiche";
     }
 }
 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/bloc2/offres}" class="back-link">&larr; Retour aux offres</a>
+                <h2 class="page-title">Fiche Candidat</h2>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Colonne de gauche : Informations personnelles -->
+            <div class="col-lg-5">
+                <div class="card-x h-100">
+                    <h5 class="card-head">Informations Personnelles</h5>
+                    <div class="card-pad">
+                        
+                        <div class="text-center mb-4">
+                            <div class="avatar avatar-lg mx-auto mb-3">
+                                <span th:text="${#strings.substring(candidat.nom, 0, 1)}">D</span>
+                            </div>
+                            <h4 class="fw-bold m-0" th:text="${candidat.nom + ' ' + candidat.prenom}">Dupont Jean</h4>
+                        </div>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
+                                <span class="lbl m-0">Email</span>
+                                <span class="val" th:text="${candidat.email}">jean.dupont@email.com</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
+                                <span class="lbl m-0">Téléphone</span>
+                                <span class="val" th:text="${candidat.telephone != null ? candidat.telephone : 'Non renseigné'}">06 12 34 56 78</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent border-0">
+                                <span class="lbl m-0">CV</span>
+                                <a th:if="${candidat.cvUrl != null}" th:href="${candidat.cvUrl}" target="_blank" class="btn-soft btn-sm-x">
+                                    Télécharger le CV
+                                </a>
+                                <span th:if="${candidat.cvUrl == null}" class="text-outline" style="font-size: 12px;">Aucun CV fourni</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne de droite : Historique des candidatures -->
+            <div class="col-lg-7">
+                <div class="card-x h-100">
+                    <h5 class="card-head">Historique de ses candidatures</h5>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-x">
+                            <thead>
+                                <tr>
+                                    <th>Offre d'emploi</th>
+                                    <th>Date de dépôt</th>
+                                    <th>Statut actuel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cand : ${candidatures}">
+                                    <td class="fw-medium" th:text="${cand.offre.titre}">Développeur Java</td>
+                                    <td class="text-outline" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy')}">12/10/2024</td>
+                                    <td>
+                                        <span class="pill st-brouillon" th:text="${cand.statutCandidature.libelle}">RECU</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${candidatures.isEmpty()}">
+                                    <td colspan="3" class="text-center py-5 text-outline">
+                                        Aucune candidature enregistrée pour ce candidat.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

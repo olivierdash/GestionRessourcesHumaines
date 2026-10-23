@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête -->
+        <div class="mb-4">
+            <a th:href="@{/bloc2/offres}" class="back-link">&larr; Retour aux offres</a>
+            <h2 class="page-title">
+                Candidatures pour l'offre : <span style="color: var(--primary-container);" th:text="${offre.titre}"></span>
+            </h2>
+        </div>
+
+        <!-- Tableau -->
+        <div class="card-x">
+            <div class="table-responsive">
+                <table class="table table-x">
+                    <thead>
+                        <tr>
+                            <th>Candidat</th>
+                            <th>Email</th>
+                            <th>Date de dépôt</th>
+                            <th>Statut</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cand : ${candidatures}">
+                            <td class="fw-medium" th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
+                            <td class="text-outline" th:text="${cand.candidat.email}"></td>
+                            <td class="text-outline text-nowrap" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <span class="pill st-rh" th:text="${cand.statutCandidature.libelle}"></span>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a th:href="@{/bloc2/candidats/{id}(id=${cand.candidat.idCandidat})}" 
+                                   class="btn-soft btn-sm-x me-1">
+                                    Fiche Candidat
+                                </a>
+                                <a th:href="@{/bloc2/candidatures/{id}/evaluer(id=${cand.idCandidature})}" 
+                                   class="btn-brand btn-sm-x">
+                                    Évaluer
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${candidatures.isEmpty()}">
+                            <td colspan="5" class="text-center py-5 text-outline">
+                                Aucune candidature pour cette offre.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
