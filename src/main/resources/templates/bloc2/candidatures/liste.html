@@ -1,41 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Candidatures</title>
-    <style>table, th, td { border: 1px solid #333; border-collapse: collapse; padding: 8px; } th { background-color: #f2f2f2; }</style>
+    <title>SIRH - Candidatures</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-    <h2>Candidatures pour l'offre : <span th:text="${offre.titre}" style="color: #0056b3;"></span></h2>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Candidat</th>
-                <th>Email</th>
-                <th>Date de dépôt</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="cand : ${candidatures}">
-                <td th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
-                <td th:text="${cand.candidat.email}"></td>
-                <td th:text="${cand.dateDepotCandidature}"></td>
-                <td th:text="${cand.statutCandidature.libelle}"></td>
-                <td>
-                    <a th:href="@{/bloc2/candidats/{id}(id=${cand.candidat.idCandidat})}">📄 Fiche Candidat</a> | 
-                    <a th:href="@{/bloc2/candidatures/{id}/evaluer(id=${cand.idCandidature})}">⭐ Évaluer</a>
-                </td>
-            </tr>
-            <tr th:if="${candidatures.isEmpty()}">
-                <td colspan="5" style="text-align:center;">Aucune candidature pour cette offre.</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <br>
-    <a th:href="@{/bloc2/offres}">← Retour aux offres</a>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar-wrapper">
+            <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
+            <div class="list-group list-group-flush mt-3">
+                <a th:href="@{/dashboard}" class="list-group-item list-group-item-action">Tableau de bord</a>
+                <a th:href="@{/demandes}" class="list-group-item list-group-item-action">Demandes de recrutement</a>
+                <a th:href="@{/bloc2/offres}" class="list-group-item list-group-item-action active">Offres d'emploi</a>
+                <a th:href="@{/employes}" class="list-group-item list-group-item-action">Employés</a>
+                <a th:href="@{/departements}" class="list-group-item list-group-item-action">Départements</a>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper" class="w-100 bg-light">
+            <div class="container-fluid px-4 py-4">
+                <div class="mb-4">
+                    <a th:href="@{/bloc2/offres}" class="text-decoration-none text-muted mb-2 d-inline-block">&larr; Retour aux offres</a>
+                    <h2 class="fw-bold m-0">Candidatures</h2>
+                    <p class="text-muted">Offre : <span class="fw-bold text-primary" th:text="${offre.titre}"></span></p>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Candidat</th>
+                                    <th>Email</th>
+                                    <th>Date de dépôt</th>
+                                    <th>Statut</th>
+                                    <th class="text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cand : ${candidatures}">
+                                    <td class="ps-4 fw-bold" th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
+                                    <td class="text-muted" th:text="${cand.candidat.email}"></td>
+                                    <td class="text-muted" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy')}"></td>
+                                    <td>
+                                        <span th:if="${cand.statutCandidature.id == 1}" class="badge bg-secondary">REÇU</span>
+                                        <span th:if="${cand.statutCandidature.id == 2}" class="badge bg-warning text-dark">EN ÉVALUATION</span>
+                                        <span th:if="${cand.statutCandidature.id == 3}" class="badge bg-success">RETENU</span>
+                                        <span th:if="${cand.statutCandidature.id == 4}" class="badge bg-danger">REFUSÉ</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a th:href="@{/bloc2/candidats/{id}(id=${cand.candidat.idCandidat})}" class="btn btn-sm btn-outline-secondary me-1">Fiche</a>
+                                        <a th:href="@{/bloc2/candidatures/{id}/evaluer(id=${cand.idCandidature})}" class="btn btn-sm btn-outline-primary">Évaluer</a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${candidatures.isEmpty()}">
+                                    <td colspan="5" class="text-center py-4 text-muted">Aucune candidature pour cette offre.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

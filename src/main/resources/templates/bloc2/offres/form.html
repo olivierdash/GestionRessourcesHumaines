@@ -1,34 +1,73 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Créer une offre</title>
+    <title>SIRH - Nouvelle Offre</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-    <h2>Créer une nouvelle offre</h2>
-    
-    <div th:if="${error}" style="color: red; font-weight: bold; margin-bottom: 10px;" th:text="${error}"></div>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar-wrapper">
+            <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
+            <div class="list-group list-group-flush mt-3">
+                <a th:href="@{/dashboard}" class="list-group-item list-group-item-action">Tableau de bord</a>
+                <a th:href="@{/demandes}" class="list-group-item list-group-item-action">Demandes de recrutement</a>
+                <a th:href="@{/bloc2/offres}" class="list-group-item list-group-item-action active">Offres d'emploi</a>
+                <a th:href="@{/employes}" class="list-group-item list-group-item-action">Employés</a>
+                <a th:href="@{/departements}" class="list-group-item list-group-item-action">Départements</a>
+            </div>
+        </div>
 
-    <form th:action="@{/bloc2/offres/creer}" method="post">
-        <label for="idDemande">Demande de recrutement liée :</label><br>
-        <select name="idDemande" id="idDemande" required>
-            <option value="">-- Sélectionnez une demande --</option>
-            <option th:each="dem : ${demandes}" 
-                    th:value="${dem.idDemandeRecrutement}" 
-                    th:text="${'Demande #' + dem.idDemandeRecrutement + ' - ' + dem.poste.intitule}">
-            </option>
-        </select><br><br>
-        
-        <label for="titre">Titre de l'offre :</label><br>
-        <input type="text" name="titre" id="titre" required size="50" placeholder="Ex: Développeur Java Senior"><br><br>
-        
-        <label for="description">Description :</label><br>
-        <textarea name="description" id="description" rows="5" cols="50" required placeholder="Missions, profil recherché..."></textarea><br><br>
-        
-        <button type="submit">Enregistrer en brouillon</button>
-    </form>
-    
-    <br>
-    <a th:href="@{/bloc2/offres}">← Retour à la liste</a>
+        <div id="page-content-wrapper" class="w-100 bg-light">
+            <div class="container-fluid px-4 py-4">
+                <div class="mb-4">
+                    <a th:href="@{/bloc2/offres}" class="text-decoration-none text-muted mb-2 d-inline-block">&larr; Retour à la liste</a>
+                    <h2 class="fw-bold m-0">Créer une nouvelle offre</h2>
+                    <p class="text-muted">Remplissez les informations pour préparer l'offre d'emploi.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-4">
+                                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                                <form th:action="@{/bloc2/offres/creer}" method="post">
+                                    <div class="mb-3">
+                                        <label for="idDemande" class="form-label fw-medium">Demande de recrutement liée <span class="text-danger">*</span></label>
+                                        <select name="idDemande" id="idDemande" class="form-select" required>
+                                            <option value="">-- Sélectionnez une demande --</option>
+                                            <option th:each="dem : ${demandes}" 
+                                                    th:value="${dem.idDemandeRecrutement}" 
+                                                    th:text="${'Demande #' + dem.idDemandeRecrutement + ' - ' + dem.poste.intitule}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="titre" class="form-label fw-medium">Titre de l'offre <span class="text-danger">*</span></label>
+                                        <input type="text" name="titre" id="titre" class="form-control" required placeholder="Ex: Développeur Java Senior">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="description" class="form-label fw-medium">Description du poste <span class="text-danger">*</span></label>
+                                        <textarea name="description" id="description" class="form-control" rows="5" required placeholder="Missions, profil recherché..."></textarea>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a th:href="@{/bloc2/offres}" class="btn btn-light border">Annuler</a>
+                                        <button type="submit" class="btn btn-primary px-4">Enregistrer en brouillon</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>
