@@ -3,6 +3,9 @@ package com.example.sirh.repository;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.model.DemandeRecrutement;
 import com.example.sirh.wrapper.DemandeRecrutementFilter;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +37,7 @@ public interface DemandeRecrutementRepository extends JpaRepository<DemandeRecru
             @Param("filter") DemandeRecrutementFilter filter, 
             Pageable pageable
     );
+
+    @Query("SELECT d FROM DemandeRecrutement d WHERE d.idDemandeRecrutement NOT IN (SELECT o.demandeRecrutement.idDemandeRecrutement FROM OffreEmploi o)")
+    List<DemandeRecrutement> findDemandesSansOffre();
 }

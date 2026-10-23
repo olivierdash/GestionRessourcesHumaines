@@ -27,7 +27,8 @@ public class OffreEmploiController {
     // TÂCHE 9 : Formulaire de création
     @GetMapping("/creer")
     public String formCreerOffre(Model model) {
-        model.addAttribute("demandes", demandeRepo.findAll());
+        //model.addAttribute("demandes", demandeRepo.findAll());
+        model.addAttribute("demandes", demandeRepo.findDemandesSansOffre());
         return "bloc2/offres/form";
     }
 
