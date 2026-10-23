@@ -1,55 +1,106 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Offres d'emploi</title>
-    <style>table, th, td { border: 1px solid #333; border-collapse: collapse; padding: 8px; } th { background-color: #f2f2f2; }</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRH - Offres d'emploi</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-    <h2>Liste des offres d'emploi</h2>
-    
-    <!-- Messages de succès ou d'erreur -->
-    <div th:if="${success}" style="color: green; font-weight: bold; margin-bottom: 10px;" th:text="${success}"></div>
-    <div th:if="${error}" style="color: red; font-weight: bold; margin-bottom: 10px;" th:text="${error}"></div>
 
-    <a th:href="@{/bloc2/offres/creer}" style="display:inline-block; margin-bottom: 15px;">➕ Créer une nouvelle offre</a>
-    <br>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar-wrapper">
+            <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
+            <div class="list-group list-group-flush mt-3">
+                <a th:href="@{/dashboard}" class="list-group-item list-group-item-action">Tableau de bord</a>
+                <a th:href="@{/demandes}" class="list-group-item list-group-item-action">Demandes de recrutement</a>
+                <!-- LIEN ACTIF POUR LE BLOC 2 -->
+                <a th:href="@{/bloc2/offres}" class="list-group-item list-group-item-action active">Offres d'emploi</a>
+                <a th:href="@{/employes}" class="list-group-item list-group-item-action">Employés</a>
+                <a th:href="@{/departements}" class="list-group-item list-group-item-action">Départements</a>
+            </div>
+        </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Titre</th>
-                <th>Statut</th>
-                <th>Date de publication</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="offre : ${offres}">
-                <td th:text="${offre.idOffre}"></td>
-                <td th:text="${offre.titre}"></td>
-                <td>
-                    <span th:text="${offre.statut.libelle}" 
-                          th:style="${offre.statut.id == 1 ? 'color: orange;' : 'color: green;'}"></span>
-                </td>
-                <td th:text="${offre.datePublication != null ? offre.datePublication : 'En attente'}"></td>
-                <td>
-                    <!-- Bouton Publier (uniquement si statut = BROUILLON / ID 1) -->
-                    <form th:if="${offre.statut.id == 1}" 
-                          th:action="@{/bloc2/offres/{id}/publier(id=${offre.idOffre})}" 
-                          method="post" style="display:inline;">
-                        <button type="submit">Publier</button>
-                    </form>
-                    
-                    <!-- Lien vers les candidatures -->
-                    <a th:href="@{/bloc2/offres/{id}/candidatures(id=${offre.idOffre})}" style="margin-left: 10px;">Voir Candidatures</a>
-                </td>
-            </tr>
-            <tr th:if="${offres.isEmpty()}">
-                <td colspan="5" style="text-align:center;">Aucune offre disponible.</td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100 bg-light">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 shadow-sm">
+                <div class="collapse navbar-collapse">
+                    <div class="d-flex align-items-center ms-auto">
+                        <div class="user-profile d-flex align-items-center">
+                            <div class="avatar bg-primary text-white me-2">M</div>
+                            <div>
+                                <span class="d-block fw-bold fs-6">Manager</span>
+                                <span class="d-block text-muted fs-7">Rôle: MANAGER</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-4">
+                <!-- Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}"></span>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <!-- Header page -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold m-0">Offres d'emploi</h2>
+                        <p class="text-muted m-0">Gérez les offres publiées et suivez les candidatures.</p>
+                    </div>
+                    <a th:href="@{/bloc2/offres/creer}" class="btn btn-primary">+ Nouvelle Offre</a>
+                </div>
+
+                <!-- Tableau -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">ID</th>
+                                    <th>Titre du poste</th>
+                                    <th>Statut</th>
+                                    <th>Date de publication</th>
+                                    <th class="text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="offre : ${offres}">
+                                    <td class="ps-4 text-muted">#<span th:text="${offre.idOffre}"></span></td>
+                                    <td class="fw-bold text-primary" th:text="${offre.titre}"></td>
+                                    <td>
+                                        <!-- Badge dynamique selon le statut -->
+                                        <span th:if="${offre.statut.id == 1}" class="badge bg-warning text-dark">BROUILLON</span>
+                                        <span th:if="${offre.statut.id == 2}" class="badge bg-success">PUBLIÉE</span>
+                                        <span th:if="${offre.statut.id == 3}" class="badge bg-secondary">CLÔTURÉE</span>
+                                    </td>
+                                    <td class="text-muted" th:text="${offre.datePublication != null ? #temporals.format(offre.datePublication, 'dd/MM/yyyy HH:mm') : 'Non publiée'}"></td>
+                                    <td class="text-end pe-4">
+                                        <form th:if="${offre.statut.id == 1}" th:action="@{/bloc2/offres/{id}/publier(id=${offre.idOffre})}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-success me-1">Publier</button>
+                                        </form>
+                                        <a th:href="@{/bloc2/offres/{id}/candidatures(id=${offre.idOffre})}" class="btn btn-sm btn-outline-primary">
+                                            Voir Candidatures
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${offres.isEmpty()}">
+                                    <td colspan="5" class="text-center py-4 text-muted">Aucune offre d'emploi enregistrée.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>
