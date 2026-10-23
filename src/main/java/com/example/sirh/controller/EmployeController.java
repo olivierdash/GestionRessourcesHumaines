@@ -45,7 +45,7 @@ public class EmployeController {
         model.addAttribute("employes", employesPage);
         model.addAttribute("idDepartement", idDepartement);
 
-        return "employe/index";
+        return "bloc4/employe/index";
     }
 
     // -----------------------------------------------------------------
