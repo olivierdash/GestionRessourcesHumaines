@@ -22,12 +22,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/utilisateur/login")
-                // ON INDIQUE A SPRING D'UTILISER CES NOMS DE PARAMETRES
-                .usernameParameter("email") 
+                .loginPage("/utilisateur/login") // <-- Indique à Spring d'utiliser TA page
+                .loginProcessingUrl("/utilisateur/login") // L'URL vers laquelle le formulaire POST
+                .usernameParameter("email")
                 .passwordParameter("motDePasse")
-                .defaultSuccessUrl("/utilisateur/dashboard", true)
+                .defaultSuccessUrl("/utilisateur/dashboard", true) // Où aller après connexion
                 .permitAll()
             )
             .logout(logout -> logout
@@ -37,9 +36,5 @@ public class SecurityConfig {
             );
         return http.build();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
+        model.addAttribute("idDepartement", idDepartement);
 }
