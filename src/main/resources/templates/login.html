@@ -21,6 +21,28 @@
         </div>
         <div th:if="${param.logout}" class="alert alert-success alert-floating auto-dismiss-alert">
             Vous avez été déconnecté avec succès.
+            <!-- Formulaire géré par Spring Security -->
+            <form th:action="@{/login}" method="post">
+                
+                <div th:if="${param.error}" class="alert alert-danger">
+                    Email ou mot de passe incorrect.
+                </div>
+                <div th:if="${param.logout}" class="alert alert-success">
+                    Vous avez été déconnecté.
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required autofocus>
+                </div>
+
+                <div class="mb-4">
+                    <label for="motDePasse" class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="motDePasse" name="motDePasse" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">Se connecter</button>
+            </form>
         </div>
     </div>
 
