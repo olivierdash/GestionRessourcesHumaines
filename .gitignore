@@ -38,5 +38,3 @@ docker-compose.yml
 
 ### connexion en base de donnée :
 src/main/resources/application.properties
-src/main/resources/application.properties
-*.properties
