@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Candidatures</title>
+    <style>table, th, td { border: 1px solid #333; border-collapse: collapse; padding: 8px; } th { background-color: #f2f2f2; }</style>
+</head>
+<body>
+    <h2>Candidatures pour l'offre : <span th:text="${offre.titre}" style="color: #0056b3;"></span></h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Candidat</th>
+                <th>Email</th>
+                <th>Date de dépôt</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="cand : ${candidatures}">
+                <td th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
+                <td th:text="${cand.candidat.email}"></td>
+                <td th:text="${cand.dateDepotCandidature}"></td>
+                <td th:text="${cand.statutCandidature.libelle}"></td>
+                <td>
+                    <a th:href="@{/bloc2/candidats/{id}(id=${cand.candidat.idCandidat})}">📄 Fiche Candidat</a> | 
+                    <a th:href="@{/bloc2/candidatures/{id}/evaluer(id=${cand.idCandidature})}">⭐ Évaluer</a>
+                </td>
+            </tr>
+            <tr th:if="${candidatures.isEmpty()}">
+                <td colspan="5" style="text-align:center;">Aucune candidature pour cette offre.</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <br>
+    <a th:href="@{/bloc2/offres}">← Retour aux offres</a>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRH - Demandes de recrutement</title>
+    
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar-wrapper">
+            <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
+            <div class="list-group list-group-flush mt-3">
+                <a th:href="@{/dashboard}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-grid-1x2-fill"></i> Tableau de bord
+                </a>
+                <a th:href="@{/demandes}" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-folder2-open"></i> Demandes de recrutement
+                </a>
+                <a th:href="@{/employes}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people-fill"></i> Employés
+                </a>
+                <a th:href="@{/departements}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-building"></i> Départements
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 shadow-sm">
+                <button class="btn btn-link text-dark d-lg-none" id="menu-toggle">☰</button>
+                <div class="collapse navbar-collapse">
+                    <div class="d-flex align-items-center ms-auto">
+                        <div class="user-profile d-flex align-items-center">
+                            <div class="avatar bg-primary text-white me-2">M</div>
+                            <div>
+                                <span class="d-block fw-bold fs-6">Manager</span>
+                                <span class="d-block text-muted fs-7">Rôle: MANAGER</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="container-fluid px-4 py-4">
+                <!-- Header page -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold m-0">Demandes de recrutement</h2>
+                        <p class="text-muted m-0">Gérez et suivez l'état de vos demandes.</p>
+                    </div>
+                    <a th:href="@{/demandes/create}" class="btn btn-primary">+ Nouvelle Demande</a>
+                </div>
+
+                <!-- Formulaire de Filtre -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/demandes}" method="get" class="row g-3 align-items-end">
+                            
+                            <!-- Dates -->
+                            <div class="col-md-2">
+                                <label class="form-label text-muted fs-7">Date min</label>
+                                <input type="date" class="form-control form-control-sm" name="dateMin" th:value="${filter.dateMin}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label text-muted fs-7">Date max</label>
+                                <input type="date" class="form-control form-control-sm" name="dateMax" th:value="${filter.dateMax}">
+                            </div>
+
+                            <!-- Poste (Avec recherche intégrée) -->
+                            <div class="col-md-3">
+                                <label class="form-label text-muted fs-7">Poste</label>
+                                <input type="text" class="form-control form-control-sm mb-1" id="posteSearch" placeholder="Rechercher un poste..." autocomplete="off" style="font-size: 0.8rem;">
+                                <select class="form-select form-select-sm" id="posteSelect" name="idPoste">
+                                    <option value="">Tous</option>
+                                    <option th:each="poste : ${postes}" 
+                                            th:value="${poste.idPoste}" 
+                                            th:text="${poste.intitule}"
+                                            th:selected="${filter.idPoste == poste.idPoste}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Département -->
+                            <div class="col-md-2">
+                                <label class="form-label text-muted fs-7">Département</label>
+                                <select class="form-select form-select-sm" name="idDepartement">
+                                    <option value="">Tous</option>
+                                    <option th:each="dept : ${departements}" 
+                                            th:value="${dept.idDepartement}" 
+                                            th:text="${dept.titre}"
+                                            th:selected="${filter.idDepartement == dept.idDepartement}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Manager -->
+                            <div class="col-md-3">
+                                <label class="form-label text-muted fs-7">Manager</label>
+                                <select class="form-select form-select-sm" name="idManager">
+                                    <option value="">Tous</option>
+                                    <option th:each="manager : ${managers}" 
+                                            th:value="${manager.idUtilisateur}" 
+                                            th:text="${manager.nom}"
+                                            th:selected="${filter.idManager == manager.idUtilisateur}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Boutons -->
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+                                <button type="submit" class="btn btn-sm btn-primary px-4">Filtrer</button>
+                                <a th:href="@{/demandes}" class="btn btn-sm btn-outline-secondary px-4">Reset</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tableau des demandes -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Réf.</th>
+                                    <th>Date création</th>
+                                    <th>Poste</th>
+                                    <th>Département</th>
+                                    <th>Manager</th>
+                                    <th>Effectif</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${demandes.content.isEmpty()}">
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        Aucune demande de recrutement ne correspond à vos critères.
+                                    </td>
+                                </tr>
+
+                                <tr th:each="demande : ${demandes.content}">
+                                    <td>
+                                        <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement()})}" 
+                                           class="fw-bold text-primary text-decoration-none">
+                                            #<span th:text="${demande.idDemandeRecrutement()}"></span>
+                                        </a>
+                                    </td>
+                                    <td th:text="${#temporals.format(demande.dateCreation(), 'dd/MM/yyyy HH:mm')}">12/10/2024</td>
+                                    <td class="fw-medium" th:text="${demande.intitulePoste()}">Développeur Java</td>
+                                    <td th:text="${demande.titreDepartement()}">Informatique</td>
+                                    <td th:text="${demande.nomManager()}">Jean Dupont</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            <span th:text="${demande.effectif()}"></span> pers.
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="card-footer bg-white border-top py-3" th:if="${demandes.totalPages > 1}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted fs-7">
+                                Affichage de <span th:text="${demandes.number * demandes.size + 1}"></span> à 
+                                <span th:text="${demandes.number * demandes.size + demandes.numberOfElements}"></span> sur 
+                                <span th:text="${demandes.totalElements}"></span> résultats
+                            </span>
+                            
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" th:classappend="${demandes.first} ? 'disabled'">
+                                        <a class="page-link" 
+                                           th:href="@{/demandes(
+                                                page=${demandes.number - 1}, 
+                                                size=${demandes.size},
+                                                dateMin=${filter.dateMin}, 
+                                                dateMax=${filter.dateMax},
+                                                idPoste=${filter.idPoste},
+                                                idDepartement=${filter.idDepartement},
+                                                idManager=${filter.idManager})}">
+                                            Précédent
+                                        </a>
+                                    </li>
+                                    
+                                    <li class="page-item disabled">
+                                        <span class="page-link text-dark">
+                                            Page <span th:text="${demandes.number + 1}"></span> / <span th:text="${demandes.totalPages}"></span>
+                                        </span>
+                                    </li>
+
+                                    <li class="page-item" th:classappend="${demandes.last} ? 'disabled'">
+                                        <a class="page-link" 
+                                           th:href="@{/demandes(
+                                                page=${demandes.number + 1}, 
+                                                size=${demandes.size},
+                                                dateMin=${filter.dateMin}, 
+                                                dateMax=${filter.dateMax},
+                                                idPoste=${filter.idPoste},
+                                                idDepartement=${filter.idDepartement},
+                                                idManager=${filter.idManager})}">
+                                            Suivant
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/script.js}"></script>
+
+    <!-- SCRIPT SPECIFIQUE POUR LA RECHERCHE DU POSTE -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById('posteSearch');
+            const selectElement = document.getElementById('posteSelect');
+
+            if (searchInput && selectElement) {
+                searchInput.addEventListener('input', function () {
+                    const filter = this.value.toLowerCase();
+                    const options = selectElement.options;
+
+                    // On parcourt toutes les options du select
+                    for (let i = 0; i < options.length; i++) {
+                        // On garde toujours l'option "Tous" (index 0) visible
+                        if (i === 0) continue; 
+
+                        const text = options[i].text.toLowerCase();
+                        if (text.includes(filter)) {
+                            options[i].style.display = ""; // Afficher
+                        } else {
+                            options[i].style.display = "none"; // Cacher
+                        }
+                    }
+                    
+                    // Si l'option sélectionnée est cachée par la recherche, on sélectionne "Tous"
+                    if (selectElement.selectedIndex > 0 && options[selectElement.selectedIndex].style.display === "none") {
+                        selectElement.selectedIndex = 0;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

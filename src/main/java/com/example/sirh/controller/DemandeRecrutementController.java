@@ -1,5 +1,6 @@
 package com.example.sirh.controller;
 
+import com.example.sirh.constante.ConstanteDemande;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.model.*;
 import com.example.sirh.wrapper.DemandeRecrutementFilter;
@@ -8,12 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
@@ -22,139 +25,125 @@ import java.util.List;
 @RequestMapping("/demandes")
 public class DemandeRecrutementController {
 
-    private final DemandeRecrutementRepository demandeRepository;
-    private final UtilisateurRepository utilisateurRepository;
-    private final PosteRepository posteRepository;
-    private final DepartementRepository departementRepository;
-    private final EtatDemandeRepository etatDemandeRepository;
-    private final HistoriqueDemandeRecrutementRepository historiqueRepository;
+        private final DemandeRecrutementRepository demandeRepository;
+        private final UtilisateurRepository utilisateurRepository;
+        private final PosteRepository posteRepository;
+        private final DepartementRepository departementRepository;
+        private final EtatDemandeRepository etatDemandeRepository;
+        private final HistoriqueDemandeRecrutementRepository historiqueRepository;
+        private final StatutDemandeRecrutementRepository statutRepository;
 
-    public DemandeRecrutementController(
-            DemandeRecrutementRepository demandeRepository,
-            UtilisateurRepository utilisateurRepository,
-            PosteRepository posteRepository,
-            DepartementRepository departementRepository,
-            EtatDemandeRepository etatDemandeRepository,
-            HistoriqueDemandeRecrutementRepository historiqueRepository) {
-        this.demandeRepository = demandeRepository;
-        this.utilisateurRepository = utilisateurRepository;
-        this.posteRepository = posteRepository;
-        this.departementRepository = departementRepository;
-        this.etatDemandeRepository = etatDemandeRepository;
-        this.historiqueRepository = historiqueRepository;
-    }
+        public DemandeRecrutementController(
+                        DemandeRecrutementRepository demandeRepository,
+                        UtilisateurRepository utilisateurRepository,
+                        PosteRepository posteRepository,
+                        DepartementRepository departementRepository,
+                        EtatDemandeRepository etatDemandeRepository,
+                        HistoriqueDemandeRecrutementRepository historiqueRepository,
+                        StatutDemandeRecrutementRepository statutDemandeRecrutementRepository) {
+                this.demandeRepository = demandeRepository;
+                this.utilisateurRepository = utilisateurRepository;
+                this.posteRepository = posteRepository;
+                this.departementRepository = departementRepository;
+                this.etatDemandeRepository = etatDemandeRepository;
+                this.historiqueRepository = historiqueRepository;
+                this.statutRepository = statutDemandeRecrutementRepository;
+        }
 
-    // -----------------------------------------------------------------
-    // INDEX : Liste avec pagination et filtre
-    // -----------------------------------------------------------------
-    @GetMapping
-    public String index(
-            @ModelAttribute("filter") DemandeRecrutementFilter filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Model model) {
+        // -----------------------------------------------------------------
+        // INDEX : Liste avec pagination et filtre
+        // -----------------------------------------------------------------
+        @GetMapping
+        public String index(
+                        @ModelAttribute("filter") DemandeRecrutementFilter filter,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size,
+                        Model model) {
+                
+                if (filter.getDateMin() == null)
+                        filter.setDateMin(java.time.LocalDate.now());
+                if (filter.getDateMax() == null)
+                        filter.setDateMax(java.time.LocalDate.now());
 
-        // Sécurité pour les dates (si l'utilisateur efface les champs)
-        if (filter.getDateMin() == null) filter.setDateMin(java.time.LocalDate.now());
-        if (filter.getDateMax() == null) filter.setDateMax(java.time.LocalDate.now());
+                Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 100),
+                                Sort.by("dateCreation").descending());
 
-        // Pagination triée par date de création décroissante
-        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 100),
-                Sort.by("dateCreation").descending());
+                // APPEL SIMPLIFIÉ
+                Page<DemandeRecrutementLib> demandesPage = demandeRepository.findAllLib(filter, pageable);
 
-        Page<DemandeRecrutementLib> demandesPage = demandeRepository.findAllLib(
-                filter.getDateMin().atStartOfDay(),
-                filter.getDateMax().atTime(LocalTime.MAX),
-                filter.getIdPoste(),
-                filter.getEffectifMin(),
-                filter.getEffectifMax(),
-                filter.getIdManager(),
-                filter.getIdDepartement(),
-                pageable
-        );
+                model.addAttribute("demandes", demandesPage);
+                model.addAttribute("postes", posteRepository.findAll());
+                model.addAttribute("departements", departementRepository.findAll());
+                model.addAttribute("managers", utilisateurRepository.findAll());
 
-        model.addAttribute("demandes", demandesPage);
-        model.addAttribute("postes", posteRepository.findAll());
-        model.addAttribute("departements", departementRepository.findAll());
-        model.addAttribute("managers", utilisateurRepository.findAll()); // À filtrer par role MANAGER si besoin
+                return "bloc1/demande/index";
+        }
 
-        return "demande/index";
-    }
+        // -----------------------------------------------------------------
+        // CREATE (GET) : Formulaire de création
+        // -----------------------------------------------------------------
+        @GetMapping("/create")
+        public String create(Model model) {
+                model.addAttribute("postes", posteRepository.findAll());
+                // On ne propose que les utilisateurs ayant le rôle MANAGER (filtrage basique en
+                // Java)
+                List<Utilisateur> managers = utilisateurRepository.findAll().stream()
+                                .filter(u -> "MANAGER".equalsIgnoreCase(u.getRole().getLibelle()))
+                                .toList();
+                model.addAttribute("managers", managers);
 
-    // -----------------------------------------------------------------
-    // CREATE (GET) : Formulaire de création
-    // -----------------------------------------------------------------
-    @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("postes", posteRepository.findAll());
-        // On ne propose que les utilisateurs ayant le rôle MANAGER (filtrage basique en Java)
-        List<Utilisateur> managers = utilisateurRepository.findAll().stream()
-                .wrapper(u -> "MANAGER".equals(u.getRole()))
-                .toList();
-        model.addAttribute("managers", managers);
-        
-        return "demande/form";
-    }
+                return "bloc1/demande/form";
+        }
 
-    // -----------------------------------------------------------------
-    // CREATE (POST) : Enregistrement
-    // -----------------------------------------------------------------
-    @PostMapping
-    public String store(
-            @RequestParam Integer idManager,
-            @RequestParam Integer idPoste,
-            @RequestParam Integer effectif,
-            @RequestParam(required = false) String motif) {
+        // -----------------------------------------------------------------
+        // CREATE (POST) : Enregistrement
+        // -----------------------------------------------------------------
+        @PostMapping
+        public String store(
+                        @RequestParam Integer idManager,
+                        @RequestParam Integer idPoste,
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateSouhaitee,
+                        @RequestParam Integer effectif,
+                        @RequestParam(required = false) String motif) {
 
-        Utilisateur manager = utilisateurRepository.findById(idManager)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Manager introuvable"));
-        
-        Poste poste = posteRepository.findById(idPoste)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Poste introuvable"));
+                Utilisateur manager = utilisateurRepository.findById(idManager)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "Manager introuvable"));
 
-        DemandeRecrutement demande = DemandeRecrutement.builder()
-                .manager(manager)
-                .poste(poste)
-                .effectif(effectif)
-                .motif(motif)
-                .build();
+                Poste poste = posteRepository.findById(idPoste)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                                "Poste introuvable"));
 
-        DemandeRecrutement savedDemande = demandeRepository.save(demande);
+                StatutDemandeRecrutement statutBrouillon = statutRepository.findById(ConstanteDemande.BROUILLON).get();
 
-        // Création de l'état initial (BROUILLON)
-        etatDemandeRepository.findAll().stream()
-                .wrapper(e -> "BROUILLON".equals(e.getIntitule()))
-                .findFirst()
-                .ifPresent(etat -> {
-                    HistoriqueDemandeRecrutement hist = HistoriqueDemandeRecrutement.builder()
-                            .demandeRecrutement(savedDemande)
-                            .etatDemande(etat)
-                            .validateur(manager)
-                            .build();
-                    historiqueRepository.save(hist);
-                });
+                DemandeRecrutement demande = DemandeRecrutement.builder()
+                                .manager(manager)
+                                .poste(poste)
+                                .dateSouhaitee(dateSouhaitee)
+                                .effectif(effectif)
+                                .motif(motif)
+                                .statut(statutBrouillon) 
+                                .build();
 
-        return "redirect:/demandes/" + savedDemande.getIdDemandeRecrutement();
-    }
+                DemandeRecrutement savedDemande = demandeRepository.save(demande);
 
-    // -----------------------------------------------------------------
-    // SHOW : Fiche de la demande avec historique d'état
-    // -----------------------------------------------------------------
-    @GetMapping("/{id}")
-    public String show(@PathVariable Integer id, Model model) {
-        // Récupération de la demande
-        DemandeRecrutement demande = demandeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Demande introuvable"));
+                return "redirect:/demandes/" + savedDemande.getIdDemandeRecrutement();
+        }
 
-        // Récupération et tri de l'historique (du plus récent au plus ancien)
-        List<HistoriqueDemandeRecrutement> historique = historiqueRepository.findAll().stream()
-                .wrapper(h -> h.getDemandeRecrutement().getIdDemandeRecrutement().equals(id))
-                .sorted(Comparator.comparing(HistoriqueDemandeRecrutement::getDateChangement).reversed())
-                .toList();
+        // -----------------------------------------------------------------
+        // SHOW : Fiche de la demande avec historique d'état
+        // -----------------------------------------------------------------
+        @GetMapping("/{id}")
+        public String show(@PathVariable Integer id, Model model) {
+                DemandeRecrutement demande = demandeRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Demande introuvable"));
 
-        model.addAttribute("demande", demande);
-        model.addAttribute("historique", historique);
-        
-        return "demande/show";
-    }
+                List<HistoriqueDemandeRecrutement> historique = historiqueRepository.getByIdDemandeRecrutement(id);
+
+                model.addAttribute("demande", demande);
+                model.addAttribute("historique", historique);
+
+                return "bloc1/demande/show";
+        }
 }
