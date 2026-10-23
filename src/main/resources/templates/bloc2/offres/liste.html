@@ -10,18 +10,19 @@
 <body>
 
     <div class="d-flex" id="wrapper">
-        <!-- Sidebar -->
+        <!-- Sidebar
         <div class="sidebar" id="sidebar-wrapper">
             <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
             <div class="list-group list-group-flush mt-3">
                 <a th:href="@{/dashboard}" class="list-group-item list-group-item-action">Tableau de bord</a>
                 <a th:href="@{/demandes}" class="list-group-item list-group-item-action">Demandes de recrutement</a>
-                <!-- LIEN ACTIF POUR LE BLOC 2 -->
+                 LIEN ACTIF POUR LE BLOC 2 
                 <a th:href="@{/bloc2/offres}" class="list-group-item list-group-item-action active">Offres d'emploi</a>
                 <a th:href="@{/employes}" class="list-group-item list-group-item-action">Employés</a>
                 <a th:href="@{/departements}" class="list-group-item list-group-item-action">Départements</a>
             </div>
-        </div>
+        </div> -->
+        <div th:replace="~{components/sidebar :: sidebar('offres')}" ></div>
 
         <!-- Page Content -->
         <div id="page-content-wrapper" class="w-100 bg-light">

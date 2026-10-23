@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="d-flex" id="wrapper">
-        <!-- Sidebar -->
+        <!-- Sidebar 
         <div class="sidebar" id="sidebar-wrapper">
             <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
             <div class="list-group list-group-flush mt-3">
@@ -18,8 +18,9 @@
                 <a th:href="@{/employes}" class="list-group-item list-group-item-action">Employés</a>
                 <a th:href="@{/departements}" class="list-group-item list-group-item-action">Départements</a>
             </div>
-        </div>
-
+        </div>-->
+        <div th:replace="~{components/sidebar :: sidebar('offres')}" ></div>
+        
         <div id="page-content-wrapper" class="w-100 bg-light">
             <div class="container-fluid px-4 py-4">
                 <div class="mb-4">
