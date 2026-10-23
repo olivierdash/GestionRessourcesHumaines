@@ -45,7 +45,44 @@ public class EmployeController {
         model.addAttribute("employes", employesPage);
         model.addAttribute("idDepartement", idDepartement);
 
-        return "bloc4/employe/index";
+        return "employe/index";
+    }
+
+    // -----------------------------------------------------------------
+    // CREATE (GET) : Afficher le formulaire
+    // -----------------------------------------------------------------
+    @GetMapping("/create")
+    public String create(Model model) {
+        // On récupère toutes les candidatures (Idéalement, il faudrait filtrer celles qui n'ont pas encore d'employé)
+        List<Candidature> candidatures = candidatureRepository.findAll();
+        
+        model.addAttribute("candidatures", candidatures);
+        return "employe/form";
+    }
+
+    // -----------------------------------------------------------------
+    // CREATE (POST) : Enregistrer le nouvel employé
+    // -----------------------------------------------------------------
+    @PostMapping
+    public String store(
+            @RequestParam Integer idCandidature,
+            @RequestParam String matricule,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hiringDate,
+            @RequestParam String statusEmployer) {
+
+        Candidature candidature = candidatureRepository.findById(idCandidature)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Candidature introuvable"));
+
+        Employe employe = Employe.builder()
+                .candidature(candidature)
+                .matricule(matricule)
+                .hiringDate(hiringDate)
+                .statusEmployer(statusEmployer)
+                .build();
+
+        employeRepository.save(employe);
+
+        return "redirect:/employes";
     }
 
     // -----------------------------------------------------------------
