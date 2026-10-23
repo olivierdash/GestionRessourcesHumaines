@@ -205,15 +205,12 @@
 
                 <nav>
                     <ul class="pagination pagination-sm mb-0 gap-1">
-                        <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
-                            <a class="btn-soft btn-sm" th:href="@{/demandes(
                         <li class="page-item" th:classappend="${demandes.first} ? 'disabled'">
-                        <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
-                            <a class="btn-soft btn-sm" th:href="@{/demandes(
+                            <a class="page-btn" th:href="@{/demandes(
                                     page=${demandes.number - 1}, size=${demandes.size},
                                     dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
                                     idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
-                                    idManager=${filter.idManager}, idMotifDemande=${filter.idMotifDemande})}">
+                                    idManager=${filter.idManager})}">
                                 Précédent
                             </a>
                         </li>
@@ -347,5 +344,4 @@
         </script>
     </main>
 </body>
-
 </html>
