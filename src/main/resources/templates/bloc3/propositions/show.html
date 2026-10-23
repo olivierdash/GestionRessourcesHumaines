@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Proposition d'embauche</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container py-4" style="max-width: 860px;">
+    <a th:href="@{/bloc3/propositions}" class="btn btn-link px-0">&larr; Retour à la liste</a>
+
+    <div th:if="${succes}" class="alert alert-success mt-2" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="alert alert-danger mt-2" th:text="${erreur}"></div>
+
+    <h1 class="h3 my-3">
+        Proposition n° <span th:text="${proposition.idProposition}"></span>
+        <span class="badge bg-secondary ms-2" th:text="${proposition.statut.libelle}"></span>
+    </h1>
+
+    <div th:if="${alerteGrille != null}" class="alert alert-warning" th:text="${alerteGrille}"></div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="mb-1"><strong>Candidat :</strong>
+                <span th:text="${proposition.candidature.candidat.prenom + ' ' + proposition.candidature.candidat.nom}"></span></p>
+            <p class="mb-1"><strong>Poste :</strong>
+                <span th:text="${proposition.candidature.demandeRecrutement.poste.intitule}"></span></p>
+            <p class="mb-1"><strong>Salaire proposé :</strong>
+                <span th:text="${proposition.salairePropose}"></span></p>
+            <p class="mb-1" th:if="${proposition.salaireFinal != null}"><strong>Salaire final :</strong>
+                <span th:text="${proposition.salaireFinal}"></span></p>
+            <p class="mb-1"><strong>Expiration :</strong>
+                <span th:text="${#temporals.format(proposition.dateExpiration, 'dd/MM/yyyy HH:mm')}"></span></p>
+            <p class="mb-1" th:if="${proposition.dateDecision != null}"><strong>Décision le :</strong>
+                <span th:text="${#temporals.format(proposition.dateDecision, 'dd/MM/yyyy HH:mm')}"></span></p>
+            <p class="mb-0" th:if="${proposition.remarque != null}"><strong>Remarque du candidat :</strong>
+                <span th:text="${proposition.remarque}"></span></p>
+        </div>
+    </div>
+
+    <!-- EN_ATTENTE : corriger le salaire puis soumettre -->
+    <div th:if="${proposition.statut.libelle == 'EN_ATTENTE'}" class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5">Préparer la proposition</h2>
+            <form th:action="@{/bloc3/propositions/{id}/modifier-salaire(id=${proposition.idProposition})}"
+                  method="post" class="row g-2 mb-3">
+                <div class="col-auto">
+                    <input type="number" step="0.01" min="0" name="salaire" class="form-control"
+                           th:value="${proposition.salairePropose}" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-secondary">Modifier le salaire</button>
+                </div>
+            </form>
+            <form th:action="@{/bloc3/propositions/{id}/soumettre(id=${proposition.idProposition})}" method="post">
+                <button type="submit" class="btn btn-primary">Soumettre à validation</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SOUMISE : validation DG ou Finance -->
+    <div th:if="${proposition.statut.libelle == 'SOUMISE'}" class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5">Validation (Direction ou Finance)</h2>
+            <form th:action="@{/bloc3/propositions/{id}/valider(id=${proposition.idProposition})}" method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="decision">Décision</label>
+                    <select class="form-select" id="decision" name="decision">
+                        <option value="APPROUVER">Approuver</option>
+                        <option value="REFUSER">Refuser</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="commentaire">Commentaire (obligatoire pour un refus)</label>
+                    <textarea class="form-control" id="commentaire" name="commentaire" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer la décision</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APPROUVEE : réponse du candidat -->
+    <div th:if="${proposition.statut.libelle == 'APPROUVEE'}" class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5">Réponse du candidat</h2>
+            <form th:action="@{/bloc3/propositions/{id}/repondre(id=${proposition.idProposition})}" method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="reponse">Réponse</label>
+                    <select class="form-select" id="reponse" name="reponse">
+                        <option value="ACCEPTER">Accepter</option>
+                        <option value="PATIENTER">Patienter (repousse l'expiration de 7 jours)</option>
+                        <option value="REFUSER">Refuser</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="remarque">Remarque</label>
+                    <textarea class="form-control" id="remarque" name="remarque" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer la réponse</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ACCEPTE : créer le dossier -->
+    <div th:if="${proposition.statut.libelle == 'ACCEPTE' and employe == null}" class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5">Convertir en salarié</h2>
+            <form th:action="@{/bloc3/propositions/{id}/dossier(id=${proposition.idProposition})}" method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="idTypeContrat">Type de contrat</label>
+                    <select class="form-select" id="idTypeContrat" name="idTypeContrat">
+                        <option value="1">CDI</option>
+                        <option value="2">CDD</option>
+                        <option value="3">CE</option>
+                        <option value="4">STAGE</option>
+                    </select>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="dateDebut">Date de début</label>
+                        <input type="date" class="form-control" id="dateDebut" name="dateDebut" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="dateFin">Date de fin (CDD, stage)</label>
+                        <input type="date" class="form-control" id="dateFin" name="dateFin">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Créer dossier</button>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${employe != null}" class="alert alert-success">
+        Dossier créé. Matricule : <strong th:text="${employe.matricule}"></strong>.
+        <a th:href="@{/bloc3/employes/{id}(id=${employe.idEmployer})}">Voir la fiche salarié</a>
+    </div>
+
+    <!-- REFUSE / EXPIREE : clôturée -->
+    <div th:if="${proposition.statut.libelle == 'REFUSE' or proposition.statut.libelle == 'EXPIREE'}"
+         class="alert alert-secondary">
+        Proposition clôturée.
+        <a th:href="@{/bloc3/candidatures/{id}/proposer(id=${proposition.candidature.idCandidature})}">
+            Faire une nouvelle proposition</a>
+    </div>
+
+    <!-- Historique des validations -->
+    <h2 class="h5">Historique des validations</h2>
+    <table class="table table-sm">
+        <thead>
+        <tr><th>Date</th><th>Validateur</th><th>Décision</th><th>Commentaire</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="v : ${validations}">
+            <td th:text="${v.dateValidationProposition != null} ? ${#temporals.format(v.dateValidationProposition, 'dd/MM/yyyy HH:mm')} : '-'"></td>
+            <td th:text="${v.validateur.nom}"></td>
+            <td th:text="${v.decision}"></td>
+            <td th:text="${v.commentaire}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(validations)}">
+            <td colspan="4" class="text-muted">Aucune validation pour le moment.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

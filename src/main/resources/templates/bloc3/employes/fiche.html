@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche salarié</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container py-4" style="max-width: 860px;">
+    <a th:href="@{/bloc3/propositions}" class="btn btn-link px-0">&larr; Propositions</a>
+
+    <div th:if="${succes}" class="alert alert-success mt-2" th:text="${succes}"></div>
+
+    <h1 class="h3 my-3">
+        Fiche salarié
+        <span class="badge bg-primary ms-2" th:text="${employe.matricule}"></span>
+    </h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="mb-1"><strong>Nom :</strong>
+                <span th:text="${employe.candidature.candidat.prenom + ' ' + employe.candidature.candidat.nom}"></span></p>
+            <p class="mb-1"><strong>Matricule :</strong> <span th:text="${employe.matricule}"></span></p>
+            <p class="mb-1"><strong>Date d'embauche :</strong>
+                <span th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></span></p>
+            <p class="mb-0"><strong>Statut :</strong> <span th:text="${employe.statusEmployer}"></span></p>
+        </div>
+    </div>
+
+    <h2 class="h5">Contrat</h2>
+    <table class="table table-sm mb-4">
+        <thead>
+        <tr><th>Type</th><th>Poste</th><th>Début</th><th>Fin</th><th>Salaire mensuel</th><th>Statut</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${contrats}">
+            <td th:text="${c.typeContrat.libelle}"></td>
+            <td th:text="${c.poste.intitule}"></td>
+            <td th:text="${#temporals.format(c.dateDebut, 'dd/MM/yyyy')}"></td>
+            <td th:text="${c.dateFin != null} ? ${#temporals.format(c.dateFin, 'dd/MM/yyyy')} : '-'"></td>
+            <td th:text="${c.salaireMensuel}"></td>
+            <td th:text="${c.status}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="h5">Affectation</h2>
+    <table class="table table-sm">
+        <thead>
+        <tr><th>Poste</th><th>Début</th><th>Fin</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${affectations}">
+            <td th:text="${a.poste.intitule}"></td>
+            <td th:text="${#temporals.format(a.dateDebut, 'dd/MM/yyyy')}"></td>
+            <td th:text="${a.dateFin != null} ? ${#temporals.format(a.dateFin, 'dd/MM/yyyy')} : '-'"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
