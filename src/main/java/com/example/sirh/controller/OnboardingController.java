@@ -28,7 +28,8 @@ public class OnboardingController {
 
     public OnboardingController(OnboardingService onboardingService,
             DocumentService documentService,
-            TypeDocumentRepository typeDocumentRepository,UtilisateurRepository utilisateurRepository) {
+            TypeDocumentRepository typeDocumentRepository,
+            UtilisateurRepository utilisateurRepository) {
         this.onboardingService = onboardingService;
         this.documentService = documentService;
         this.typeDocumentRepository = typeDocumentRepository;
