@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.sirh.model.Onboarding;
 import com.example.sirh.repository.TypeDocumentRepository;
+import com.example.sirh.repository.UtilisateurRepository;
 import com.example.sirh.service.DocumentService;
 import com.example.sirh.service.OnboardingService;
 
@@ -23,13 +24,16 @@ public class OnboardingController {
     private final OnboardingService onboardingService;
     private final DocumentService documentService;
     private final TypeDocumentRepository typeDocumentRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
     public OnboardingController(OnboardingService onboardingService,
             DocumentService documentService,
-            TypeDocumentRepository typeDocumentRepository) {
+            TypeDocumentRepository typeDocumentRepository,
+            UtilisateurRepository utilisateurRepository) {
         this.onboardingService = onboardingService;
         this.documentService = documentService;
         this.typeDocumentRepository = typeDocumentRepository;
+        this.utilisateurRepository = utilisateurRepository;
     }
 
     @PostMapping("/taches/{idTache}/documents")
