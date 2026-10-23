@@ -49,14 +49,16 @@
 <body>
 
     <div class="d-flex" id="wrapper">
-        <!-- Sidebar -->
+        <!-- Sidebar 
         <div class="sidebar" id="sidebar-wrapper">
             <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
             <div class="list-group list-group-flush mt-3">
                 <a th:href="@{/dashboard}" class="list-group-item list-group-item-action">Tableau de bord</a>
                 <a th:href="@{/demandes}" class="list-group-item list-group-item-action active">Demandes de recrutement</a>
             </div>
-        </div>
+        </div>-->
+        <div th:replace="~{components/sidebar :: sidebar('demandes')}" ></div>
+
 
         <!-- Page Content -->
         <div id="page-content-wrapper" class="w-100 bg-light">
