@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Onboarding</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="container mt-4">
+
+    <h1>Onboarding</h1>
+
+    <div class="alert alert-success" th:if="${succes}" th:text="${succes}"></div>
+    <div class="alert alert-danger" th:if="${erreur}" th:text="${erreur}"></div>
+
+    <div class="progress mb-4">
+        <div class="progress-bar"
+             th:style="'width: ' + ${progression} + '%'"
+             th:text="${progression} + ' %'"></div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Document</th>
+                <th>Tâche</th>
+                <th>Responsable</th>
+                <th>Échéance</th>
+                <th>Obligatoire</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="t : ${taches}">
+                <td>
+                    <form th:action="@{/onboarding/taches/{id}/documents(id=${t.id})}"
+                        method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="idEmploye" th:value="${idEmploye}">
+
+                        <select name="idTypeDocument" class="form-select form-select-sm mb-1" required>
+                            <option th:each="td : ${typesDocument}"
+                                    th:value="${td.idTypeDocument}"
+                                    th:text="${td.libelle}"></option>
+                        </select>
+
+                        <input type="file" name="fichier" class="form-control form-control-sm mb-1" required>
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Déposer</button>
+                    </form>
+                </td>
+                <td th:text="${t.titre}"></td>
+                <td th:text="${t.responsable.nom}"></td>
+                <td th:text="${t.dateEcheance}"></td>
+                <td th:text="${t.obligatoire} ? 'Oui' : 'Non'"></td>
+                <td th:text="${t.statut.libelle}"></td>
+                <td>
+                    <form th:if="${t.statut.libelle != 'terminée'}"
+                        th:action="@{/onboarding/taches/{id}/terminer(id=${t.id})}"
+                        method="post">
+                        <input type="hidden" name="idEmploye" th:value="${idEmploye}">
+                        <button type="submit" class="btn btn-sm btn-success">Terminer</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
