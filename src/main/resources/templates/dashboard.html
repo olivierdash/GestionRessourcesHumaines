@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:fragment="layout(content)">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SIRH Pro – Application</title>
+
+    <!-- Fichiers CSS Locaux -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <span class="logo"><span class="ms">groups</span></span>SIRH Pro
+            </div>
+            <div class="sidebar-label">Menu principal</div>
+            <nav class="nav flex-column">
+                <!-- Les liens avec th:href pour la navigation -->
+                <a class="nav-link" th:href="@{/demandes}"><span class="ms">assignment</span>Demandes de Recrutement<span class="sidebar-badge">5</span></a>
+                <a class="nav-link" th:href="@{/employes}"><span class="ms">badge</span>Employés</a>
+                <a class="nav-link" th:href="@{/departements}"><span class="ms">apartment</span>Départements</a>
+                <a class="nav-link" th:href="@{/candidats}"><span class="ms">person_search</span>Candidats</a>
+            </nav>
+        </div>
+        
+        <div class="sidebar-user">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+                <div class="avatar">CD</div>
+                <div class="min-w-0">
+                    <div class="fw-semibold text-truncate" style="font-size:14px">Claire Delorme</div>
+                    <div class="text-truncate" style="font-size:11px;color:var(--light-blue)">Responsable RH / Manager</div>
+                </div>
+            </div>
+            <div class="d-flex">
+                <button class="icon-btn" title="Paramètres" type="button"><span class="ms" style="font-size:18px">settings</span></button>
+                <form th:action="@{/logout}" method="post" class="m-0 d-flex align-items-center">
+                    <button class="icon-btn" title="Déconnexion" type="submit"><span class="ms" style="font-size:18px">logout</span></button>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenu Principal -->
+    <div class="content-wrap">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-2 flex-grow-1 me-3">
+                <button class="topbar-btn d-lg-none" type="button" onclick="document.getElementById('sidebar').classList.toggle('show')" aria-label="Menu">
+                    <span class="ms">menu</span>
+                </button>
+                <div class="search-box">
+                    <span class="ms">search</span>
+                    <input type="search" class="form-control" placeholder="Rechercher une demande, un candidat...">
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div class="position-relative">
+                    <button class="topbar-btn" title="Notifications" type="button"><span class="ms">notifications</span></button>
+                    <span class="notif-dot"></span>
+                </div>
+                <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span class="ms">help</span></button>
+            </div>
+        </header>
+
+        <!-- Zone d'injection du contenu -->
+        <main>
+            <div class="page">
+                <div th:replace="${content}"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

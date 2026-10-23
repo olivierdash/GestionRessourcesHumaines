@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête de page -->
+        <div class="d-flex flex-column mb-4">
+            <h2 class="page-title">Demandes de recrutement</h2>
+        </div>
+
+        <!-- Barre de Filtres -->
+        <div class="card-x mb-4 p-4">
+            <form th:action="@{/demandes}" method="get">
+                <div class="row g-3 mb-4">
+                    <!-- Recherche -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="search-box" style="max-width: 100%;">
+                            <span class="ms">search</span>
+                            <input type="text" class="form-control" id="posteSearch" placeholder="Rechercher un poste..." autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Département -->
+                    <div class="col-lg-2 col-md-6">
+                        <select class="form-select" name="idDepartement">
+                            <option value="">Département...</option>
+                            <option th:each="dept : ${departements}" th:value="${dept.idDepartement}"
+                                th:text="${dept.titre}" th:selected="${filter.idDepartement == dept.idDepartement}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Manager -->
+                    <div class="col-lg-2 col-md-6">
+                        <select class="form-select" name="idManager">
+                            <option value="">Manager...</option>
+                            <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
+                                th:text="${manager.nom}" th:selected="${filter.idManager == manager.idUtilisateur}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Poste -->
+                    <div class="col-lg-2 col-md-6">
+                        <select class="form-select" id="posteSelect" name="idPoste">
+                            <option value="">Poste...</option>
+                            <option th:each="poste : ${postes}" th:value="${poste.idPoste}" th:text="${poste.intitule}"
+                                th:selected="${filter.idPoste == poste.idPoste}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Dates (Période) -->
+                    <div class="col-lg-3 col-md-12">
+                        <div class="d-flex gap-2 align-items-center h-100">
+                            <input type="date" class="form-control" name="dateMin" th:value="${filter.dateMin}" title="Date minimum">
+                            <span class="text-outline fw-bold">-</span>
+                            <input type="date" class="form-control" name="dateMax" th:value="${filter.dateMax}" title="Date maximum">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ligne 2 : Séparation et Boutons -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center pt-3" style="border-top: 1px solid var(--surface-high);">
+                    <span class="text-outline" style="font-size: 13px;">
+                        <strong th:text="${demandes.totalElements}">24</strong> demandes trouvées
+                    </span>
+
+                    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                        <a th:href="@{/demandes}" class="btn-soft d-flex align-items-center gap-1">
+                            <span class="ms" style="font-size: 18px;">restart_alt</span> Réinitialiser
+                        </a>
+                        <button type="submit" class="btn-brand d-flex align-items-center gap-1">
+                            <span class="ms" style="font-size: 18px;">filter_list</span> Appliquer les filtres
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tableau -->
+        <div class="card-x">
+            <div class="table-responsive">
+                <table class="table table-x">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Date création</th>
+                            <th>Poste demandé</th>
+                            <th>Département</th>
+                            <th>Demandeur</th>
+                            <th class="text-center">Postes</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${demandes.content.isEmpty()}">
+                            <td colspan="7" class="text-center py-5 text-outline">
+                                Aucune demande de recrutement ne correspond à vos critères.
+                            </td>
+                        </tr>
+
+                        <tr th:each="demande : ${demandes.content}">
+                            <td>
+                                <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement()})}"
+                                    class="fw-bold text-decoration-none" style="color: var(--primary-container);">
+                                    #<span th:text="${demande.idDemandeRecrutement()}"></span>
+                                </a>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-medium" th:text="${#temporals.format(demande.dateCreation(), 'dd MMM yyyy')}">18 Mai 2024</span>
+                                    <span class="text-outline" style="font-size: 11px;" th:text="${#temporals.format(demande.dateCreation(), 'HH:mm')}">09:42</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 32px; height: 32px; background-color: var(--surface-mid); color: var(--primary-container);">
+                                        <span class="ms" style="font-size: 18px;">work</span>
+                                    </div>
+                                    <span class="fw-medium" th:text="${demande.intitulePoste()}">Développeur Fullstack</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-medium" th:text="${demande.titreDepartement()}">Informatique</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar">
+                                        <span th:text="${#strings.substring(demande.nomManager(), 0, 1)}">J</span>
+                                    </div>
+                                    <span class="text-outline" th:text="${demande.nomManager()}">Jean Dupont</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="pill st-brouillon" th:text="${demande.effectif()} + ' poste(s)'">1 poste</span>
+                            </td>
+                            <td class="text-end">
+                                <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement()})}"
+                                    class="btn-soft btn-sm-x">
+                                    Détail <span class="ms" style="font-size: 16px;">chevron_right</span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3" style="background-color: var(--surface-low);" th:if="${demandes.totalPages > 1}">
+                <span class="text-outline" style="font-size: 13px;">
+                    Affichage de <strong th:text="${demandes.number * demandes.size + 1}"></strong> à
+                    <strong th:text="${demandes.number * demandes.size + demandes.numberOfElements}"></strong> sur
+                    <strong th:text="${demandes.totalElements}"></strong> résultats
+                </span>
+
+                <nav>
+                    <ul class="pagination pagination-sm mb-0 gap-1">
+                        <li class="page-item" th:classappend="${demandes.first} ? 'disabled'">
+                            <a class="page-btn" th:href="@{/demandes(
+                                    page=${demandes.number - 1}, size=${demandes.size},
+                                    dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
+                                    idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
+                                    idManager=${filter.idManager})}">
+                                Précédent
+                            </a>
+                        </li>
+
+                        <li class="page-item disabled">
+                            <span class="page-btn current">
+                                Page <span th:text="${demandes.number + 1}"></span> / <span th:text="${demandes.totalPages}"></span>
+                            </span>
+                        </li>
+
+                        <li class="page-item" th:classappend="${demandes.last} ? 'disabled'">
+                            <a class="page-btn" th:href="@{/demandes(
+                                    page=${demandes.number + 1}, size=${demandes.size},
+                                    dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
+                                    idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
+                                    idManager=${filter.idManager})}">
+                                Suivant
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Script de recherche -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const searchInput = document.getElementById('posteSearch');
+                const selectElement = document.getElementById('posteSelect');
+                if (searchInput && selectElement) {
+                    searchInput.addEventListener('input', function () {
+                        const filter = this.value.toLowerCase();
+                        const options = selectElement.options;
+                        for (let i = 1; i < options.length; i++) {
+                            const text = options[i].text.toLowerCase();
+                            options[i].style.display = text.includes(filter) ? "" : "none";
+                        }
+                    });
+                }
+            });
+        </script>
+    </main>
+</body>
+</html>

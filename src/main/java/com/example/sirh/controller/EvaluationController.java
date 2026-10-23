@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/bloc2/candidatures")
+@RequestMapping("/candidatures")
 @RequiredArgsConstructor
 public class EvaluationController {
 
@@ -27,7 +27,7 @@ public class EvaluationController {
         model.addAttribute("candidature", candidatureService.getCandidatureById(idCandidature));
         model.addAttribute("typesEvaluation", typeEvalRepo.findAll());
         model.addAttribute("evaluations", evaluationService.listerEvaluationsParCandidature(idCandidature));
-        return "bloc2/candidatures/evaluation";
+        return "candidatures/evaluation";
     }
 
     // TÂCHE 12 : Enregistrer l'évaluation

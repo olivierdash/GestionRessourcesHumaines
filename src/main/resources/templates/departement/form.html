@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <div class="mb-4">
+            <a th:href="@{/departements}" class="back-link">&larr; Retour à la liste</a>
+            <h2 class="page-title" th:text="${departement.idDepartement == null ? 'Nouveau Département' : 'Modifier le Département'}"></h2>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card-x">
+                    <div class="p-4">
+
+                        <!-- Message d'erreur serveur -->
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                        <!-- Formulaire avec gestion du PUT via _method -->
+                        <form th:action="${departement.idDepartement == null} ? @{/departements} : @{/departements/{id}(id=${departement.idDepartement})}" 
+                              method="post" 
+                              id="departementForm"
+                              novalidate>
+
+                            <!-- Champ caché pour simuler le PUT -->
+                            <input type="hidden" name="_method" value="put" th:if="${departement.idDepartement != null}">
+
+                            <!-- Titre -->
+                            <div class="mb-4">
+                                <label for="titre" class="form-label">Titre du département <span class="req">*</span></label>
+                                <input type="text" class="form-control" id="titre" name="titre" 
+                                       th:value="${departement.titre}" required>
+                                <div class="invalid-feedback" id="titreError">
+                                    Veuillez saisir un titre unique.
+                                </div>
+                            </div>
+
+                            <!-- Manager -->
+                            <div class="mb-4">
+                                <label for="idManager" class="form-label">Manager assigné</label>
+                                <select class="form-select" id="idManager" name="idManager">
+                                    <option value="">— Aucun —</option>
+                                    <option th:each="manager : ${managers}" 
+                                            th:value="${manager.idUtilisateur}" 
+                                            th:text="${manager.nom}"
+                                            th:selected="${departement.manager != null and departement.manager.idUtilisateur == manager.idUtilisateur}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top" style="border-color: var(--surface-high) !important;">
+                                <a th:href="@{/departements}" class="btn-soft me-3">Annuler</a>
+                                <button type="submit" class="btn-brand" id="btnSubmit">Enregistrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCRIPT DE VALIDATION JAVASCRIPT -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById('departementForm');
+                const titreInput = document.getElementById('titre');
+                const titreError = document.getElementById('titreError');
+                const btnSubmit = document.getElementById('btnSubmit');
+                
+                const currentId = /*[[${departement.idDepartement}]]*/ null;
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const titreValue = titreInput.value.trim();
+
+                    if (titreValue === "") {
+                        titreInput.classList.add('is-invalid');
+                        titreError.textContent = "Le titre est obligatoire.";
+                        return;
+                    }
+
+                    btnSubmit.disabled = true;
+                    btnSubmit.textContent = "Vérification...";
+
+                    let url = '/departements/check-titre?titre=' + encodeURIComponent(titreValue);
+                    if (currentId) {
+                        url += '&idDepartement=' + currentId;
+                    }
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(isUnique => {
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = "Enregistrer";
+
+                            if (isUnique) {
+                                titreInput.classList.remove('is-invalid');
+                                form.submit(); 
+                            } else {
+                                titreInput.classList.add('is-invalid');
+                                titreError.textContent = "Ce titre de département est déjà utilisé.";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la vérification:", error);
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = "Enregistrer";
+                            form.submit();
+                        });
+                });
+
+                titreInput.addEventListener('input', function() {
+                    titreInput.classList.remove('is-invalid');
+                });
+            });
+        </script>
+
+    </main>
+</body>
+</html>
