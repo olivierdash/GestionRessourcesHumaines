@@ -17,13 +17,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/login", "/utilisateur/login").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/fonts/**").permitAll()
+                .requestMatchers("/login").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/utilisateur/login") // <-- Indique à Spring d'utiliser TA page
-                .loginProcessingUrl("/utilisateur/login") // L'URL vers laquelle le formulaire POST
+                .loginPage("/login") // <-- Indique à Spring d'utiliser TA page
+                .loginProcessingUrl("/login") // L'URL vers laquelle le formulaire POST
                 .usernameParameter("email")
                 .passwordParameter("motDePasse")
                 .defaultSuccessUrl("/utilisateur/dashboard", true) // Où aller après connexion
@@ -36,4 +36,6 @@ public class SecurityConfig {
             );
         return http.build();
     }
+
+    
 }
