@@ -15,7 +15,7 @@ public class Utilisateur {
     private String email;
     @Column(name = "mot_de_passe", nullable = false)
     private String motDePasse;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "id_role", nullable = false)
     private Role role;
 }
