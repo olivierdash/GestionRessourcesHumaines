@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouveau contrat</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="container mt-4">
+
+    <h1 th:text="${ancien != null} ? 'Renouveler le contrat' : 'Nouveau contrat'"></h1>
+
+    <div class="alert alert-danger" th:if="${erreur}" th:text="${erreur}"></div>
+
+    <form th:action="${ancien != null}
+                    ? @{/contrats/{idc}/renouveler(idc=${ancien.idContract})}
+                    : @{/contrats/employe/{id}(id=${idEmploye})}"
+        method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Type de contrat</label>
+            <select name="idTypeContrat" class="form-select" required>
+                <option th:each="t : ${types}"
+                    th:value="${t.idTypeContrat}"
+                    th:text="${t.libelle}"
+                    th:selected="${ancien != null and ancien.typeContrat.idTypeContrat == t.idTypeContrat}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Poste</label>
+            <select name="idPoste" class="form-select" required>
+                <option th:each="p : ${postes}"
+                    th:value="${p.idPoste}"
+                    th:text="${p.intitule}"
+                    th:selected="${ancien != null and ancien.poste.idPoste == p.idPoste}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Date de début</label>
+            <input type="date" name="dateDebut" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Date de fin (obligatoire pour un CDD)</label>
+            <input type="date" name="dateFin" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Salaire mensuel</label>
+            <input type="number" step="0.01" name="salaireMensuel" class="form-control" required
+                th:value="${ancien != null} ? ${ancien.salaireMensuel} : ''">        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a th:href="@{/contrats/employe/{id}(id=${idEmploye})}" class="btn btn-secondary">Annuler</a>
+    </form>
+
+</body>
+</html>
