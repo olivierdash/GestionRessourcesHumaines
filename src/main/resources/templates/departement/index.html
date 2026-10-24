@@ -36,15 +36,12 @@
                         <!-- Boucle sur les départements -->
                         <tr th:each="dept : ${departements}">
                             <td class="fw-semibold fs-6" th:text="${dept.titre}">
-                                Ressources Humaines
+                                
                             </td>
                             <td>
                                 <!-- Affichage du Manager -->
                                 <div th:if="${dept.manager != null}" class="d-flex align-items-center gap-2">
-                                    <div class="avatar">
-                                        <span th:text="${#strings.substring(dept.manager.nom, 0, 1)}">J</span>
-                                    </div>
-                                    <span class="fw-medium" th:text="${dept.manager.nom}">Jean Dupont</span>
+                                    <span class="fw-medium" th:text="${dept.manager.nom}"></span>
                                 </div>
                                 <span th:if="${dept.manager == null}" class="pill st-autre">
                                     Non assigné
