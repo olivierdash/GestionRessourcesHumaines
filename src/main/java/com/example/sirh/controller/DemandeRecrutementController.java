@@ -4,6 +4,9 @@ import com.example.sirh.constante.ConstanteDemande;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.model.*;
 import com.example.sirh.wrapper.DemandeRecrutementFilter;
+
+import lombok.RequiredArgsConstructor;
+
 import com.example.sirh.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +26,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/demandes")
+@RequiredArgsConstructor 
 public class DemandeRecrutementController {
 
         private final DemandeRecrutementRepository demandeRepository;
@@ -33,22 +37,6 @@ public class DemandeRecrutementController {
         private final HistoriqueDemandeRecrutementRepository historiqueRepository;
         private final StatutDemandeRecrutementRepository statutRepository;
 
-        public DemandeRecrutementController(
-                        DemandeRecrutementRepository demandeRepository,
-                        UtilisateurRepository utilisateurRepository,
-                        PosteRepository posteRepository,
-                        DepartementRepository departementRepository,
-                        EtatDemandeRepository etatDemandeRepository,
-                        HistoriqueDemandeRecrutementRepository historiqueRepository,
-                        StatutDemandeRecrutementRepository statutDemandeRecrutementRepository) {
-                this.demandeRepository = demandeRepository;
-                this.utilisateurRepository = utilisateurRepository;
-                this.posteRepository = posteRepository;
-                this.departementRepository = departementRepository;
-                this.etatDemandeRepository = etatDemandeRepository;
-                this.historiqueRepository = historiqueRepository;
-                this.statutRepository = statutDemandeRecrutementRepository;
-        }
 
         // -----------------------------------------------------------------
         // INDEX : Liste avec pagination et filtre
@@ -98,7 +86,7 @@ public class DemandeRecrutementController {
         // -----------------------------------------------------------------
         // CREATE (POST) : Enregistrement
         // -----------------------------------------------------------------
-        @PostMapping
+        @PostMapping("/create")
         public String store(
                         @RequestParam Integer idManager,
                         @RequestParam Integer idPoste,

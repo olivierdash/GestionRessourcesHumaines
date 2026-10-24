@@ -27,4 +27,6 @@ public class PropositionEmbauche {
     private StatutProposition statut;
     @Column(name = "date_decision")
     private LocalDateTime dateDecision;
+    @Column(columnDefinition = "TEXT")
+    private String remarque;
 }
