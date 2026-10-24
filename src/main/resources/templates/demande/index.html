@@ -206,7 +206,7 @@
                 <nav>
                     <ul class="pagination pagination-sm mb-0 gap-1">
                         <li class="page-item" th:classappend="${demandes.first} ? 'disabled'">
-                            <a class="page-btn" th:href="@{/demandes(
+                            <a class="btn-soft btn-sm" th:href="@{/demandes(
                                     page=${demandes.number - 1}, size=${demandes.size},
                                     dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
                                     idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
@@ -344,4 +344,5 @@
         </script>
     </main>
 </body>
+
 </html>
