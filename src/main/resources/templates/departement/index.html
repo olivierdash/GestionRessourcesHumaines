@@ -37,14 +37,19 @@
                         <tr th:each="dept : ${departements}">
                             <td class="fw-semibold fs-6" th:text="${dept.titre}">
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 
 =======
                                 Ressources Humaines
 >>>>>>> e90ab66 (integration SPA fonctionnelle)
+=======
+                                
+>>>>>>> cd93fba (factorisation css)
                             </td>
                             <td>
                                 <!-- Affichage du Manager -->
                                 <div th:if="${dept.manager != null}" class="d-flex align-items-center gap-2">
+<<<<<<< HEAD
 <<<<<<< HEAD
                                     <span class="fw-medium" th:text="${dept.manager.nom}"></span>
 =======
@@ -53,6 +58,9 @@
                                     </div>
                                     <span class="fw-medium" th:text="${dept.manager.nom}">Jean Dupont</span>
 >>>>>>> e90ab66 (integration SPA fonctionnelle)
+=======
+                                    <span class="fw-medium" th:text="${dept.manager.nom}"></span>
+>>>>>>> cd93fba (factorisation css)
                                 </div>
                                 <span th:if="${dept.manager == null}" class="pill st-autre">
                                     Non assigné
