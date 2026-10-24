@@ -69,15 +69,16 @@
                 </a>
 
                 <!-- FINANCE : Uniquement le rôle Finance et DG -->
-                <a class="nav-link" th:href="@{/demandes/validations}">
-                    <span class="ms">payments</span>Validation en Attente
+                <a sec:authorize="hasAnyRole('FINANCE', 'DG')" class="nav-link" th:href="@{/finance}">
+                    <span class="ms">payments</span>Validation Financière
                 </a>
             </nav>
         </div>
 
         <div class="sidebar-user d-flex align-items-center justify-content-between">
             <!-- Avatar avec les 2 premières lettres du nom (Variables du Design System) -->
-            <div class="avatar" th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">
+            <div class="avatar" 
+                 th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">
                 CD
             </div>
 
@@ -173,17 +174,22 @@
             </div>
             <div class="d-flex align-items-center gap-2">
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <div class="position-relative">
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+                <div class="position-relative">
+>>>>>>> 8fd0b30 (factorisation css)
                     <button class="topbar-btn" title="Notifications" type="button"><span
                             class="ms">notifications</span></button>
                     <span class="notif-dot"></span>
                 </div>
                 <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span
                         class="ms">help</span></button>
+<<<<<<< HEAD
 =======
                     <button class="topbar-btn" title="Notifications" type="button"><span class="ms">notifications</span></button>
                     <span class="notif-dot"></span>
@@ -224,6 +230,8 @@
                     </span>
                 </a>
 >>>>>>> 24a41ed (validation demande recrutement terminee)
+=======
+>>>>>>> 8fd0b30 (factorisation css)
             </div>
         </header>
 
