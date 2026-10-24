@@ -26,7 +26,7 @@
  DROP TABLE IF EXISTS roles                          CASCADE;
  DROP TABLE IF EXISTS utilisateur                    CASCADE;
  DROP TABLE IF EXISTS validation_proposition         CASCADE;
-
+ DROP TABLE IF EXISTS affectation                    CASCADE;
 
 --- status 
 CREATE TABLE type_notification(
@@ -274,4 +274,14 @@ CREATE TABLE notification (
     FOREIGN KEY (id_destinataire_candidat) REFERENCES candidat(id_candidat),
     FOREIGN KEY (id_destinataire_utilisateur) REFERENCES utilisateur(id_utilisateur),
     FOREIGN KEY (id_type_notification) REFERENCES type_notification(id_type_notification)
+);
+
+CREATE TABLE IF NOT EXISTS affectation (
+    id_affectation SERIAL PRIMARY KEY,
+    id_employer INTEGER NOT NULL,
+    id_poste INTEGER NOT NULL,
+    date_debut DATE NOT NULL,
+    date_fin DATE,
+    FOREIGN KEY (id_employer) REFERENCES employer(id_employer) ON DELETE CASCADE,
+    FOREIGN KEY (id_poste) REFERENCES poste(id_poste)
 );

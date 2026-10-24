@@ -18,7 +18,8 @@ INSERT INTO utilisateur (id_utilisateur, nom, email, mot_de_passe, id_role) VALU
 
 -- Départements et Postes
 INSERT INTO departement (id_departement, titre, id_manager) VALUES (1, 'Informatique', 2);
-INSERT INTO poste (id_poste, id_departement, intitule, lieu) VALUES (1, 1, 'Développeur Fullstack', 'Paris');
+INSERT INTO poste (id_poste, id_departement, intitule, lieu) VALUES 
+(1, 1, 'Développeur Fullstack', 'Paris');
 
 -- Demande de recrutement (Déjà validée, statut 2 = RECRUTEMENT_OUVERT)
 INSERT INTO demande_recrutement (id_demande_recrutement, id_manager, id_poste, effectif, motif, id_statut_demande_recrutement) 
