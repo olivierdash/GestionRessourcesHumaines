@@ -54,7 +54,7 @@ public class EmployeController {
     @GetMapping("/create")
     public String create(Model model) {
         // On récupère toutes les candidatures (Idéalement, il faudrait filtrer celles qui n'ont pas encore d'employé)
-        List<Candidature> candidatures = candidatureRepository.findAll();
+        List<Candidature> candidatures = candidatureRepository.findCandidaturesSansEmploye();
         
         model.addAttribute("candidatures", candidatures);
         return "employe/form";
