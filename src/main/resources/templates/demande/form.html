@@ -35,6 +35,19 @@
                                     <option value="" disabled>Sélectionnez un manager...</option>
                                     <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
                                         th:text="${manager.nom}"></option>
+                        <!-- Ajout de la classe needs-validation -->
+                        <form th:action="@{/demandes}" method="post" id="demandeForm" class="needs-validation"
+                            novalidate>
+
+                            <!-- Manager -->
+                            <div class="mb-4">
+                                <label for="idManager" class="form-label">Manager demandeur <span
+                                        class="text-error">*</span></label>
+                                <select class="form-select" id="idManager" name="idManager" required>
+                                    <option value="" disabled selected>Sélectionnez un manager...</option>
+                                    <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
+                                        th:text="${manager.nom + ' (' + manager.role.libelle + ')'}">
+                                    </option>
                                 </select>
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('idManager')}"
                                     th:errors="*{idManager}"></div>
@@ -102,6 +115,7 @@
                                     Enregistrer
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>

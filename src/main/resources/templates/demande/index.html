@@ -156,31 +156,33 @@
                                 </div>
                             </td>
 
-                            <!-- Poste -->
+                            <!-- Poste (Sans icône) -->
                             <td>
-                                <span class="fw-medium text-main" th:text="${demande.posteIntitule()}"></span>
+                                <span class="fw-medium text-main" th:text="${demande.intitulePoste()}"></span>
                             </td>
 
                             <!-- Département -->
                             <td>
-                                <span class="text-muted" th:text="${demande.departementTitre()}"></span>
+                                <span class="text-muted" th:text="${demande.titreDepartement()}"></span>
                             </td>
 
                             <!-- Demandeur -->
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="text-muted" th:text="${demande.managerNom()}">Inconnu</span>
+                                    <span class="text-muted" th:text="${demande.nomManager()}">Inconnu</span>
                                 </div>
                             </td>
 
                             <!-- Effectif -->
                             <td class="text-center" style="min-width: 100px;">
                                 <div class="effectif-wrapper">
+                                    <!-- Badge court (sera formaté en JS, le data-value sert de base) -->
                                     <span class="pill pill-neutre effectif-short"
                                         th:attr="data-value=${demande.effectif()}">
                                         <span th:text="${demande.effectif()}">1</span>
                                     </span>
 
+                                    <!-- Badge long (valeur exacte) -->
                                     <span class="pill effectif-full" th:text="${demande.effectif()}">
                                         1
                                     </span>
@@ -194,7 +196,7 @@
             <!-- Pagination -->
             <div class="p-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 border-top"
                 style="border-color: var(--color-border) !important; background-color: var(--color-surface-low);"
-                th:if="${demandes.totalPages >= 1}">
+                th:if="${demandes.totalPages > 1}">
                 <span class="text-muted text-small">
                     Affichage de <strong th:text="${demandes.number * demandes.size + 1}"></strong> à
                     <strong th:text="${demandes.number * demandes.size + demandes.numberOfElements}"></strong> sur
@@ -203,18 +205,11 @@
 
                 <nav>
                     <ul class="pagination pagination-sm mb-0 gap-1">
-<<<<<<< HEAD
                         <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
                             <a class="btn-soft btn-sm" th:href="@{/demandes(
-=======
-<<<<<<< HEAD
                         <li class="page-item" th:classappend="${demandes.first} ? 'disabled'">
-                            <a class="page-btn" th:href="@{/demandes(
-=======
                         <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
                             <a class="btn-soft btn-sm" th:href="@{/demandes(
->>>>>>> 24a41ed (validation demande recrutement terminee)
->>>>>>> 5e24d00 (validation demande recrutement terminee)
                                     page=${demandes.number - 1}, size=${demandes.size},
                                     dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
                                     idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
