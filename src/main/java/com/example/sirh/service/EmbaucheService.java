@@ -6,11 +6,13 @@ import com.example.sirh.model.Contrat;
 import com.example.sirh.model.Employe;
 import com.example.sirh.model.Poste;
 import com.example.sirh.model.PropositionEmbauche;
+import com.example.sirh.model.StatutContrat;
 import com.example.sirh.model.TypeContrat;
 import com.example.sirh.repository.AffectationRepository;
 import com.example.sirh.repository.ContratRepository;
 import com.example.sirh.repository.EmployeRepository;
 import com.example.sirh.repository.PropositionEmbaucheRepository;
+import com.example.sirh.repository.StatutContratRepository;
 import com.example.sirh.repository.TypeContractRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class EmbaucheService {
     private final ContratRepository contratRepo;
     private final AffectationRepository affectationRepo;
     private final TypeContractRepository typeContratRepo;
+    private final StatutContratRepository statutContratRepo;
 
     /**
      * Bouton « Créer dossier » : matricule + employé + contrat + affectation en UNE transaction.
@@ -54,6 +57,8 @@ public class EmbaucheService {
         }
         TypeContrat type = typeContratRepo.findById(idTypeContrat)
                 .orElseThrow(() -> new IllegalArgumentException("Type de contrat introuvable : " + idTypeContrat));
+        StatutContrat statutActif = statutContratRepo.findByLibelle("actif")
+                .orElseThrow(() -> new IllegalStateException("Statut 'actif' introuvable"));
 
         Poste poste = candidature.getDemandeRecrutement().getPoste();
         BigDecimal salaire = p.getSalaireFinal() != null ? p.getSalaireFinal() : p.getSalairePropose();
@@ -72,7 +77,7 @@ public class EmbaucheService {
                 .dateDebut(dateDebut)
                 .dateFin(dateFin)
                 .salaireMensuel(salaire)
-                .status("ACTIF")
+                .statut(statutActif)
                 .build());
 
         affectationRepo.save(Affectation.builder()
@@ -97,7 +102,7 @@ public class EmbaucheService {
 
     @Transactional(readOnly = true)
     public List<Contrat> contratsDe(Integer idEmployer) {
-        return contratRepo.findByEmployeIdEmployer(idEmployer);
+        return contratRepo.findByEmployeIdEmployerOrderByDateDebutDesc(idEmployer);
     }
 
     @Transactional(readOnly = true)
