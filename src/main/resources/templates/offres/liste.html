@@ -8,7 +8,7 @@
         <!-- En-tête -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <h2 class="page-title">Liste des offres d'emploi</h2>
-            <a th:href="@{/bloc2/offres/creer}" class="btn-brand">+ Créer une nouvelle offre</a>
+            <a th:href="@{/offres/creer}" class="btn-brand">+ Créer une nouvelle offre</a>
         </div>
 
         <!-- Messages de succès ou d'erreur -->
@@ -42,13 +42,13 @@
                             <td class="text-end text-nowrap">
                                 <!-- Bouton Publier -->
                                 <form th:if="${offre.statut.id == 1}" 
-                                      th:action="@{/bloc2/offres/{id}/publier(id=${offre.idOffre})}" 
+                                      th:action="@{/offres/{id}/publier(id=${offre.idOffre})}" 
                                       method="post" class="d-inline">
                                     <button type="submit" class="btn-brand btn-sm-x">Publier</button>
                                 </form>
 
                                 <!-- Lien vers les candidatures -->
-                                <a th:href="@{/bloc2/offres/{id}/candidatures(id=${offre.idOffre})}" class="btn-soft btn-sm-x ms-1">Voir Candidatures</a>
+                                <a th:href="@{/offres/{id}/candidatures(id=${offre.idOffre})}" class="btn-soft btn-sm-x ms-1">Voir Candidatures</a>
                             </td>
                         </tr>
                         <tr th:if="${offres.isEmpty()}">

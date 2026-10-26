@@ -1,0 +1,144 @@
+/* =========================================================
+   PAGE DE CONNEXION (Adaptée au Design System)
+   ========================================================= */
+
+/* 1. Le body sert juste de fond (le centrage est géré par Bootstrap dans le HTML) */
+body {
+    background-color: var(--color-canvas);
+    margin: 0;
+}
+
+/* 2. La carte du formulaire */
+.login-card {
+    background-color: var(--color-surface);
+    width: 100%;
+    max-width: 460px;
+    padding: 3rem 2.5rem;
+    border-radius: var(--radius-lg); /* 12px */
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+    position: relative;
+    z-index: 10;
+}
+
+/* 3. Conteneur des alertes (positionné de façon absolue en haut) */
+.login-messages-container {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 460px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* 4. Style des alertes flottantes */
+.alert-floating {
+    border: none;
+    font-size: 13px;
+    border-radius: var(--radius-sm); /* 6px */
+    text-align: center;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 0;
+    animation: plongeeDisparition 4s ease-in-out forwards;
+}
+
+/* 5. Inputs avec icônes */
+.input-icon-wrapper {
+    position: relative;
+}
+
+.input-icon-wrapper .ms {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted); /* Gris pour l'icône au repos */
+    font-size: 20px;
+    transition: var(--transition-fast);
+    pointer-events: none;
+}
+
+.input-icon-wrapper .form-control {
+    padding-left: 3rem;
+    height: 44px; /* Taille standard du Design System */
+    border-radius: var(--radius-sm); /* 6px */
+    background-color: var(--color-surface-low);
+    border: 1px solid transparent;
+    color: var(--color-text-main);
+    font: var(--font-body);
+    transition: var(--transition-fast);
+}
+
+/* Focus de l'input (bordure et ombre basées sur la couleur primaire) */
+.input-icon-wrapper .form-control:focus {
+    background-color: var(--color-surface);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 40, 142, 0.15); /* Ombre avec la couleur primary #00288E */
+}
+
+/* 6. Validation Bootstrap */
+.input-icon-wrapper .form-control.is-invalid {
+    border-color: var(--color-error) !important;
+    background-color: var(--color-surface);
+}
+
+.input-icon-wrapper .form-control.is-invalid + .ms {
+    color: var(--color-error);
+}
+
+.invalid-feedback {
+    font-size: 11px;
+    margin-top: 5px;
+    margin-left: 5px;
+    font-weight: 500;
+    color: var(--color-error);
+}
+
+/* 7. Bouton de connexion */
+.login-btn {
+    height: 44px; /* Taille standard du Design System */
+    border-radius: var(--radius-sm); /* 6px */
+    background-color: var(--color-primary);
+    color: #FFFFFF;
+    font: var(--font-label);
+    box-shadow: var(--shadow-button);
+    transition: var(--transition-fast);
+}
+
+.login-btn:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+/* 8. Animations */
+@keyframes plongeeDisparition {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(30px); visibility: hidden; }
+}
+
+.auto-dismiss-alert {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.alert-fade-out {
+    opacity: 0;
+    transform: translateY(20px);
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    border: 0 !important;
+}
+
+/* 9. Responsive (Petits écrans) */
+@media (max-width: 576px) {
+    .login-card {
+        padding: 2rem 1.5rem;
+        max-width: 95%;
+    }
+}

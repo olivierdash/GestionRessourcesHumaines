@@ -50,6 +50,6 @@ public class EvaluationController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
-        return "redirect:/bloc2/candidatures/" + idCandidature + "/evaluer";
+        return "redirect:/candidatures/" + idCandidature + "/evaluer";
     }
 }

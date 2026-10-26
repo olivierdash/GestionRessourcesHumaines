@@ -1,6 +1,6 @@
 package com.example.sirh.service;
 
-
+import com.example.sirh.config.CustomUserDetails;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.UtilisateurRepository;
 import org.springframework.security.core.userdetails.User;
@@ -20,15 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // On cherche l'utilisateur par email
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé avec l'email : " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + email));
 
-        // On retourne l'utilisateur avec son mot de passe EN CLAIR
-        return User.builder()
-                .username(utilisateur.getEmail())
-                .password(utilisateur.getMotDePasse()) 
-                .roles(utilisateur.getRole().getLibelle()) // ex: "MANAGER", "RH"
-                .build();
+        // On retourne notre propre objet qui contient toutes les infos
+        return new CustomUserDetails(utilisateur);
     }
 }

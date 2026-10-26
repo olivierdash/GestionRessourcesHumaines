@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvelle proposition</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container py-4" style="max-width: 640px;">
+    <h1 class="h3 mb-4">Proposer un poste</h1>
+
+    <div th:if="${erreur}" class="alert alert-danger" th:text="${erreur}"></div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="mb-1"><strong>Candidat :</strong>
+                <span th:text="${candidature.candidat.prenom + ' ' + candidature.candidat.nom}"></span></p>
+            <p class="mb-1"><strong>Poste :</strong>
+                <span th:text="${candidature.demandeRecrutement.poste.intitule}"></span></p>
+            <p class="mb-0"><strong>Statut de la candidature :</strong>
+                <span class="badge bg-info" th:text="${candidature.statutCandidature.libelle}"></span></p>
+        </div>
+    </div>
+
+    <form th:action="@{/candidatures/{id}/proposer(id=${candidature.idCandidature})}" method="post">
+        <div class="mb-3">
+            <label for="salaire" class="form-label">Salaire mensuel proposé</label>
+            <input type="number" step="0.01" min="0" class="form-control" id="salaire" name="salaire" required>
+        </div>
+        <div class="mb-3">
+            <label for="joursValidite" class="form-label">Validité de la proposition (jours)</label>
+            <input type="number" min="1" value="7" class="form-control" id="joursValidite" name="joursValidite" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Créer la proposition</button>
+        <a th:href="@{/propositions}" class="btn btn-link">Annuler</a>
+    </form>
+</div>
+</body>
+</html>

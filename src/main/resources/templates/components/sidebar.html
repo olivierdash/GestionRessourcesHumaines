@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr">
+<body>
+
+    <aside class="sidebar" id="sidebar" th:fragment="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <span class="logo"><span class="ms">groups</span></span>SIRH Pro
+            </div>
+            <div class="sidebar-label">Menu principal</div>
+            
+            <nav class="nav flex-column">
+                <a class="nav-link" th:href="@{/demandes}">
+                    <span class="ms">assignment</span>Demandes de Recrutement
+                </a>
+
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" class="nav-link" th:href="@{/employes}">
+                    <span class="ms">badge</span>Employés
+                </a>
+
+                <a sec:authorize="hasAnyRole('RH', 'DG')" class="nav-link" th:href="@{/departements}">
+                    <span class="ms">apartment</span>Départements
+                </a>
+
+                <a sec:authorize="hasAnyRole('RH', 'MANAGER')" class="nav-link" th:href="@{/offres}">
+                    <span class="ms">person_search</span>Offre d'Emplois
+                </a>
+
+                <a sec:authorize="hasAnyRole('FINANCE', 'DG','RH')" class="nav-link" th:href="@{/demandes/validations}">
+                    <span class="ms">payments</span>Mes validations
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-user d-flex align-items-center justify-content-between">
+            <div class="avatar" 
+                 th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">
+                CD
+            </div>
+
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button class="icon-btn" title="Déconnexion" type="submit">
+                    <span class="ms" style="font-size: 20px;">logout</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+</body>
+</html>

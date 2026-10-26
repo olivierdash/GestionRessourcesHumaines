@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Propositions d'embauche</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container py-4">
+    <h1 class="h3 mb-4">Propositions d'embauche</h1>
+
+    <table class="table table-striped align-middle">
+        <thead>
+        <tr>
+            <th>N°</th>
+            <th>Candidat</th>
+            <th>Poste</th>
+            <th>Salaire proposé</th>
+            <th>Expiration</th>
+            <th>Statut</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${propositions}">
+            <td th:text="${p.idProposition}"></td>
+            <td th:text="${p.candidature.candidat.prenom + ' ' + p.candidature.candidat.nom}"></td>
+            <td th:text="${p.candidature.demandeRecrutement.poste.intitule}"></td>
+            <td th:text="${p.salairePropose}"></td>
+            <td th:text="${#temporals.format(p.dateExpiration, 'dd/MM/yyyy HH:mm')}"></td>
+            <td><span class="badge bg-secondary" th:text="${p.statut.libelle}"></span></td>
+            <td>
+                <a class="btn btn-sm btn-primary"
+                   th:href="@{/propositions/{id}(id=${p.idProposition})}">Ouvrir</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(propositions)}">
+            <td colspan="7" class="text-center text-muted">Aucune proposition.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

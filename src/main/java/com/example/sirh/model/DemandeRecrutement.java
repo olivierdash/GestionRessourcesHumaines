@@ -5,10 +5,13 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "demande_recrutement")
+@Entity 
+@Table(name = "demande_recrutement")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class DemandeRecrutement {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_demande_recrutement")
     private Integer idDemandeRecrutement;
 
@@ -29,10 +32,14 @@ public class DemandeRecrutement {
     @Column(nullable = false)
     private Integer effectif;
     
-    @Column(columnDefinition = "TEXT")
-    private String motif;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_motif_demande", nullable = false)
+    private MotifDemande motif;
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_statut_demande_recrutement", nullable = false)
-    private StatutDemandeRecrutement statut;
+    @JoinColumn(name = "id_etat_demande", nullable = false)
+    private EtatDemande etatDemande;
+
+    @Column(name = "commentaires", columnDefinition = "TEXT")
+    private String commentaires;
 }
