@@ -40,9 +40,9 @@
 
                         <!-- Badge de statut dynamique -->
                         <span class="pill"
-                              th:classappend="${employe.statusEmployer == 'ACTIF' ? 'st-actif' : 
-                                              (employe.statusEmployer == 'SORTI' ? 'st-sorti' : 'st-autre')}"
-                              th:text="${employe.statusEmployer}">
+                            th:classappend="${employe.statusEmployer == 'ACTIF' ? 'st-actif' : 
+                                            (employe.statusEmployer == 'SORTI' ? 'st-sorti' : 'st-autre')}"
+                            th:text="${employe.statusEmployer}">
                             ACTIF
                         </span>
 

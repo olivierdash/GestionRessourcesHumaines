@@ -4,6 +4,67 @@
 
     <main th:fragment="mainContent" class="app-page">
 
+        <!-- ===== Carte d'accueil + statistiques ===== -->
+        <section class="hero-card mb-4">
+            <div class="hero-top">
+                <div class="hero-text">
+                    <h2 class="hero-title">
+                        <span id="heroGreeting">Bonjour</span>,
+                        <span th:text="${#authentication.principal.utilisateur.nom}">Prénom</span> 👋
+                    </h2>
+                    <p class="hero-sub" id="heroDate">Voici l'état de vos demandes de recrutement.</p>
+                </div>
+                <div class="hero-art" aria-hidden="true"><span class="ms">groups</span></div>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <span class="stat-icon"><span class="ms">assignment</span></span>
+                    <div>
+                        <div class="stat-label">Demandes trouvées</div>
+                        <div class="stat-value" th:text="${demandes.totalElements}">248</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-green">
+                    <span class="stat-icon"><span class="ms">visibility</span></span>
+                    <div>
+                        <div class="stat-label">Affichées</div>
+                        <div class="stat-value" th:text="${demandes.numberOfElements}">10</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-amber">
+                    <span class="stat-icon"><span class="ms">pending_actions</span></span>
+                    <div>
+                        <div class="stat-label">Validations en attente</div>
+                        <div class="stat-value" th:text="${validationsEnAttenteCount != null ? validationsEnAttenteCount : 0}">3</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-violet">
+                    <span class="stat-icon"><span class="ms">auto_stories</span></span>
+                    <div>
+                        <div class="stat-label">Page</div>
+                        <div class="stat-value">
+                            <span th:text="${demandes.number + 1}">1</span><span class="stat-sep"> / </span><span th:text="${demandes.totalPages == 0 ? 1 : demandes.totalPages}">4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            (function () {
+                var now = new Date();
+                var g = document.getElementById('heroGreeting');
+                var d = document.getElementById('heroDate');
+                if (g) g.textContent = now.getHours() >= 18 ? 'Bonsoir' : 'Bonjour';
+                if (d) {
+                    var txt = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    d.textContent = txt.charAt(0).toUpperCase() + txt.slice(1) + ' — voici l\'état de vos demandes de recrutement.';
+                }
+            })();
+        </script>
+
+
         <!-- En-tête de page -->
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
             <div>

@@ -29,22 +29,74 @@
 
                 <a sec:authorize="hasAnyRole('FINANCE', 'DG','RH')" class="nav-link" th:href="@{/demandes/validations}">
                     <span class="ms">payments</span>Mes validations
+                    <!-- Pastille orange : nombre de validations en attente -->
+                    <span class="nav-badge"
+                          th:if="${validationsEnAttenteCount != null and validationsEnAttenteCount > 0}"
+                          th:text="${validationsEnAttenteCount}">3</span>
                 </a>
             </nav>
         </div>
 
-        <div class="sidebar-user d-flex align-items-center justify-content-between">
-            <div class="avatar" 
-                 th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">
-                CD
+        <div>
+            <!-- Carte "Astuce" -->
+            <div class="sidebar-tip">
+                <span class="tip-icon"><span class="ms">lightbulb</span></span>
+                <div class="tip-title">Astuce</div>
+                <p class="tip-text">Utilisez les filtres pour retrouver rapidement une demande.</p>
             </div>
 
-            <form th:action="@{/logout}" method="post" class="m-0">
-                <button class="icon-btn" title="Déconnexion" type="submit">
-                    <span class="ms" style="font-size: 20px;">logout</span>
-                </button>
-            </form>
+            <!-- Profil -->
+            <div class="sidebar-user d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <div class="avatar" 
+                         th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">
+                        CD
+                    </div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name" th:text="${#authentication.principal.utilisateur.nom}">Nom Prénom</div>
+                        <div class="sidebar-user-role">
+                            <span sec:authorize="hasRole('DG')">Direction</span>
+                            <span sec:authorize="hasRole('RH') and !hasRole('DG')">RH</span>
+                            <span sec:authorize="hasRole('FINANCE') and !hasAnyRole('DG','RH')">Finance</span>
+                            <span sec:authorize="hasRole('MANAGER') and !hasAnyRole('DG','RH','FINANCE')">Manager</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button class="icon-btn" title="Déconnexion" type="submit">
+                        <span class="ms" style="font-size: 20px;">logout</span>
+                    </button>
+                </form>
+            </div>
         </div>
+
+        <!-- Surligne la page courante + ferme le menu mobile au clic extérieur -->
+        <script>
+            (function () {
+                var sidebar = document.getElementById('sidebar');
+                if (!sidebar) return;
+
+                var clean = function (p) { return p.replace(/\/+$/, '') || '/'; };
+                var current = clean(window.location.pathname);
+                var best = null, bestLen = -1;
+
+                sidebar.querySelectorAll('.nav-link').forEach(function (a) {
+                    var p = clean(new URL(a.getAttribute('href'), window.location.origin).pathname);
+                    var match = (current === p) || (current.indexOf(p + '/') === 0);
+                    if (match && p.length > bestLen) { best = a; bestLen = p.length; }
+                });
+                if (best) best.classList.add('active');
+
+                document.addEventListener('click', function (e) {
+                    if (sidebar.classList.contains('show') &&
+                        !sidebar.contains(e.target) &&
+                        !e.target.closest('.topbar-btn')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            })();
+        </script>
     </aside>
 
 </body>
