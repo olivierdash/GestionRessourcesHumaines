@@ -1,17 +1,14 @@
 package com.example.sirh.dto;
 
+import com.example.sirh.model.MotifDemande;
 import java.time.LocalDateTime;
 
-/**
- * Projection (View) regroupant demande_recrutement x utilisateur x poste x departement
- */
 public record DemandeRecrutementLib(
-        Integer idDemandeRecrutement,
-        LocalDateTime dateCreation,
-        Integer effectif,
-        String motif,
-        String nomManager,
-        String intitulePoste,
-        String titreDepartement
-) {
-}
+    Integer idDemandeRecrutement,
+    LocalDateTime dateCreation,
+    Integer effectif,
+    MotifDemande motif,          // <-- entité directement
+    String managerNom,
+    String posteIntitule,
+    String departementTitre
+) {}

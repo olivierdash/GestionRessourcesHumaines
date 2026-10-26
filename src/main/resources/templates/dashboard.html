@@ -13,7 +13,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 
-<body class="app-page"> <!-- Ajout de app-page ici -->
+<body class="app-page">
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -21,28 +21,25 @@
             <div class="sidebar-brand">
                 <span class="logo"><span class="ms">groups</span></span>SIRH Pro
             </div>
+            <div class="sidebar-label">Menu principal</div>
+            
             <nav class="nav flex-column">
-                <!-- Tout le monde peut voir ses demandes -->
                 <a class="nav-link" th:href="@{/demandes}">
                     <span class="ms">assignment</span>Demandes de Recrutement
                 </a>
 
-                <!-- Seuls le RH, DG et Manager peuvent voir les employés -->
                 <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" class="nav-link" th:href="@{/employes}">
                     <span class="ms">badge</span>Employés
                 </a>
 
-                <!-- RÉFÉRENTIELS : Uniquement RH et DG -->
                 <a sec:authorize="hasAnyRole('RH', 'DG')" class="nav-link" th:href="@{/departements}">
                     <span class="ms">apartment</span>Départements
                 </a>
 
-                <!-- CANDIDATS : Seulement RH et Manager (pour recruter) -->
                 <a sec:authorize="hasAnyRole('RH', 'MANAGER')" class="nav-link" th:href="@{/candidats}">
                     <span class="ms">person_search</span>Candidats
                 </a>
 
-                <!-- FINANCE : Uniquement le rôle Finance et DG -->
                 <a sec:authorize="hasAnyRole('FINANCE', 'DG')" class="nav-link" th:href="@{/finance}">
                     <span class="ms">payments</span>Validation Financière
                 </a>
@@ -74,19 +71,24 @@
                     onclick="document.getElementById('sidebar').classList.toggle('show')" aria-label="Menu">
                     <span class="ms">menu</span>
                 </button>
+                
                 <div class="search-box">
                     <span class="ms">search</span>
                     <input type="search" class="form-control" placeholder="Rechercher une demande, un candidat...">
                 </div>
             </div>
+            
             <div class="d-flex align-items-center gap-2">
                 <div class="position-relative">
-                    <button class="topbar-btn" title="Notifications" type="button"><span
-                            class="ms">notifications</span></button>
+                    <button class="topbar-btn" title="Notifications" type="button">
+                        <span class="ms">notifications</span>
+                    </button>
                     <span class="notif-dot"></span>
                 </div>
-                <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span
-                        class="ms">help</span></button>
+                
+                <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button">
+                    <span class="ms">help</span>
+                </button>
             </div>
         </header>
 

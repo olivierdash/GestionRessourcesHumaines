@@ -24,4 +24,6 @@ public interface ContratRepository extends JpaRepository<Contrat, Integer> {
     boolean existeChevauchement(@Param("idEmploye") Integer idEmploye,
             @Param("debut") LocalDate debut,
             @Param("fin") LocalDate fin);
+
+    List<Contrat> findByEmployeIdEmployer(Integer idEmployer);
 }

@@ -21,4 +21,6 @@ public class HistoriqueDemandeRecrutement {
     private Utilisateur validateur;
     @Column(name = "date_changement", insertable = false, updatable = false)
     private LocalDateTime dateChangement;
+    @Column(columnDefinition = "TEXT")
+    private String commentaires;
 }
