@@ -1,0 +1,1 @@
+ALTER TABLE proposition_embauche ADD COLUMN remarque TEXT;
