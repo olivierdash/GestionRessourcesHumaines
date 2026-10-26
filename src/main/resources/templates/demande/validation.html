@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <div class="mb-4">
+            <h2 class="page-title">Mes validations en attente</h2>
+            <p class="text-muted text-small mt-1 mb-0">
+                Demandes de recrutement nécessitant votre approbation en tant que <strong th:text="${role}"></strong>.
+            </p>
+        </div>
+
+        <div class="card-x">
+            <div class="table-responsive">
+                <table class="table table-x">
+                    <thead>
+                        <tr>
+                            <th>Réf.</th>
+                            <th>Date</th>
+                            <th>Poste</th>
+                            <th>Département</th>
+                            <th>Manager</th>
+                            <th>Effectif</th>
+                            <!-- Colonne supplémentaire uniquement pour la finance -->
+                            <th th:if="${role == 'FINANCE'}">Faisabilité (Grille)</th>
+                            <th class="text-end">Action rapide</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${demandes.isEmpty()}">
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <span class="ms"
+                                    style="font-size: 48px; color: var(--color-success);">check_circle</span>
+                                <p class="mt-3 mb-0">Aucune demande en attente. Vous êtes à jour !</p>
+                            </td>
+                        </tr>
+
+                        <tr th:each="demande : ${demandes}">
+                            <td>
+                                <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement})}"
+                                    class="fw-bold text-decoration-none" style="color: var(--color-primary);">
+                                    #<span th:text="${demande.idDemandeRecrutement}"></span>
+                                </a>
+                            </td>
+                            <td class="text-muted" th:text="${#temporals.format(demande.dateCreation, 'dd/MM/yyyy')}">
+                                12/10/2024</td>
+                            <td class="fw-medium" th:text="${demande.poste.intitule}">Développeur Java</td>
+                            <td class="text-muted" th:text="${demande.poste.departement.titre}">Informatique</td>
+                            <td class="text-muted" th:text="${demande.manager.nom}">Jean Dupont</td>
+                            <td class="text-center">
+                                <span class="pill pill-neutre" th:text="${demande.effectif} + ' poste(s)'">1
+                                    poste(s)</span>
+                            </td>
+
+                            <!-- Cellule conditionnelle pour la Finance -->
+                            <td th:if="${role == 'FINANCE'}">
+                                <!-- On récupère la grille correspondante via la Map -->
+                                <div th:with="grille=${grilles.get(demande.idDemandeRecrutement)}">
+
+                                    <!-- Si la grille existe, on affiche les bornes -->
+                                    <div th:if="${grille != null}" class="d-flex flex-column">
+                                        <span class="badge bg-success text-white" style="align-self: flex-start;">
+                                            Budget prévu
+                                        </span>
+                                        <small class="text-muted mt-1">
+                                            Entre <strong
+                                                th:text="${#numbers.formatDecimal(grille.salaireMin, 0, 'COMMA', 2, 'POINT')}"></strong>
+                                            et <strong
+                                                th:text="${#numbers.formatDecimal(grille.salaireMax, 0, 'COMMA', 2, 'POINT')}"></strong>
+                                            €
+                                        </small>
+                                    </div>
+
+                                    <!-- Si aucune grille n'est définie pour ce poste/département -->
+                                    <div th:if="${grille == null}">
+                                        <span class="badge bg-danger text-white">
+                                            <span class="ms"
+                                                style="font-size: 14px; vertical-align: middle;">warning</span> Grille
+                                            introuvable
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end align-items-center gap-2">
+
+                                    <!-- Bouton Refuser -->
+                                    <button type="button" class="btn-danger btn-sm d-flex align-items-center gap-1"
+                                        data-bs-toggle="modal" data-bs-target="#decisionModal"
+                                        th:attr="data-id=${demande.idDemandeRecrutement}, data-action='refuse'">
+                                        <span class="ms" style="font-size: 16px;">close</span> Refuser
+                                    </button>
+
+                                    <!-- Bouton Valider -->
+                                    <button type="button" class="btn-brand btn-sm d-flex align-items-center gap-1"
+                                        data-bs-toggle="modal" data-bs-target="#decisionModal"
+                                        th:attr="data-id=${demande.idDemandeRecrutement}, data-action='valider'">
+                                        <span class="ms" style="font-size: 16px;">check</span> Valider
+                                    </button>
+
+                                    <!-- Bouton Détails -->
+                                    <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement})}"
+                                        class="btn-soft btn-sm">
+                                        Détails
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Modal de décision -->
+        <div class="modal fade" id="decisionModal" tabindex="-1" aria-labelledby="decisionModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content border-0"
+                    style="border-radius: var(--radius-md); box-shadow: var(--shadow-card);">
+                    <!-- Le formulaire vers lequel on va envoyer la requête -->
+                    <form id="decisionForm" method="post" action="">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title fw-bold" id="decisionModalLabel">Confirmer la décision</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="modalMessage" class="fw-bold mb-3"></p>
+
+                            <div class="mb-3">
+                                <label for="modalRemarque" class="form-label">Remarque <span
+                                        class="text-error">*</span></label>
+                                <textarea name="remarque" id="modalRemarque" class="form-control" rows="3" required
+                                    placeholder="Précisez la raison de votre décision..."></textarea>
+                            </div>
+
+                            <!-- L'action (valider ou refuse) sera injectée ici -->
+                            <input type="hidden" name="action" id="modalAction" value="">
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-soft" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn-brand" id="modalSubmitBtn">Confirmer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const decisionModal = document.getElementById('decisionModal');
+
+            decisionModal.addEventListener('show.bs.modal', function (event) {
+                // Le bouton qui a déclenché le modal
+                const button = event.relatedTarget;
+
+                // Récupération des données
+                const idDemande = button.getAttribute('data-id');
+                const action = button.getAttribute('data-action');
+
+                // Éléments du modal à modifier
+                const form = document.getElementById('decisionForm');
+                const title = document.getElementById('decisionModalLabel');
+                const message = document.getElementById('modalMessage');
+                const actionInput = document.getElementById('modalAction');
+                const submitBtn = document.getElementById('modalSubmitBtn');
+                const remarqueInput = document.getElementById('modalRemarque');
+
+                // 1. Mettre à jour l'URL de soumission du formulaire
+                form.action = '/demandes/update/' + idDemande;
+
+                // 2. Remplir l'action cachée et vider le champ texte
+                actionInput.value = action;
+                remarqueInput.value = '';
+
+                // 3. Adapter le design selon l'action
+                if (action === 'valider') {
+                    title.textContent = 'Valider la demande #' + idDemande;
+                    message.textContent = 'Vous êtes sur le point de valider cette demande.';
+                    message.className = 'fw-bold mb-3 text-success';
+                    submitBtn.className = 'btn-brand';
+                    submitBtn.textContent = 'Confirmer la validation';
+                } else if (action === 'refuse') {
+                    title.textContent = 'Refuser la demande #' + idDemande;
+                    message.textContent = 'Vous êtes sur le point de refuser cette demande.';
+                    message.className = 'fw-bold mb-3 text-danger';
+                    submitBtn.className = 'btn-danger';
+                    submitBtn.textContent = 'Confirmer le refus';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
