@@ -6,7 +6,7 @@
     <main th:fragment="mainContent" class="app-page">
 
         <div class="mb-4">
-            <a th:href="@{/bloc2/offres}" class="back-link">&larr; Retour à la liste</a>
+            <a th:href="@{/offres}" class="back-link">&larr; Retour à la liste</a>
             <h2 class="page-title">Créer une nouvelle offre</h2>
         </div>
 
@@ -17,7 +17,7 @@
 
                         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-                        <form th:action="@{/bloc2/offres/creer}" method="post">
+                        <form th:action="@{/offres/creer}" method="post">
 
                             <div class="mb-4">
                                 <label for="idDemande" class="form-label">Demande de recrutement liée <span class="req">*</span></label>
@@ -41,7 +41,7 @@
                             </div>
 
                             <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top" style="border-color: var(--surface-high) !important;">
-                                <a th:href="@{/bloc2/offres}" class="btn-soft me-3">Annuler</a>
+                                <a th:href="@{/offres}" class="btn-soft me-3">Annuler</a>
                                 <button type="submit" class="btn-brand">Enregistrer en brouillon</button>
                             </div>
                         </form>

@@ -7,7 +7,7 @@
 
         <!-- En-tête -->
         <div class="mb-4">
-            <a th:href="@{/bloc2/offres}" class="back-link">&larr; Retour aux offres</a>
+            <a th:href="@{/offres}" class="back-link">&larr; Retour aux offres</a>
             <h2 class="page-title">
                 Évaluer le candidat : <span style="color: var(--primary-container);" th:text="${candidature.candidat.nom + ' ' + candidature.candidat.prenom}"></span>
             </h2>
@@ -60,7 +60,7 @@
                 <div class="card-x h-100">
                     <h5 class="card-head">Ajouter une nouvelle évaluation</h5>
                     <div class="card-pad mt-2">
-                        <form th:action="@{/bloc2/candidatures/{id}/evaluer(id=${candidature.idCandidature})}" method="post">
+                        <form th:action="@{/candidatures/{id}/evaluer(id=${candidature.idCandidature})}" method="post">
 
                             <div class="mb-4">
                                 <label for="idTypeEvaluation" class="form-label">Type de l'évaluation <span class="req">*</span></label>

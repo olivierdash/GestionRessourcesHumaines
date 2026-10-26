@@ -1,40 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr">
 <body>
 
-    <!-- Déclaration du fragment nommé "sidebar" -->
-    <div class="sidebar" id="sidebar-wrapper" th:fragment="sidebar(activePage)">
-        <div class="sidebar-heading">SIRH <span class="text-yellow">Pro</span></div>
-        <div class="list-group list-group-flush mt-3">
+    <aside class="sidebar" id="sidebar" th:fragment="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <span class="logo"><span class="ms">groups</span></span>SIRH Pro
+            </div>
+            <div class="sidebar-label">Menu principal</div>
             
-            <!-- Remarque le th:classappend : il ajoute la classe 'active' si activePage correspond -->
-            <a th:href="@{/utilisateur/dashboard}" class="list-group-item list-group-item-action" 
-               th:classappend="${activePage == 'dashboard'} ? 'active'">
-               Tableau de bord
-            </a>
-            
-            <a th:href="@{/demandes}" class="list-group-item list-group-item-action" 
-               th:classappend="${activePage == 'demandes'} ? 'active'">
-               Demandes de recrutement
-            </a>
-            
-            <a th:href="@{/bloc2/offres}" class="list-group-item list-group-item-action" 
-               th:classappend="${activePage == 'offres'} ? 'active'">
-               Offres d'emploi
-            </a>
-            
-            <a th:href="@{/employes}" class="list-group-item list-group-item-action" 
-               th:classappend="${activePage == 'employes'} ? 'active'">
-               Employés
-            </a>
-            
-            <a th:href="@{/departements}" class="list-group-item list-group-item-action" 
-               th:classappend="${activePage == 'departements'} ? 'active'">
-               Départements
-            </a>
-            
+            <nav class="nav flex-column">
+                <a class="nav-link" th:href="@{/demandes}">
+                    <span class="ms">assignment</span>Demandes de Recrutement
+                </a>
+
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" class="nav-link" th:href="@{/employes}">
+                    <span class="ms">badge</span>Employés
+                </a>
+
+                <a sec:authorize="hasAnyRole('RH', 'DG')" class="nav-link" th:href="@{/departements}">
+                    <span class="ms">apartment</span>Départements
+                </a>
+
+                <a sec:authorize="hasAnyRole('RH', 'MANAGER')" class="nav-link" th:href="@{/offres}">
+                    <span class="ms">person_search</span>Offre d'Emplois
+                </a>
+
+                <a sec:authorize="hasAnyRole('FINANCE', 'DG','RH')" class="nav-link" th:href="@{/demandes/validations}">
+                    <span class="ms">payments</span>Mes validations
+                </a>
+            </nav>
         </div>
-    </div>
+
+        <div class="sidebar-user d-flex align-items-center justify-content-between">
+            <div class="avatar" 
+                 th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">
+                CD
+            </div>
+
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button class="icon-btn" title="Déconnexion" type="submit">
+                    <span class="ms" style="font-size: 20px;">logout</span>
+                </button>
+            </form>
+        </div>
+    </aside>
 
 </body>
 </html>

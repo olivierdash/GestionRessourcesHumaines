@@ -45,7 +45,7 @@ public class OffreEmploiController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur : " + e.getMessage());
         }
-        return "redirect:/bloc2/offres";
+        return "redirect:/offres";
     }
 
     // TÂCHE 9 bis : Publication de l'offre
@@ -57,6 +57,6 @@ public class OffreEmploiController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/bloc2/offres";
+        return "redirect:/offres";
     }
 }

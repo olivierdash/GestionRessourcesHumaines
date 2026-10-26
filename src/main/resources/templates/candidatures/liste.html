@@ -7,7 +7,7 @@
 
         <!-- En-tête -->
         <div class="mb-4">
-            <a th:href="@{/bloc2/offres}" class="back-link">&larr; Retour aux offres</a>
+            <a th:href="@{//offres}" class="back-link">&larr; Retour aux offres</a>
             <h2 class="page-title">
                 Candidatures pour l'offre : <span style="color: var(--primary-container);" th:text="${offre.titre}"></span>
             </h2>
@@ -35,11 +35,11 @@
                                 <span class="pill st-rh" th:text="${cand.statutCandidature.libelle}"></span>
                             </td>
                             <td class="text-end text-nowrap">
-                                <a th:href="@{/bloc2/candidats/{id}(id=${cand.candidat.idCandidat})}" 
+                                <a th:href="@{/candidats/{id}(id=${cand.candidat.idCandidat})}" 
                                    class="btn-soft btn-sm-x me-1">
                                     Fiche Candidat
                                 </a>
-                                <a th:href="@{/bloc2/candidatures/{id}/evaluer(id=${cand.idCandidature})}" 
+                                <a th:href="@{/candidatures/{id}/evaluer(id=${cand.idCandidature})}" 
                                    class="btn-brand btn-sm-x">
                                     Évaluer
                                 </a>
