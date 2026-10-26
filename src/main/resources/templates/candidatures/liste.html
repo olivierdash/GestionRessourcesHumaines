@@ -7,7 +7,8 @@
 
         <!-- En-tête -->
         <div class="mb-4">
-            <a th:href="@{//offres}" class="back-link">&larr; Retour aux offres</a>
+            <!-- Correction du double slash ici -->
+            <a th:href="@{/offres}" class="back-link">&larr; Retour aux offres</a>
             <h2 class="page-title">
                 Candidatures pour l'offre : <span style="color: var(--primary-container);" th:text="${offre.titre}"></span>
             </h2>
@@ -43,6 +44,27 @@
                                    class="btn-brand btn-sm-x">
                                     Évaluer
                                 </a>
+
+                                <!-- 🔥 NOUVEAUX BOUTONS (Affichés seulement si le candidat n'est ni RETENU (3) ni REFUSE (4)) -->
+                                <div th:if="${cand.statutCandidature.id != 3 and cand.statutCandidature.id != 4}" style="display:inline-block;">
+                                    
+                                    <!-- Bouton RETENIR -->
+                                    <form th:action="@{/candidatures/{id}/retenir(id=${cand.idCandidature})}" method="post" style="display:inline;">
+                                        <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
+                                        <button type="submit" class="btn-soft btn-sm-x ms-1" style="color: #198754; border-color: #198754;" title="Retenir ce candidat">
+                                            Retenir
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Bouton REFUSER -->
+                                    <form th:action="@{/candidatures/{id}/refuser(id=${cand.idCandidature})}" method="post" style="display:inline;">
+                                        <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
+                                        <button type="submit" class="btn-soft btn-sm-x ms-1" style="color: #dc3545; border-color: #dc3545;" title="Refuser ce candidat">
+                                            Refuser
+                                        </button>
+                                    </form>
+                                    
+                                </div>
                             </td>
                         </tr>
                         <tr th:if="${candidatures.isEmpty()}">

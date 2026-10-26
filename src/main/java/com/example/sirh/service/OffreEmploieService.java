@@ -32,7 +32,7 @@ public class OffreEmploieService {
     public List<OffreEmploi> listAllEmploie(){
         return offreEmploieRepo.findAllByOrderByDatePublicationDesc();
     }
-
+    
     /**
      * task 9 : créer/publié tout les offres d'emploie
      */ 
