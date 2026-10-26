@@ -32,7 +32,7 @@
             <td><span class="badge bg-secondary" th:text="${p.statut.libelle}"></span></td>
             <td>
                 <a class="btn btn-sm btn-primary"
-                   th:href="@{/bloc3/propositions/{id}(id=${p.idProposition})}">Ouvrir</a>
+                   th:href="@{/propositions/{id}(id=${p.idProposition})}">Ouvrir</a>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(propositions)}">

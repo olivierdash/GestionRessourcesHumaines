@@ -38,62 +38,91 @@
 }
 
 /* =========================================================
-   2. DESIGN SYSTEM TOKENS (Fondations)
+   2. DESIGN SYSTEM TOKENS  —  THÈME "SOFT BLUE" (neumorphisme léger)
+   Les noms de variables sont conservés : seules les valeurs changent.
    ========================================================= */
 :root {
-    /* --- PALETTE DE COULEURS --- */
-    --color-primary: #00288E;        /* Deep Blue */
-    --color-primary-hover: #1e3a8a;
-    --color-secondary: #FE932C;      /* Warm Amber */
-    --color-secondary-hover: #d97706;
-    --color-tertiary: #002E81;       /* Dark Navy */
-    
-    /* --- COULEURS D'ÉTAT (Status) --- */
-    --color-error: #BA1A1A;
-    --color-error-bg: #FEE2E2;
-    --color-success: #065F46;
-    --color-success-bg: #D1FAE5;
-    --color-warning: #B45309;
-    --color-warning-bg: #FEF3C7;
+    /* --- PALETTE --- */
+    --color-primary: #3B82F6;          /* Bleu vif (boutons, liens, états actifs) */
+    --color-primary-hover: #2F6FEB;
+    --color-primary-soft: #DCE8FE;     /* Fond bleu pâle (item actif, pills) */
+    --color-secondary: #FF9F43;        /* Orange (badge, accents) */
+    --color-secondary-hover: #F08A24;
+    --color-tertiary: #2F6FEB;         /* Bleu des liens / boutons secondaires */
+
+    /* --- ÉTATS --- */
+    --color-error: #E0485B;
+    --color-error-bg: #FFDCE1;
+    --color-success: #1C9B5C;
+    --color-success-bg: #D2F4E2;
+    --color-warning: #D98410;
+    --color-warning-bg: #FFEBC8;
 
     /* --- SURFACES & TEXTES --- */
-    --color-canvas: #FAF8FF;
-    --color-surface: #FFFFFF;
-    --color-surface-low: #F2F3FF;
-    --color-surface-mid: #EAEDFF;
-    --color-text-main: #131B2E;
-    --color-text-muted: #757684;
-    --color-border: #E2E8F0;
+    --color-canvas: #E1E9F7;           /* Fond de page */
+    --color-surface: #EEF3FC;          /* Cartes / champs au focus */
+    --color-surface-low: #E5ECF9;      /* Champs, zones en creux */
+    --color-surface-mid: #D4E0F4;
+    --color-text-main: #1B2A4E;        /* Bleu nuit */
+    --color-text-muted: #66769A;
+    --color-border: rgba(150, 172, 214, 0.28);
+
+    /* Alias utilisés par certains templates */
+    --surface-high: rgba(150, 172, 214, 0.35);
+    --primary-container: #3B82F6;
+
+    /* --- DÉGRADÉS --- */
+    --bg-gradient:
+        radial-gradient(1100px 560px at 88% -8%, rgba(255, 255, 255, 0.75), transparent 62%),
+        radial-gradient(900px 520px at -5% 105%, rgba(184, 207, 248, 0.55), transparent 60%),
+        linear-gradient(160deg, #DCE6F6 0%, #E4ECF9 55%, #DDE7F7 100%);
+    --surface-gradient: linear-gradient(145deg, #F2F6FD 0%, #E6EEFA 100%);
+    --brand-gradient: linear-gradient(135deg, #5AA0FF 0%, #3B82F6 55%, #2F6FEB 100%);
 
     /* --- TYPOGRAPHIE --- */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    
+
     --font-display: 800 36px/44px var(--font-family);
     --font-h1: 700 28px/36px var(--font-family);
     --font-h2: 700 24px/32px var(--font-family);
     --font-body: 400 14px/20px var(--font-family);
     --font-small: 400 13px/18px var(--font-family);
-    
-    /* CORRECTION : Passage de 11px à 13px pour les labels (plus lisible) */
-    --font-label: 600 13px/16px var(--font-family); 
+    --font-label: 600 13px/16px var(--font-family);
 
-    /* --- FORMES & OMBRES --- */
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    
-    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-button: 0 1px 3px rgba(15, 23, 42, 0.08);
-    
+    /* --- FORMES --- */
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-pill: 999px;
+
+    /* --- OMBRES (effet "soft UI" : ombre bleutée + reflet blanc) --- */
+    --shadow-card:
+        10px 10px 26px rgba(150, 172, 214, 0.38),
+        -8px -8px 22px rgba(255, 255, 255, 0.85);
+    --shadow-raised:
+        5px 5px 12px rgba(150, 172, 214, 0.35),
+        -4px -4px 10px rgba(255, 255, 255, 0.9);
+    --shadow-inset:
+        inset 3px 3px 7px rgba(150, 172, 214, 0.30),
+        inset -3px -3px 7px rgba(255, 255, 255, 0.90);
+    --shadow-button:
+        0 8px 18px rgba(59, 130, 246, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
     --transition-fast: all 0.2s ease-in-out;
-    --sidebar-width: 260px;
-    --topbar-height: 64px;
+    --sidebar-width: 250px;
+    --sidebar-gap: 16px;
+    --topbar-height: 84px;
 }
 
 /* =========================================================
    3. STYLES DE BASE & ICÔNES
    ========================================================= */
+html { min-height: 100%; }
+
 body {
+    background: var(--bg-gradient);
+    background-attachment: fixed;
     background-color: var(--color-canvas);
     color: var(--color-text-main);
     font: var(--font-body);
@@ -102,10 +131,22 @@ body {
 
 h1, .h1 { font: var(--font-h1); margin-bottom: 0.5rem; }
 h2, .h2 { font: var(--font-h2); margin-bottom: 0.5rem; }
+h1, h2, h3, h4, h5, h6 { color: var(--color-text-main); }
 .text-small { font: var(--font-small); }
 .text-label { font: var(--font-label); text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* CORRECTION CRUCIALE : La classe pour les icônes Material */
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { color: var(--color-primary-hover); text-decoration: none; }
+
+hr { border-top: 1px solid var(--color-border); }
+
+.text-muted { color: var(--color-text-muted) !important; }
+.text-main { color: var(--color-text-main); }
+.text-outline { color: var(--color-text-muted); }
+.text-error { color: var(--color-error) !important; }
+.req { color: var(--color-error); margin-left: 2px; }
+
+/* Icônes Material Symbols */
 .ms {
     font-family: 'Material Symbols Outlined';
     font-weight: normal;
@@ -122,54 +163,181 @@ h2, .h2 { font: var(--font-h2); margin-bottom: 0.5rem; }
     -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================================
-   4. BOUTONS
-   ========================================================= */
-.btn-brand, .btn-soft, .btn-danger {
+/* ---------------------------------------------------------
+   Titres de page & liens retour
+   --------------------------------------------------------- */
+.page-title {
+    font: 700 26px/34px var(--font-family);
+    letter-spacing: -0.02em;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.back-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem; /* CORRECTION : Ajout d'espace entre le texte et l'icône */
-    height: 44px;
-    padding: 0 1.5rem;
-    border-radius: var(--radius-sm);
-    font: var(--font-label);
-    text-decoration: none;
-    border: none;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+    font: 600 13px/18px var(--font-family);
+    color: var(--color-text-muted);
+    transition: var(--transition-fast);
+}
+.back-link:hover { color: var(--color-primary); }
+
+.lbl {
+    display: block;
+    margin-bottom: 0.25rem;
+    font: 600 11.5px/16px var(--font-family);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+.val { font: 600 14px/20px var(--font-family); color: var(--color-text-main); }
+
+.divider {
+    border: 0;
+    height: 1px;
+    margin: 1.25rem 0;
+    background: linear-gradient(to right, transparent, rgba(130, 155, 205, 0.45), transparent);
+}
+
+/* =========================================================
+   3b. COMPATIBILITÉ BOOTSTRAP 5 (le CSS fourni est en 4.4.1)
+   Classes utilisées par les templates mais absentes de BS 4.
+   ========================================================= */
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 1rem; }
+.gap-4 { gap: 1.5rem; }
+.gap-5 { gap: 3rem; }
+.row.g-2 { row-gap: 0.5rem; }
+.row.g-3 { row-gap: 1rem; }
+.row.g-4 { row-gap: 1.5rem; }
+
+.ms-1 { margin-left: 0.25rem; }
+.ms-2 { margin-left: 0.5rem; }
+.me-1 { margin-right: 0.25rem; }
+.me-2 { margin-right: 0.5rem; }
+.me-3 { margin-right: 1rem; }
+
+.fw-medium { font-weight: 500; }
+.fw-semibold { font-weight: 600; }
+.fw-bold { font-weight: 700; }
+.fs-6 { font-size: 1rem; }
+.font-monospace { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.text-end { text-align: right; }
+.d-grid { display: grid; }
+
+.top-0 { top: 0; }
+.start-0 { left: 0; }
+.start-100 { left: 100%; }
+.translate-middle { transform: translate(-50%, -50%); }
+
+.bg-canvas { background: var(--bg-gradient); background-color: var(--color-canvas); }
+.bg-light { background: var(--color-surface-low) !important; box-shadow: var(--shadow-inset); }
+.rounded { border-radius: var(--radius-sm) !important; }
+
+/* Bouton de fermeture des alertes (BS5) */
+.btn-close {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    box-sizing: content-box;
+    width: 1em;
+    height: 1em;
+    padding: 0.35em;
+    border: 0;
+    border-radius: 50%;
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2366769A'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center / 0.7em no-repeat;
+    opacity: 0.7;
     cursor: pointer;
     transition: var(--transition-fast);
 }
+.btn-close:hover { opacity: 1; background-color: rgba(255, 255, 255, 0.6); }
+
+/* =========================================================
+   4. BOUTONS  (pilules, dégradé bleu + lueur)
+   ========================================================= */
+.btn-brand, .btn-soft, .btn-danger, .btn-danger-soft {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 46px;
+    padding: 0 1.6rem;
+    border-radius: var(--radius-pill);
+    font: var(--font-label);
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition-fast);
+}
+.btn-brand:hover, .btn-soft:hover, .btn-danger:hover, .btn-danger-soft:hover {
+    text-decoration: none;
+}
 
 .btn-brand {
-    background-color: var(--color-primary);
+    background: var(--brand-gradient);
     color: #FFFFFF;
     box-shadow: var(--shadow-button);
 }
 .btn-brand:hover {
-    background-color: var(--color-primary-hover);
+    color: #FFFFFF;
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(59, 130, 246, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
+.btn-brand:active { transform: translateY(0); filter: brightness(0.97); }
 
 .btn-soft {
-    background-color: var(--color-surface-low);
+    background: var(--surface-gradient);
     color: var(--color-tertiary);
-    border: 1px solid var(--color-border);
+    border-color: rgba(255, 255, 255, 0.75);
+    box-shadow: var(--shadow-raised);
 }
 .btn-soft:hover {
-    background-color: var(--color-surface-mid);
+    color: var(--color-primary-hover);
+    background: #F3F7FE;
+    transform: translateY(-1px);
 }
+.btn-soft:active { box-shadow: var(--shadow-inset); transform: none; }
 
-.btn-danger {
-    background-color: var(--color-error-bg);
+.btn-danger, .btn-danger-soft {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    box-shadow: var(--shadow-raised);
+}
+.btn-danger:hover, .btn-danger-soft:hover {
+    background: #FFC9D1;
     color: var(--color-error);
 }
-.btn-danger:hover {
-    background-color: #FCA5A5;
+.btn-danger-soft:disabled,
+.btn-brand:disabled, .btn-soft:disabled, .btn-danger:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
 }
 
-.btn-sm { height: 32px; padding: 0 1rem; font-size: 12px; }
+/* Petites tailles (déclarées APRÈS les boutons pour les surcharger) */
+.btn-sm, .btn-sm-x { height: 34px; padding: 0 1.1rem; font-size: 12px; }
+
+/* Boutons Bootstrap génériques alignés sur le thème */
+.btn { border-radius: var(--radius-pill); font-weight: 600; transition: var(--transition-fast); }
+.btn.btn-primary {
+    background: var(--brand-gradient);
+    border-color: transparent;
+    color: #FFFFFF;
+    box-shadow: var(--shadow-button);
+    padding: 0.55rem 1.4rem;
+}
+.btn.btn-primary:hover { filter: brightness(1.06); color: #FFFFFF; transform: translateY(-1px); }
+.btn.btn-primary:focus { box-shadow: var(--shadow-button), 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
 /* =========================================================
-   5. CHAMPS DE SAISIE (Formulaires)
+   5. CHAMPS DE SAISIE  (effet "en creux")
    ========================================================= */
 .form-label {
     font: var(--font-label);
@@ -179,30 +347,55 @@ h2, .h2 { font: var(--font-h2); margin-bottom: 0.5rem; }
 }
 
 .form-control, .form-select {
-    height: 44px;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-low); /* Mis en gris clair par défaut */
+    height: 46px;
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-low);
     border: 1px solid transparent;
+    box-shadow: var(--shadow-inset);
     color: var(--color-text-main);
     font: var(--font-body);
-    padding: 0 1rem;
+    padding: 0 1.1rem;
     transition: var(--transition-fast);
 }
 
-.form-control::placeholder {
-    color: var(--color-text-muted);
+textarea.form-control {
+    height: auto;
+    padding: 0.8rem 1.1rem;
 }
+
+.form-select {
+    display: block;
+    width: 100%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2366769A' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 14px 14px;
+}
+.form-select-sm { height: 38px; font-size: 13px; border-radius: var(--radius-sm); }
+
+.form-control::placeholder { color: var(--color-text-muted); opacity: 0.85; }
 
 .form-control:focus, .form-select:focus {
     outline: none;
-    background-color: var(--color-surface); /* Devient blanc au focus */
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 40, 142, 0.15);
+    background-color: var(--color-surface);
+    color: var(--color-text-main);
+    border-color: rgba(59, 130, 246, 0.55);
+    box-shadow: var(--shadow-inset), 0 0 0 3px rgba(59, 130, 246, 0.16);
+}
+
+.form-control:disabled, .form-select:disabled, .form-control[readonly] {
+    background-color: var(--color-surface-low);
+    opacity: 0.7;
 }
 
 .form-control.is-invalid {
     border-color: var(--color-error);
-    background-color: #FFF;
+    background-color: var(--color-surface);
+    background-image: none;
 }
 .invalid-feedback {
     color: var(--color-error);
@@ -210,219 +403,273 @@ h2, .h2 { font: var(--font-h2); margin-bottom: 0.5rem; }
     margin-top: 4px;
 }
 
-/* CORRECTION : Empêcher le fond jaune d'Autofill de Google Chrome */
+/* Empêche le fond jaune d'Autofill de Chrome */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px var(--color-surface-low) inset !important;
     -webkit-text-fill-color: var(--color-text-main) !important;
     transition: background-color 5000s ease-in-out 0s;
 }
 
-/* =========================================================
-   6. CARTES (Cards)
-   ========================================================= */
-.card-x {
-    background-color: var(--color-surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--color-border);
-    overflow: visible;
-}
-.card-x .card-head {
-    padding: 1.25rem 1.5rem 0;
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-}
-.card-x .card-pad {
-    padding: 1.25rem 1.5rem 1.5rem;
+/* Zone d'action en bas des formulaires */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
 }
 
 /* =========================================================
-   7. BADGES / PILLS
+   6. CARTES
+   ========================================================= */
+.card-x, .card {
+    background: var(--surface-gradient);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    overflow: visible;
+    color: var(--color-text-main);
+}
+.card-x .card-head {
+    padding: 1.35rem 1.6rem 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0;
+}
+.card-x .card-pad { padding: 1.25rem 1.6rem 1.6rem; }
+
+/* Bloc "motif" (fiche demande) */
+.motif-box {
+    background: var(--color-surface-low) !important;
+    box-shadow: var(--shadow-inset);
+    border-radius: var(--radius-md) !important;
+}
+
+/* =========================================================
+   7. BADGES / PILLS  (pastels)
    ========================================================= */
 .pill {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 50rem;
-    font-size: 11px;
+    padding: 0.3rem 0.85rem;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
     line-height: 1.4;
 }
 
-.pill-en-cours { background-color: var(--color-surface-low); color: var(--color-tertiary); }
-.pill-attente { background-color: var(--color-warning-bg); color: var(--color-warning); }
-.pill-valide { background-color: var(--color-success-bg); color: var(--color-success); }
-.pill-refuse { background-color: var(--color-error-bg); color: var(--color-error); }
-.pill-neutre { background-color: var(--color-surface-mid); color: var(--color-text-muted); }
-.pill-id { background-color: var(--color-surface-mid); color: var(--color-primary); font-family: monospace; }
-
-
+.pill-en-cours, .st-rh { background-color: var(--color-primary-soft); color: var(--color-tertiary); }
+.pill-attente, .st-brouillon { background-color: var(--color-warning-bg); color: var(--color-warning); }
+.pill-valide, .st-publie, .st-actif { background-color: var(--color-success-bg); color: var(--color-success); }
+.pill-refuse, .st-sorti { background-color: var(--color-error-bg); color: var(--color-error); }
+.pill-neutre, .st-autre { background-color: rgba(130, 155, 205, 0.2); color: var(--color-text-muted); }
+.pill-id { background-color: var(--color-primary-soft); color: var(--color-primary-hover); font-family: monospace; }
 
 /* =========================================================
-   AJOUTS : Tableaux & Petits Avatars
+   8. TABLEAUX  (lignes "flottantes" arrondies)
    ========================================================= */
+.card-x .table-responsive { padding: 0.75rem 1.25rem 1rem; }
 
-/* --- Style du Tableau (Pour la classe .table-x) --- */
+.table { color: var(--color-text-main); }
+.table td, .table th { border-top: 1px solid var(--color-border); }
+
 .table-x {
     margin-bottom: 0;
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 8px;
 }
 
 .table-x thead th {
-    background-color: var(--color-surface-low);
+    background-color: transparent;
     color: var(--color-text-muted);
-    font: var(--font-label);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 1rem 1.25rem;
+    font: 600 12.5px/16px var(--font-family);
+    padding: 0.5rem 1.25rem;
     border: none;
     text-align: left;
+    white-space: nowrap;
 }
+.table-x thead th.text-end { text-align: right; }
 
 .table-x tbody td {
-    padding: 1rem 1.25rem;
+    padding: 0.95rem 1.25rem;
     border: none;
-    border-bottom: 1px solid var(--color-border);
+    border-top: 1px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(150, 172, 214, 0.12);
     vertical-align: middle;
+    background-color: rgba(255, 255, 255, 0.38);
     color: var(--color-text-main);
     font: var(--font-body);
+    transition: background-color 0.2s ease;
 }
+.table-x tbody td:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+.table-x tbody td:last-child  { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.table-x tbody td[colspan]    { border-radius: var(--radius-md); }
 
-.table-x tbody tr:hover td {
-    background-color: rgba(242, 243, 255, 0.6); /* Effet de survol basé sur --color-surface-low */
+.table-x tbody tr:hover td { background-color: rgba(255, 255, 255, 0.78); }
+
+td.ref { font-weight: 600; }
+td.ref a { color: var(--color-primary); }
+
+/* Pagination */
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 1rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-gradient);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: var(--shadow-raised);
+    color: var(--color-tertiary);
+    font: 600 13px/1 var(--font-family);
+    transition: var(--transition-fast);
 }
-
-.table-x tbody tr:last-child td {
-    border-bottom: none;
+a.page-btn:hover { color: var(--color-primary-hover); transform: translateY(-1px); }
+.page-btn.current {
+    background: var(--brand-gradient);
+    color: #FFFFFF;
+    border-color: transparent;
+    box-shadow: var(--shadow-button);
 }
+.page-btn.disabled { opacity: 0.45; pointer-events: none; box-shadow: none; }
 
-/* --- Avatar de petite taille (pour les tableaux) --- */
-.avatar-sm {
-    width: 28px;
-    height: 28px;
+/* =========================================================
+   9. AVATARS
+   ========================================================= */
+.avatar, .avatar-sm {
     border-radius: 50%;
-    background-color: var(--color-primary);
+    background: var(--brand-gradient);
     color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 11px;
+    font-weight: 700;
     flex-shrink: 0;
-}/* --- Sidebar --- */
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.avatar { width: 44px; height: 44px; font-size: 16px; letter-spacing: 0.5px; }
+.avatar-sm { width: 30px; height: 30px; font-size: 11px; }
+.avatar-lg { width: 72px; height: 72px; font-size: 26px; }
+
+/* =========================================================
+   10. SIDEBAR  (panneau clair flottant, coins arrondis)
+   ========================================================= */
 .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
+    top: var(--sidebar-gap);
+    left: var(--sidebar-gap);
+    bottom: var(--sidebar-gap);
     width: var(--sidebar-width);
-    background-color: var(--color-tertiary);
-    color: #FFFFFF;
+    background: linear-gradient(160deg, rgba(243, 247, 253, 0.92), rgba(227, 236, 250, 0.92));
+    color: var(--color-text-main);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 28px;
+    box-shadow: var(--shadow-card);
     z-index: 1040;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+    overflow-y: auto;
 }
 
 .sidebar-brand {
     height: var(--topbar-height);
-    padding: 0 1rem;
+    padding: 0 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: rgba(0, 0, 0, 0.15);
-    font-weight: 700;
-    font-size: 16px;
+    gap: 0.75rem;
+    background: none;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    color: var(--color-text-main);
 }
 
 .sidebar-brand .logo {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-sm);
-    background: var(--color-secondary);
-    color: var(--color-text-main);
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--brand-gradient);
+    color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
+.sidebar-brand .logo .ms { font-size: 22px; }
 
 .sidebar-label {
-    padding: 1rem 1rem 0.25rem;
-    font: var(--font-label);
+    padding: 0.5rem 1.5rem 0.5rem;
+    font: 600 11px/16px var(--font-family);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-muted);
 }
 
 .sidebar .nav-link {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    margin: 0 0.5rem 0.25rem;
-    border-radius: var(--radius-sm);
-    color: rgba(255, 255, 255, 0.7);
-    transition: var(--transition-fast);
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    margin: 0 0.9rem 0.35rem;
+    border-radius: var(--radius-md);
+    color: #5A6A8E;
+    font-size: 14px;
     font-weight: 500;
+    transition: var(--transition-fast);
 }
+.sidebar .nav-link .ms { font-size: 22px; flex-shrink: 0; }
 
 .sidebar .nav-link:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--color-primary-hover);
 }
 
 .sidebar .nav-link.active {
-    background: var(--color-primary);
-    color: #FFFFFF;
-    box-shadow: inset 3px 0 0 0 var(--color-secondary);
+    background: linear-gradient(135deg, #DDE9FE, #CDDFFD);
+    color: var(--color-primary-hover);
+    font-weight: 600;
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.85), 4px 4px 12px rgba(120, 150, 210, 0.25);
 }
 
 .sidebar-user {
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.2);
-}
-
-/* Avatar dans la sidebar */
-.avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background-color: var(--color-secondary);
-    color: var(--color-text-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 16px;
-    letter-spacing: 0.5px;
+    margin: 0.9rem;
+    padding: 0.75rem 0.9rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    box-shadow: var(--shadow-raised);
 }
 
 .icon-btn {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.6);
-    padding: 0.25rem;
-    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    padding: 0.4rem;
+    border-radius: 12px;
     transition: var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--color-error);
 }
 
-/* --- Topbar & Contenu --- */
+/* =========================================================
+   11. TOPBAR & CONTENU
+   ========================================================= */
 .content-wrap {
-    margin-left: var(--sidebar-width);
+    margin-left: calc(var(--sidebar-width) + var(--sidebar-gap) * 2);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -431,17 +678,17 @@ input:-webkit-autofill:active{
 .topbar {
     position: fixed;
     top: 0;
-    left: var(--sidebar-width);
+    left: calc(var(--sidebar-width) + var(--sidebar-gap) * 2);
     right: 0;
     height: var(--topbar-height);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+    background: linear-gradient(to bottom, rgba(222, 231, 246, 0.97) 55%, rgba(222, 231, 246, 0));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     z-index: 1030;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
+    padding: 0 2rem 0 1rem;
 }
 
 .search-box {
@@ -449,57 +696,69 @@ input:-webkit-autofill:active{
     width: 100%;
     max-width: 28rem;
 }
-
 .search-box .ms {
     position: absolute;
-    left: 0.75rem;
+    left: 1rem;
     top: 50%;
     transform: translateY(-50%);
+    font-size: 22px;
     color: var(--color-text-muted);
     pointer-events: none;
+    z-index: 2;
 }
-
 .search-box input {
-    height: 40px;
-    padding-left: 2.5rem;
-    border: none;
-    background: var(--color-surface-low);
-    border-radius: var(--radius-sm);
+    height: 48px;
+    padding-left: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    background: var(--surface-gradient);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-raised);
     font-size: 13px;
 }
-
 .search-box input:focus {
     background: var(--color-surface);
-    box-shadow: 0 0 0 2px var(--color-primary);
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: var(--shadow-raised), 0 0 0 3px rgba(59, 130, 246, 0.16);
 }
 
 .topbar-btn {
-    border: none;
-    background: none;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    background: var(--surface-gradient);
     color: var(--color-text-muted);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 46px;
+    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: var(--shadow-raised);
     transition: var(--transition-fast);
 }
-
 .topbar-btn:hover {
-    background: var(--color-surface-mid);
-    color: var(--color-text-main);
+    color: var(--color-primary);
+    background: #F3F7FE;
+    transform: translateY(-1px);
+    text-decoration: none;
 }
 
 .notif-dot {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 9px;
+    right: 10px;
     width: 10px;
     height: 10px;
     border-radius: 50%;
     background: var(--color-error);
-    border: 2px solid #FFFFFF;
+    border: 2px solid var(--color-surface);
+}
+
+/* Pastille de notification (Bootstrap badge) */
+.topbar .badge.bg-danger {
+    background: linear-gradient(135deg, #FF7A59, #F04B5E) !important;
+    border: 2px solid var(--color-surface) !important;
+    color: #FFFFFF;
+    box-shadow: 0 3px 8px rgba(240, 75, 94, 0.35);
 }
 
 main {
@@ -510,77 +769,109 @@ main {
 .page {
     max-width: 1560px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem 2rem 2rem 1rem;
 }
 
 /* =========================================================
-   9. CUSTOM SELECT (Liste Flottante)
+   12. ALERTES, PROGRESSION, TIMELINE
    ========================================================= */
-.custom-select-wrapper {
+.alert {
+    position: relative;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow-raised);
+    font-weight: 500;
+}
+.alert-success { background: var(--color-success-bg); color: #15744A; }
+.alert-danger  { background: var(--color-error-bg);   color: #BF3346; }
+.alert-warning { background: var(--color-warning-bg); color: #A96208; }
+.alert-info    { background: var(--color-primary-soft); color: #2A5FCC; }
+.alert-dismissible { padding-right: 3.5rem; }
+
+.progress {
+    height: 14px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-low);
+    box-shadow: var(--shadow-inset);
+    overflow: hidden;
+}
+.progress-bar {
+    background: linear-gradient(90deg, #7DB8FF, #3B82F6);
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 1.5rem;
     position: relative;
 }
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, rgba(59, 130, 246, 0.45), rgba(150, 172, 214, 0.25));
+}
+.timeline-item { position: relative; padding-bottom: 1.4rem; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    border: 2px solid var(--color-surface);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+/* =========================================================
+   13. CUSTOM SELECT (liste flottante)
+   ========================================================= */
+.custom-select-wrapper { position: relative; }
 
 .custom-dropdown {
     position: absolute;
-    top: calc(100% + 4px);
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
     background: var(--color-surface);
-    border-radius: var(--radius-sm);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Ombre plus prononcée pour flotter */
-    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 14px 30px rgba(120, 150, 210, 0.35), -4px -4px 12px rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     max-height: 220px;
     overflow-y: auto;
-    
-    z-index: 9999; /* S'assure que la liste passe au-dessus de tout */
-    
+    z-index: 9999;
     display: none;
 }
-
-.custom-dropdown.show {
-    display: block;
-}
+.custom-dropdown.show { display: block; }
 
 .custom-option {
     padding: 0.65rem 1rem;
     font: var(--font-body);
     color: var(--color-text-main);
     cursor: pointer;
-    border-bottom: 1px solid var(--color-surface-low);
+    border-bottom: 1px solid var(--color-border);
     transition: var(--transition-fast);
 }
-
-.custom-option:last-child {
-    border-bottom: none;
-}
-
-.custom-option:hover, 
+.custom-option:last-child { border-bottom: none; }
+.custom-option:hover,
 .custom-option.active {
-    background-color: var(--color-surface-low);
-    color: var(--color-primary);
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--color-primary-hover);
     font-weight: 500;
 }
-/* =========================================================
-   10. UTILITAIRES DE FORMULAIRE (Consistance)
-   ========================================================= */
 
-/* Couleur du texte d'erreur / astérisque */
-.text-error {
-    color: var(--color-error) !important;
-}
-
-/* Zone d'action en bas des formulaires (Boutons Annuler / Enregistrer) */
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem; /* Remplace le me-3 par un espacement géré par le parent */
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border);
-}
 /* =========================================================
-   ANIMATION DE L'EFFECTIF (Tooltip d'extension)
+   14. ANIMATION DE L'EFFECTIF (tooltip d'extension)
    ========================================================= */
 .effectif-wrapper {
     position: relative;
@@ -588,280 +879,11 @@ main {
     justify-content: center;
     align-items: center;
 }
-
-/* Le badge raccourci (1K, 1M) */
 .effectif-short {
     position: relative;
     z-index: 2;
     transition: opacity 0.2s ease;
 }
-
-.btn-brand {
-    background-color: var(--color-primary);
-    color: #FFFFFF;
-    box-shadow: var(--shadow-button);
-}
-.btn-brand:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.btn-soft {
-    background-color: var(--color-surface-low);
-    color: var(--color-tertiary);
-    border: 1px solid var(--color-border);
-}
-.btn-soft:hover {
-    background-color: var(--color-surface-mid);
-}
-
-.btn-danger {
-    background-color: var(--color-error-bg);
-    color: var(--color-error);
-}
-.btn-danger:hover {
-    background-color: #FCA5A5;
-}
-
-.btn-sm { height: 32px; padding: 0 1rem; font-size: 12px; }
-
-/* =========================================================
-   5. CHAMPS DE SAISIE (Formulaires)
-   ========================================================= */
-.form-label {
-    font: var(--font-label);
-    color: var(--color-text-main);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control, .form-select {
-    height: 44px;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-low); /* Mis en gris clair par défaut */
-    border: 1px solid transparent;
-    color: var(--color-text-main);
-    font: var(--font-body);
-    padding: 0 1rem;
-    transition: var(--transition-fast);
-}
-
-.form-control::placeholder {
-    color: var(--color-text-muted);
-}
-
-.btn-brand {
-    background-color: var(--color-primary);
-    color: #FFFFFF;
-    box-shadow: var(--shadow-button);
-}
-.btn-brand:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.btn-soft {
-    background-color: var(--color-surface-low);
-    color: var(--color-tertiary);
-    border: 1px solid var(--color-border);
-}
-.btn-soft:hover {
-    background-color: var(--color-surface-mid);
-}
-
-.btn-danger {
-    background-color: var(--color-error-bg);
-    color: var(--color-error);
-}
-.btn-danger:hover {
-    background-color: #FCA5A5;
-}
-
-.btn-sm { height: 32px; padding: 0 1rem; font-size: 12px; }
-
-/* =========================================================
-   5. CHAMPS DE SAISIE (Formulaires)
-   ========================================================= */
-.form-label {
-    font: var(--font-label);
-    color: var(--color-text-main);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control, .form-select {
-    height: 44px;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-low); /* Mis en gris clair par défaut */
-    border: 1px solid transparent;
-    color: var(--color-text-main);
-    font: var(--font-body);
-    padding: 0 1rem;
-    transition: var(--transition-fast);
-}
-
-.form-control::placeholder {
-    color: var(--color-text-muted);
-}
-
-.btn-brand {
-    background-color: var(--color-primary);
-    color: #FFFFFF;
-    box-shadow: var(--shadow-button);
-}
-.btn-brand:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.btn-soft {
-    background-color: var(--color-surface-low);
-    color: var(--color-tertiary);
-    border: 1px solid var(--color-border);
-}
-.btn-soft:hover {
-    background-color: var(--color-surface-mid);
-}
-
-.btn-danger {
-    background-color: var(--color-error-bg);
-    color: var(--color-error);
-}
-.btn-danger:hover {
-    background-color: #FCA5A5;
-}
-
-.btn-sm { height: 32px; padding: 0 1rem; font-size: 12px; }
-
-/* =========================================================
-   5. CHAMPS DE SAISIE (Formulaires)
-   ========================================================= */
-.form-label {
-    font: var(--font-label);
-    color: var(--color-text-main);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control, .form-select {
-    height: 44px;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-low); /* Mis en gris clair par défaut */
-    border: 1px solid transparent;
-    color: var(--color-text-main);
-    font: var(--font-body);
-    padding: 0 1rem;
-    transition: var(--transition-fast);
-}
-
-.form-control::placeholder {
-    color: var(--color-text-muted);
-}
-
-.btn-brand {
-    background-color: var(--color-primary);
-    color: #FFFFFF;
-    box-shadow: var(--shadow-button);
-}
-.btn-brand:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.btn-soft {
-    background-color: var(--color-surface-low);
-    color: var(--color-tertiary);
-    border: 1px solid var(--color-border);
-}
-.btn-soft:hover {
-    background-color: var(--color-surface-mid);
-}
-
-.btn-danger {
-    background-color: var(--color-error-bg);
-    color: var(--color-error);
-}
-.btn-danger:hover {
-    background-color: #FCA5A5;
-}
-
-.btn-sm { height: 32px; padding: 0 1rem; font-size: 12px; }
-
-/* =========================================================
-   5. CHAMPS DE SAISIE (Formulaires)
-   ========================================================= */
-.form-label {
-    font: var(--font-label);
-    color: var(--color-text-main);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control, .form-select {
-    height: 44px;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-low); /* Mis en gris clair par défaut */
-    border: 1px solid transparent;
-    color: var(--color-text-main);
-    font: var(--font-body);
-    padding: 0 1rem;
-    transition: var(--transition-fast);
-}
-
-.form-control::placeholder {
-    color: var(--color-text-muted);
-}
-
-.btn-brand {
-    background-color: var(--color-primary);
-    color: #FFFFFF;
-    box-shadow: var(--shadow-button);
-}
-.btn-brand:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.btn-soft {
-    background-color: var(--color-surface-low);
-    color: var(--color-tertiary);
-    border: 1px solid var(--color-border);
-}
-.btn-soft:hover {
-    background-color: var(--color-surface-mid);
-}
-
-.btn-danger {
-    background-color: var(--color-error-bg);
-    color: var(--color-error);
-}
-.btn-danger:hover {
-    background-color: #FCA5A5;
-}
-
-.btn-sm { height: 32px; padding: 0 1rem; font-size: 12px; }
-
-/* =========================================================
-   5. CHAMPS DE SAISIE (Formulaires)
-   ========================================================= */
-.form-label {
-    font: var(--font-label);
-    color: var(--color-text-main);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control, .form-select {
-    height: 44px;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-low); /* Mis en gris clair par défaut */
-    border: 1px solid transparent;
-    color: var(--color-text-main);
-    font: var(--font-body);
-    padding: 0 1rem;
-    transition: var(--transition-fast);
-}
-
-.form-control::placeholder {
-    color: var(--color-text-muted);
-}
-
-/* Le badge avec la valeur réelle (caché par défaut) */
 .effectif-full {
     position: absolute;
     top: 50%;
@@ -869,46 +891,269 @@ main {
     transform: translate(-50%, -50%) scaleX(0);
     transform-origin: center;
     opacity: 0;
-    background-color: var(--color-primary);
+    background: var(--brand-gradient);
     color: #FFFFFF;
-    padding: 0.25rem 0.75rem;
-    border-radius: 50rem;
-    font-size: 11px;
+    padding: 0.3rem 0.85rem;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
     z-index: 1;
     pointer-events: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-button);
 }
-
-/* Au survol : on cache le raccourci et on étend le réel */
 .effectif-wrapper:hover .effectif-full {
     opacity: 1;
     transform: translate(-50%, -50%) scaleX(1);
     z-index: 3;
 }
+.effectif-wrapper:hover .effectif-short { opacity: 0; }
 
-.effectif-wrapper:hover .effectif-short {
-    opacity: 0;
+/* =========================================================
+   15. PAGE D'ERREUR (surcharge des couleurs en dur)
+   ========================================================= */
+svg.illustration { color: rgba(59, 130, 246, 0.85); }
+.status-code { color: #CFDBF2; }
+
+/* =========================================================
+   15b. SIDEBAR : badge, carte astuce, profil
+   ========================================================= */
+.min-w-0 { min-width: 0; }
+
+.nav-badge {
+    margin-left: auto;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, #FFB45E, #FF9439);
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(255, 148, 57, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
-/* --- Responsive --- */
+
+.sidebar-tip {
+    margin: 0.9rem 0.9rem 0;
+    padding: 1.1rem 1.1rem 1.15rem;
+    border-radius: 20px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.65), rgba(221, 233, 254, 0.7));
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-raised);
+}
+.sidebar-tip .tip-icon {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 0.6rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #FFE7B8, #FFD08A);
+    color: #C77A0B;
+    box-shadow: 0 4px 10px rgba(255, 170, 60, 0.3);
+}
+.sidebar-tip .tip-icon .ms { font-size: 20px; }
+.sidebar-tip .tip-title { font-size: 14px; font-weight: 700; color: var(--color-text-main); }
+.sidebar-tip .tip-text {
+    margin: 0.2rem 0 0;
+    font-size: 12.5px;
+    line-height: 17px;
+    color: var(--color-text-muted);
+}
+
+.sidebar-user { margin-top: 0.75rem; }
+.sidebar .avatar { text-transform: uppercase; }
+.sidebar-user-info { min-width: 0; line-height: 1.25; }
+.sidebar-user-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 105px;
+}
+.sidebar-user-role {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 105px;
+}
+
+/* =========================================================
+   15c. CARTE D'ACCUEIL (HERO) & CARTES DE STATISTIQUES
+   ========================================================= */
+.hero-card {
+    position: relative;
+    overflow: hidden;
+    padding: 1.75rem 1.75rem 1.5rem;
+    border-radius: 28px;
+    background: var(--surface-gradient);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: var(--shadow-card);
+}
+/* Grand halo bleu décoratif (le "nuage" de l'image) */
+.hero-card::before {
+    content: '';
+    position: absolute;
+    top: -90px;
+    right: -40px;
+    width: 340px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(120, 175, 255, 0.55), rgba(120, 175, 255, 0));
+    pointer-events: none;
+}
+.hero-card::after {
+    content: '';
+    position: absolute;
+    top: 30px;
+    right: 150px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+    pointer-events: none;
+}
+
+.hero-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.4rem;
+    min-height: 92px;
+}
+.hero-title {
+    font: 700 26px/34px var(--font-family);
+    letter-spacing: -0.02em;
+    margin: 0 0 0.25rem;
+}
+.hero-sub { margin: 0; max-width: 34rem; font-size: 14px; color: var(--color-text-muted); }
+
+/* Tuile 3D flottante à droite */
+.hero-art {
+    flex-shrink: 0;
+    width: 104px;
+    height: 104px;
+    margin-right: 1.25rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    background: linear-gradient(145deg, #7DB8FF 0%, #3B82F6 60%, #2F6FEB 100%);
+    transform: rotate(-7deg);
+    box-shadow:
+        0 18px 30px rgba(59, 130, 246, 0.38),
+        inset 0 2px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -6px 12px rgba(30, 80, 200, 0.25);
+    animation: heroFloat 5s ease-in-out infinite;
+}
+.hero-art .ms { font-size: 56px; }
+@keyframes heroFloat {
+    0%, 100% { transform: rotate(-7deg) translateY(0); }
+    50%      { transform: rotate(-7deg) translateY(-7px); }
+}
+
+.stat-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+}
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.1rem;
+    border-radius: 20px;
+    background: var(--surface-gradient);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-raised);
+    transition: var(--transition-fast);
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
+
+.stat-icon {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    background: linear-gradient(145deg, #F7FAFF, #DDE8FA);
+    box-shadow: var(--shadow-raised);
+}
+.stat-icon .ms { font-size: 24px; }
+.stat-green  .stat-icon { color: #1C9B5C; }
+.stat-amber  .stat-icon { color: #E58A10; }
+.stat-violet .stat-icon { color: #7A5AF8; }
+
+.stat-label { font-size: 12.5px; color: var(--color-text-muted); font-weight: 500; }
+.stat-value {
+    font-size: 26px;
+    line-height: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-main);
+}
+.stat-sep { color: var(--color-text-muted); font-weight: 500; }
+
+/* =========================================================
+   15d. FINITIONS (animations, scrollbars, accessibilité)
+   ========================================================= */
+.page { animation: pageIn 0.45s ease both; }
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+}
+
+::selection { background: rgba(59, 130, 246, 0.25); color: var(--color-text-main); }
+
+* { scrollbar-width: thin; scrollbar-color: rgba(130, 155, 205, 0.5) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(130, 155, 205, 0.5); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(110, 140, 200, 0.7); }
+::-webkit-scrollbar-track { background: transparent; }
+
+a:focus-visible, button:focus-visible, .nav-link:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.6);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page, .hero-art { animation: none; }
+    * { transition-duration: 0.01ms !important; }
+}
+
+/* =========================================================
+   16. RESPONSIVE
+   ========================================================= */
 @media (max-width: 991.98px) {
     .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.2s;
+        transform: translateX(-120%);
+        transition: transform 0.25s ease;
     }
-    .sidebar.show {
-        transform: none;
-    }
-    .content-wrap {
-        margin-left: 0;
-    }
+    .sidebar.show { transform: none; }
+    .content-wrap { margin-left: 0; }
     .topbar {
         left: 0;
         padding: 0 1rem;
     }
-    .page {
-        padding: 1rem;
-    }
+    .page { padding: 1rem; }
+    .hero-art { display: none; }
+    .hero-card { padding: 1.25rem; }
 }

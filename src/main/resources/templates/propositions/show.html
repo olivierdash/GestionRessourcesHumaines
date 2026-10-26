@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="container py-4" style="max-width: 860px;">
-    <a th:href="@{/bloc3/propositions}" class="btn btn-link px-0">&larr; Retour à la liste</a>
+    <a th:href="@{/propositions}" class="btn btn-link px-0">&larr; Retour à la liste</a>
 
     <div th:if="${succes}" class="alert alert-success mt-2" th:text="${succes}"></div>
     <div th:if="${erreur}" class="alert alert-danger mt-2" th:text="${erreur}"></div>
@@ -43,7 +43,7 @@
     <div th:if="${proposition.statut.libelle == 'EN_ATTENTE'}" class="card mb-4">
         <div class="card-body">
             <h2 class="h5">Préparer la proposition</h2>
-            <form th:action="@{/bloc3/propositions/{id}/modifier-salaire(id=${proposition.idProposition})}"
+            <form th:action="@{/propositions/{id}/modifier-salaire(id=${proposition.idProposition})}"
                   method="post" class="row g-2 mb-3">
                 <div class="col-auto">
                     <input type="number" step="0.01" min="0" name="salaire" class="form-control"
@@ -53,7 +53,7 @@
                     <button type="submit" class="btn btn-outline-secondary">Modifier le salaire</button>
                 </div>
             </form>
-            <form th:action="@{/bloc3/propositions/{id}/soumettre(id=${proposition.idProposition})}" method="post">
+            <form th:action="@{/propositions/{id}/soumettre(id=${proposition.idProposition})}" method="post">
                 <button type="submit" class="btn btn-primary">Soumettre à validation</button>
             </form>
         </div>
@@ -63,7 +63,7 @@
     <div th:if="${proposition.statut.libelle == 'SOUMISE'}" class="card mb-4">
         <div class="card-body">
             <h2 class="h5">Validation (Direction ou Finance)</h2>
-            <form th:action="@{/bloc3/propositions/{id}/valider(id=${proposition.idProposition})}" method="post">
+            <form th:action="@{/propositions/{id}/valider(id=${proposition.idProposition})}" method="post">
                 <div class="mb-3">
                     <label class="form-label" for="decision">Décision</label>
                     <select class="form-select" id="decision" name="decision">
@@ -84,7 +84,7 @@
     <div th:if="${proposition.statut.libelle == 'APPROUVEE'}" class="card mb-4">
         <div class="card-body">
             <h2 class="h5">Réponse du candidat</h2>
-            <form th:action="@{/bloc3/propositions/{id}/repondre(id=${proposition.idProposition})}" method="post">
+            <form th:action="@{/propositions/{id}/repondre(id=${proposition.idProposition})}" method="post">
                 <div class="mb-3">
                     <label class="form-label" for="reponse">Réponse</label>
                     <select class="form-select" id="reponse" name="reponse">
@@ -106,7 +106,7 @@
     <div th:if="${proposition.statut.libelle == 'ACCEPTE' and employe == null}" class="card mb-4">
         <div class="card-body">
             <h2 class="h5">Convertir en salarié</h2>
-            <form th:action="@{/bloc3/propositions/{id}/dossier(id=${proposition.idProposition})}" method="post">
+            <form th:action="@{/propositions/{id}/dossier(id=${proposition.idProposition})}" method="post">
                 <div class="mb-3">
                     <label class="form-label" for="idTypeContrat">Type de contrat</label>
                     <select class="form-select" id="idTypeContrat" name="idTypeContrat">
@@ -133,14 +133,14 @@
 
     <div th:if="${employe != null}" class="alert alert-success">
         Dossier créé. Matricule : <strong th:text="${employe.matricule}"></strong>.
-        <a th:href="@{/bloc3/employes/{id}(id=${employe.idEmployer})}">Voir la fiche salarié</a>
+        <a th:href="@{/employes/{id}(id=${employe.idEmployer})}">Voir la fiche salarié</a>
     </div>
 
     <!-- REFUSE / EXPIREE : clôturée -->
     <div th:if="${proposition.statut.libelle == 'REFUSE' or proposition.statut.libelle == 'EXPIREE'}"
          class="alert alert-secondary">
         Proposition clôturée.
-        <a th:href="@{/bloc3/candidatures/{id}/proposer(id=${proposition.candidature.idCandidature})}">
+        <a th:href="@{/candidatures/{id}/proposer(id=${proposition.candidature.idCandidature})}">
             Faire une nouvelle proposition</a>
     </div>
 
