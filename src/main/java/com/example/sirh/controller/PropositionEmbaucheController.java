@@ -20,7 +20,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 
 @Controller
-@RequestMapping("/bloc3")
 @RequiredArgsConstructor
 public class PropositionEmbaucheController {
 
@@ -32,14 +31,14 @@ public class PropositionEmbaucheController {
     @GetMapping("/propositions")
     public String liste(Model model) {
         model.addAttribute("propositions", propositionService.liste());
-        return "bloc3/propositions/liste";
+        return "propositions/liste";
     }
 
     /** Formulaire « Proposer » (bouton du bloc 2 sur une candidature retenue). */
     @GetMapping("/candidatures/{idCandidature}/proposer")
     public String formProposer(@PathVariable("idCandidature") Integer idCandidature, Model model) {
         model.addAttribute("candidature", candidatureService.getCandidatureById(idCandidature));
-        return "bloc3/propositions/form";
+        return "propositions/form";
     }
 
     @PostMapping("/candidatures/{idCandidature}/proposer")
@@ -50,10 +49,10 @@ public class PropositionEmbaucheController {
         try {
             PropositionEmbauche p = propositionService.proposer(idCandidature, salaire, joursValidite);
             ra.addFlashAttribute("succes", "Proposition créée.");
-            return "redirect:/bloc3/propositions/" + p.getIdProposition();
+            return "redirect:/propositions/" + p.getIdProposition();
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("erreur", ex.getMessage());
-            return "redirect:/bloc3/candidatures/" + idCandidature + "/proposer";
+            return "redirect:/candidatures/" + idCandidature + "/proposer";
         }
     }
 
@@ -66,7 +65,7 @@ public class PropositionEmbaucheController {
         model.addAttribute("validations", propositionService.historiqueValidations(id));
         model.addAttribute("employe",
                 embaucheService.trouverEmploye(p.getCandidature().getIdCandidature()).orElse(null));
-        return "bloc3/propositions/show";
+        return "propositions/show";
     }
 
     @PostMapping("/propositions/{id}/modifier-salaire")
@@ -79,7 +78,7 @@ public class PropositionEmbaucheController {
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("erreur", ex.getMessage());
         }
-        return "redirect:/bloc3/propositions/" + id;
+        return "redirect:/propositions/" + id;
     }
 
     @PostMapping("/propositions/{id}/soumettre")
@@ -90,7 +89,7 @@ public class PropositionEmbaucheController {
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("erreur", ex.getMessage());
         }
-        return "redirect:/bloc3/propositions/" + id;
+        return "redirect:/propositions/" + id;
     }
 
     /** principal.getName() = email de l'utilisateur connecté. */
@@ -109,7 +108,7 @@ public class PropositionEmbaucheController {
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("erreur", ex.getMessage());
         }
-        return "redirect:/bloc3/propositions/" + id;
+        return "redirect:/propositions/" + id;
     }
 
     @PostMapping("/propositions/{id}/repondre")
@@ -122,7 +121,7 @@ public class PropositionEmbaucheController {
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("erreur", ex.getMessage());
         }
-        return "redirect:/bloc3/propositions/" + id;
+        return "redirect:/propositions/" + id;
     }
 
     /** Bouton « Créer dossier » : employé + matricule + contrat + affectation. */
@@ -136,10 +135,10 @@ public class PropositionEmbaucheController {
         try {
             var employe = embaucheService.creerDossier(id, idTypeContrat, dateDebut, dateFin);
             ra.addFlashAttribute("succes", "Dossier créé. Matricule : " + employe.getMatricule());
-            return "redirect:/bloc3/employes/" + employe.getIdEmployer();
+            return "redirect:/employes/" + employe.getIdEmployer();
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("erreur", ex.getMessage());
-            return "redirect:/bloc3/propositions/" + id;
+            return "redirect:/propositions/" + id;
         }
     }
 
@@ -149,6 +148,6 @@ public class PropositionEmbaucheController {
         model.addAttribute("employe", embaucheService.getEmploye(id));
         model.addAttribute("contrats", embaucheService.contratsDe(id));
         model.addAttribute("affectations", embaucheService.affectationsDe(id));
-        return "bloc3/employes/fiche";
+        return "employes/fiche";
     }
 }

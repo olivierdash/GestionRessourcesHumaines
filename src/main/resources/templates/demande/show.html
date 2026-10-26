@@ -1,19 +1,10 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 <html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{dashboard :: layout(content=~{::mainContent})}">
 
-=======
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
->>>>>>> e90ab66 (integration SPA fonctionnelle)
 <body>
 
     <main th:fragment="mainContent" class="app-page">
 
-<<<<<<< HEAD
-=======
-        <!-- En-tête -->
->>>>>>> e90ab66 (integration SPA fonctionnelle)
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div>
                 <a th:href="@{/demandes}" class="back-link">&larr; Retour à la liste</a>
@@ -23,7 +14,6 @@
                 </h2>
             </div>
             <div class="d-flex gap-2">
-<<<<<<< HEAD
                 <a th:if="${demande.etatDemande != null and demande.etatDemande.intitule == 'Brouillon'}"
                     th:href="@{/demandes/update/{id}(id=${demande.idDemandeRecrutement})}" class="btn-brand">
                     <span class="ms" style="font-size: 18px;">edit</span> Modifier
@@ -39,19 +29,10 @@
         </div>
 
         <div class="row g-4">
-=======
-                <button class="btn-brand" type="button">Modifier</button>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <!-- Colonne de gauche -->
->>>>>>> e90ab66 (integration SPA fonctionnelle)
             <div class="col-lg-8">
                 <div class="card-x h-100">
                     <h5 class="card-head">Informations du poste</h5>
                     <div class="card-pad">
-<<<<<<< HEAD
 
                         <div class="row g-4">
                             <div class="col-md-6">
@@ -66,16 +47,6 @@
                                     style="font-size: 11px; letter-spacing: 0.5px;">Département</span>
                                 <div class="fw-bold" style="font-size: 16px; color: var(--color-text-main);"
                                     th:text="${demande.poste.departement.titre}">Informatique</div>
-=======
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <span class="lbl">Intitulé du poste</span>
-                                <div class="fw-bold" style="font-size: 20px; letter-spacing: -.015em;" th:text="${demande.poste.intitule}">Développeur Fullstack</div>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="lbl">Département</span>
-                                <div class="val" style="font-size: 16px;" th:text="${demande.poste.departement.titre}">Informatique</div>
->>>>>>> e90ab66 (integration SPA fonctionnelle)
                             </div>
                         </div>
 
@@ -83,7 +54,6 @@
 
                         <div class="row g-4">
                             <div class="col-md-6">
-<<<<<<< HEAD
                                 <span class="lbl text-uppercase text-muted fw-bold"
                                     style="font-size: 11px; letter-spacing: 0.5px;">Manager demandeur</span>
                                 <div class="d-flex align-items-center gap-2 mt-1">
@@ -125,34 +95,6 @@
                             <p class="m-0 mt-1" style="color: var(--color-text-main); font-size: 14px;"
                                 th:text="${demande.motif != null ? demande.motif.libelle : 'Aucun motif renseigné.'}">
                                 Remplacement d'un poste
-=======
-                                <span class="lbl">Manager demandeur</span>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar">
-                                        <span th:text="${demande.manager != null ? #strings.substring(demande.manager.nom, 0, 1) : '?'}">J</span>
-                                    </div>
-                                    <span class="val" th:text="${demande.manager != null ? demande.manager.nom : 'Inconnu'}">Jean Dupont</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="lbl">Date de création</span>
-                                <span class="val" th:text="${#temporals.format(demande.dateCreation, 'dd MMMM yyyy à HH:mm')}">12 Octobre 2023</span>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="lbl">Date d'entrée souhaitée</span>
-                                <span class="val" th:text="${demande.dateSouhaitee != null ? #temporals.format(demande.dateSouhaitee, 'dd/MM/yyyy') : 'Non spécifiée'}">01/01/2025</span>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="lbl">Effectif requis</span>
-                                <span class="val"><span th:text="${demande.effectif}">2</span> personne(s)</span>
-                            </div>
-                        </div>
-
-                        <div class="motif-box mt-4">
-                            <span class="lbl">Motif de la demande</span>
-                            <p class="m-0" th:text="${demande.motif != null ? demande.motif : 'Aucun motif renseigné.'}">
-                                Remplacement d'un départ à la retraite.
->>>>>>> e90ab66 (integration SPA fonctionnelle)
                             </p>
                         </div>
                     </div>
@@ -160,7 +102,6 @@
             </div>
         </div>
 
-<<<<<<< HEAD
         <div class="row mt-4" th:if="${peutValider}">
             <div class="col-12">
                 <div class="card-x" style="border-left: 4px solid var(--color-primary);">
@@ -181,9 +122,6 @@
             </div>
         </div>
 
-=======
-        <!-- Historique -->
->>>>>>> e90ab66 (integration SPA fonctionnelle)
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card-x">
@@ -192,7 +130,6 @@
                         <ul class="timeline" th:if="${not #lists.isEmpty(historique)}">
                             <li class="timeline-item" th:each="hist : ${historique}">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-<<<<<<< HEAD
                                     <span class="fw-bold text-uppercase"
                                         style="color: var(--color-primary); font-size: 12px; letter-spacing: 0.5px;"
                                         th:text="${hist.etatDemande != null ? hist.etatDemande.intitule : 'BROUILLON'}">
@@ -218,22 +155,6 @@
                             </li>
                         </ul>
                         <p class="text-muted m-0" th:if="${#lists.isEmpty(historique)}">Aucun historique disponible pour cette demande.</p>
-=======
-                                    <span class="fw-semibold" style="color: var(--primary-container);" th:text="${hist.etatDemande != null ? hist.etatDemande.intitule : 'BROUILLON'}">
-                                        BROUILLON
-                                    </span>
-                                    <small class="text-outline" th:text="${#temporals.format(hist.dateChangement, 'dd/MM/yyyy HH:mm')}">
-                                        12/10/2023 14:30
-                                    </small>
-                                </div>
-                                <p class="m-0 text-outline" style="font-size: 13px;">
-                                    Action effectuée par 
-                                    <span class="fw-medium text-body" th:text="${hist.validateur != null ? hist.validateur.nom : 'Système'}">Jean Dupont</span>
-                                </p>
-                            </li>
-                        </ul>
-                        <p class="text-outline m-0" th:if="${#lists.isEmpty(historique)}">Aucun historique disponible pour cette demande.</p>
->>>>>>> e90ab66 (integration SPA fonctionnelle)
                     </div>
                 </div>
             </div>
