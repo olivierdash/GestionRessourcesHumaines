@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête de la page -->
+        <div class="mb-4">
+            <a th:href="@{/employes}" class="back-link">&larr; Retour à la liste</a>
+            <h2 class="page-title d-flex flex-wrap align-items-center gap-2">
+                Fiche Employé
+                <span class="pill pill-id" th:text="'#' + ${employe.idEmployer}">#123</span>
+            </h2>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="row g-4">
+
+            <!-- Colonne de gauche (Infos principales) -->
+            <div class="col-lg-8">
+                <div class="card-x h-100">
+                    <h5 class="card-head">Informations professionnelles</h5>
+                    <div class="card-pad">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <span class="lbl">Matricule</span>
+                                <div class="fw-bold font-monospace" style="font-size: 20px;" th:text="${employe.matricule}">MAT-2024-001</div>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="lbl">Date d'embauche</span>
+                                <div class="fw-medium" style="font-size: 16px;" th:text="${#temporals.format(employe.hiringDate, 'dd MMMM yyyy')}">01 Janvier 2024</div>
+                            </div>
+                        </div>
+
+                        <hr class="divider">
+
+                        <span class="lbl">Statut actuel</span>
+
+                        <!-- Badge de statut dynamique -->
+                        <span class="pill"
+                              th:classappend="${employe.statusEmployer == 'ACTIF' ? 'st-actif' : 
+                                              (employe.statusEmployer == 'SORTI' ? 'st-sorti' : 'st-autre')}"
+                              th:text="${employe.statusEmployer}">
+                            ACTIF
+                        </span>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne de droite (Résumé & Actions) -->
+            <div class="col-lg-4">
+
+                <!-- Carte Avatar / Profil -->
+                <div class="card-x mb-4 text-center">
+                    <div class="py-4 px-3">
+                        <div class="avatar avatar-lg mx-auto mb-3">
+                            <span th:text="${#strings.substring(employe.matricule, 0, 1)}">M</span>
+                        </div>
+                        <h5 class="fw-bold m-0" th:text="${employe.matricule}">MAT-2024-001</h5>
+                        <p class="text-outline mt-1 mb-0" style="font-size: 13px;">Identifiant interne</p>
+                    </div>
+                </div>
+
+                <!-- Actions rapides -->
+                <div class="card-x">
+                    <h6 class="card-head">Actions rapides</h6>
+                    <div class="card-pad">
+                        <div class="d-grid gap-2">
+                            <button class="btn-soft" type="button" disabled>Modifier la fiche</button>
+                            <button class="btn-danger-soft" type="button" disabled>Marquer comme sorti</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

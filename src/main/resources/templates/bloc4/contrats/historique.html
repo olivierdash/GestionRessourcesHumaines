@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Historique des contrats</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="container mt-4">
+
+    <h1>Historique des contrats</h1>
+    <a th:href="@{/contrats/employe/{id}/nouveau(id=${idEmploye})}"
+    class="btn btn-primary mb-3">Nouveau contrat</a>
+    <div class="alert alert-success" th:if="${succes}" th:text="${succes}"></div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Poste</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Salaire mensuel</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="c : ${contrats}" 
+            th:classappend="${c.statut.libelle == 'actif'} ? 'table-success fw-bold' : ''">
+                <td th:text="${c.typeContrat.libelle}"></td>
+                <td th:text="${c.poste.intitule}"></td>
+                <td th:text="${c.dateDebut}"></td>
+                <td th:text="${c.dateFin} ?: 'En cours'"></td>
+                <td th:text="${c.salaireMensuel}"></td>
+                <td th:text="${c.statut.libelle}"></td>
+                <td>
+                    <a th:if="${c.statut.libelle == 'actif'}"
+                    th:href="@{/contrats/{id}/renouveler(id=${c.idContract})}"
+                    class="btn btn-sm btn-outline-primary">Renouveler</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${#lists.isEmpty(contrats)}">Aucun contrat pour ce salarié.</p>
+
+</body>
+</html>

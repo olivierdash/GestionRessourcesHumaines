@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <a th:href="@{/demandes}" class="back-link">&larr; Retour à la liste</a>
+                <h2 class="page-title d-flex flex-wrap align-items-center gap-2">
+                    Demande
+                    <span class="pill pill-id" th:text="'#' + ${demande.idDemandeRecrutement}">#123</span>
+                </h2>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:if="${demande.etatDemande != null and demande.etatDemande.intitule == 'Brouillon'}"
+                    th:href="@{/demandes/update/{id}(id=${demande.idDemandeRecrutement})}" class="btn-brand">
+                    <span class="ms" style="font-size: 18px;">edit</span> Modifier
+                </a>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">État actuel de la demande</label>
+            <input type="text" class="form-control" readonly
+                th:value="${demande.etatDemande != null ? demande.etatDemande.intitule : 'Brouillon'}"
+                style="background-color: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-secondary); font-weight: 600; cursor: not-allowed;">
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card-x h-100">
+                    <h5 class="card-head">Informations du poste</h5>
+                    <div class="card-pad">
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <span class="lbl text-uppercase text-muted fw-bold"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">Intitulé du poste</span>
+                                <div class="fw-bold"
+                                    style="font-size: 20px; color: var(--color-text-main); letter-spacing: -.015em;"
+                                    th:text="${demande.poste.intitule}">Développeur Fullstack</div>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="lbl text-uppercase text-muted fw-bold"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">Département</span>
+                                <div class="fw-bold" style="font-size: 16px; color: var(--color-text-main);"
+                                    th:text="${demande.poste.departement.titre}">Informatique</div>
+                            </div>
+                        </div>
+
+                        <hr class="divider">
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <span class="lbl text-uppercase text-muted fw-bold"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">Manager demandeur</span>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="fw-medium" style="font-size: 15px; color: var(--color-text-main);"
+                                        th:text="${demande.manager != null ? demande.manager.nom : 'Inconnu'}">Jean
+                                        Dupont</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="lbl text-uppercase text-muted fw-bold"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">Date de création</span>
+                                <span class="d-block fw-medium mt-1"
+                                    style="font-size: 15px; color: var(--color-text-main);"
+                                    th:text="${#temporals.format(demande.dateCreation, 'dd MMMM yyyy à HH:mm')}">12
+                                    Octobre 2023</span>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="lbl text-uppercase text-muted fw-bold"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">Date d'entrée souhaitée</span>
+                                <span class="d-block fw-medium mt-1"
+                                    style="font-size: 15px; color: var(--color-text-main);"
+                                    th:text="${demande.dateSouhaitee != null ? #temporals.format(demande.dateSouhaitee, 'dd/MM/yyyy') : 'Non spécifiée'}">01/01/2025</span>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="lbl text-uppercase text-muted fw-bold"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">Effectif requis</span>
+                                <span class="d-block fw-medium mt-1"
+                                    style="font-size: 15px; color: var(--color-text-main);">
+                                    <span th:text="${demande.effectif}">2</span> personne(s)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- BLOC MOTIF MIS A JOUR -->
+                        <div class="motif-box mt-4"
+                            style="background-color: var(--color-surface-low); border-radius: var(--radius-sm); padding: 1rem 1.25rem;">
+                            <span class="lbl text-uppercase text-muted fw-bold"
+                                style="font-size: 11px; letter-spacing: 0.5px;">Motif de la demande</span>
+                            <p class="m-0 mt-1" style="color: var(--color-text-main); font-size: 14px;"
+                                th:text="${demande.motif != null ? demande.motif.libelle : 'Aucun motif renseigné.'}">
+                                Remplacement d'un poste
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4" th:if="${peutValider}">
+            <div class="col-12">
+                <div class="card-x" style="border-left: 4px solid var(--color-primary);">
+                    <h5 class="card-head">Votre décision</h5>
+                    <div class="card-pad">
+                        <form th:action="@{/demandes/update/{id}(id=${demande.idDemandeRecrutement})}" method="post">
+                            <div class="mb-3">
+                                <label for="remarque" class="form-label">Remarque de validation <span class="text-error">*</span></label>
+                                <textarea name="remarque" id="remarque" class="form-control" rows="3" required placeholder="Précisez la raison de votre validation ou refus..."></textarea>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="submit" name="action" value="refuser" class="btn-danger">Refuser</button>
+                                <button type="submit" name="action" value="valider" class="btn-brand">Valider l'étape</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card-x">
+                    <h5 class="card-head">Historique de la demande</h5>
+                    <div class="card-pad">
+                        <ul class="timeline" th:if="${not #lists.isEmpty(historique)}">
+                            <li class="timeline-item" th:each="hist : ${historique}">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-uppercase"
+                                        style="color: var(--color-primary); font-size: 12px; letter-spacing: 0.5px;"
+                                        th:text="${hist.etatDemande != null ? hist.etatDemande.intitule : 'BROUILLON'}">
+                                        BROUILLON
+                                    </span>
+                                    <small class="text-muted fw-medium"
+                                        th:text="${#temporals.format(hist.dateChangement, 'dd/MM/yyyy HH:mm')}">
+                                        12/10/2023 14:30
+                                    </small>
+                                </div>
+                                <p class="m-0 text-muted" style="font-size: 13px;">
+                                    Action effectuée par
+                                    <span class="fw-medium text-main"
+                                        th:text="${hist.validateur != null ? hist.validateur.nom : 'Système'}">Jean
+                                        Dupont</span>
+                                </p>
+                                <div th:if="${hist.commentaires != null and !hist.commentaires.isEmpty()}"
+                                    class="mt-2 p-2 rounded"
+                                    style="background-color: var(--color-surface-low); border-left: 3px solid var(--color-primary); font-size: 13px; color: var(--color-text-main);">
+                                    <span class="text-muted fw-bold" style="font-size: 11px;">REMARQUE :</span>
+                                    <span th:text="${hist.commentaires}"></span>
+                                </div>
+                            </li>
+                        </ul>
+                        <p class="text-muted m-0" th:if="${#lists.isEmpty(historique)}">Aucun historique disponible pour cette demande.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+
+</html>

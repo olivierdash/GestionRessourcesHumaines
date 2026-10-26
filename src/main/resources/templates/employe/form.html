@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête -->
+        <div class="mb-4 pb-2">
+            <a th:href="@{/employes}" class="back-link">&larr; Retour à la liste</a>
+            <h2 class="page-title">Nouvel Employé</h2>
+            <p class="text-outline mt-2 mb-0">Transformez une candidature validée en contrat d'embauche.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card-x">
+                    <div class="p-4">
+                        <form th:action="@{/employes}" method="post">
+
+                            <!-- Candidature (Select) -->
+                            <div class="mb-4">
+                                <label for="idCandidature" class="form-label">Candidature liée <span class="req">*</span></label>
+                                <select class="form-select" id="idCandidature" name="idCandidature" required>
+                                    <option value="" disabled selected>Sélectionnez une candidature...</option>
+                                    <option th:each="cand : ${candidatures}" 
+                                            th:value="${cand.idCandidature}" 
+                                            th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom + ' - ' + cand.offre.titre}">
+                                    </option>
+                                </select>
+                                <div class="text-outline mt-2" style="font-size: 12px;">
+                                    Seules les candidatures retenues devraient apparaître ici.
+                                </div>
+                            </div>
+
+                            <div class="row g-4 mb-4">
+                                <!-- Matricule -->
+                                <div class="col-md-6">
+                                    <label for="matricule" class="form-label">Matricule <span class="req">*</span></label>
+                                    <input type="text" class="form-control" id="matricule" name="matricule" required placeholder="Ex: MAT-2024-005">
+                                </div>
+
+                                <!-- Date d'embauche -->
+                                <div class="col-md-6">
+                                    <label for="hiringDate" class="form-label">Date d'embauche <span class="req">*</span></label>
+                                    <input type="date" class="form-control" id="hiringDate" name="hiringDate" required>
+                                </div>
+                            </div>
+
+                            <!-- Statut -->
+                            <div class="mb-4">
+                                <label for="statusEmployer" class="form-label">Statut initial <span class="req">*</span></label>
+                                <select class="form-select" id="statusEmployer" name="statusEmployer" required>
+                                    <option value="ACTIF" selected>ACTIF</option>
+                                    <option value="INACTIF">INACTIF</option>
+                                </select>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top" style="border-color: var(--surface-high) !important;">
+                                <button type="submit" class="btn-brand">Enregistrer l'employé</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

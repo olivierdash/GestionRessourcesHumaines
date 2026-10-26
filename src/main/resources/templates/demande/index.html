@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <!-- En-tête de page -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+            <div>
+                <h2 class="page-title">Demandes de recrutement</h2>
+                <p class="text-muted text-small mt-1 mb-0">Gérez et suivez l'état d'avancement de vos besoins en
+                    recrutement.</p>
+            </div>
+            <a th:href="@{/demandes/create}" class="btn-brand">
+                <span class="ms" style="font-size: 18px;">add</span> Créer une demande
+            </a>
+        </div>
+
+        <!-- Barre de Filtres -->
+        <div class="card-x mb-4">
+            <div class="card-pad">
+                <form th:action="@{/demandes}" method="get">
+
+                    <!-- LIGNE DES FILTRES -->
+                    <div class="row g-3 align-items-end mb-4">
+
+                        <!-- Département -->
+                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
+                            <label class="form-label text-truncate">Département</label>
+                            <select class="form-select w-100" name="idDepartement">
+                                <option value="">Tous</option>
+                                <option th:each="dept : ${departements}" th:value="${dept.idDepartement}"
+                                    th:text="${dept.titre}" th:selected="${filter.idDepartement == dept.idDepartement}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Manager -->
+                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
+                            <label class="form-label text-truncate">Manager</label>
+                            <select class="form-select w-100" name="idManager">
+                                <option value="">Tous</option>
+                                <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
+                                    th:text="${manager.nom}" th:selected="${filter.idManager == manager.idUtilisateur}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Poste -->
+                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
+                            <label class="form-label text-truncate">Poste</label>
+                            <div class="custom-select-wrapper">
+
+                                <!-- L'input texte visible -->
+                                <input type="text" class="form-control w-100" id="posteFilterSearch"
+                                    placeholder="Tous les postes" autocomplete="off">
+
+                                <!-- La div qui va recevoir les options (générées par JS) -->
+                                <div class="custom-dropdown" id="posteFilterDropdown"></div>
+
+                                <!-- Le vrai select (caché) qui sera envoyé au contrôleur -->
+                                <select class="d-none" id="posteFilterSelect" name="idPoste">
+                                    <option value="">Tous</option>
+                                    <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
+                                        th:text="${poste.intitule}" th:selected="${filter.idPoste == poste.idPoste}">
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <!-- Motif (nouveau filtre) -->
+                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
+                            <label class="form-label text-truncate">Motif</label>
+                            <select class="form-select w-100" name="idMotifDemande">
+                                <option value="">Tous</option>
+                                <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}"
+                                    th:text="${motif.libelle}"
+                                    th:selected="${filter.idMotifDemande == motif.idMotifDemande}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="col-xl-4 col-lg-12 col-md-12" style="min-width: 0;">
+                            <label class="form-label text-truncate">Période de création</label>
+                            <div class="input-group flex-nowrap">
+                                <input type="date" class="form-control px-2" name="dateMin" th:value="${filter.dateMin}"
+                                    title="Date minimum">
+                                <span class="input-group-text px-2 bg-transparent text-muted border-0">-</span>
+                                <input type="date" class="form-control px-2" name="dateMax" th:value="${filter.dateMax}"
+                                    title="Date maximum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LIGNE DES BOUTONS -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 border-top">
+                        <span class="text-muted text-small mb-2 mb-sm-0">
+                            <strong th:text="${demandes.totalElements}"></strong> demandes trouvées
+                        </span>
+
+                        <div
+                            class="col-md-6 col-12 d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-5">
+                            <a th:href="@{/demandes}" class="btn-soft">
+                                Réinitialiser
+                            </a>
+                            <button type="submit" class="btn-brand">
+                                Filtrer
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tableau -->
+        <div class="card-x">
+            <div class="table-responsive">
+                <table class="table table-x">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Date création</th>
+                            <th>Poste demandé</th>
+                            <th>Département</th>
+                            <th>Demandeur</th>
+                            <th class="text-center">Effectif</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${demandes.content.isEmpty()}">
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                Aucune demande de recrutement ne correspond à vos critères.
+                            </td>
+                        </tr>
+
+                        <tr th:each="demande : ${demandes.content}">
+                            <!-- Référence -->
+                            <td>
+                                <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement()})}"
+                                    class="fw-bold text-decoration-none" style="color: var(--color-primary);">
+                                    #<span th:text="${demande.idDemandeRecrutement()}"></span>
+                                </a>
+                            </td>
+
+                            <!-- Date -->
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-medium"
+                                        th:text="${#temporals.format(demande.dateCreation(), 'dd MMM yyyy')}">18 Mai
+                                        2024</span>
+                                    <span class="text-muted" style="font-size: 11px;"
+                                        th:text="${#temporals.format(demande.dateCreation(), 'HH:mm')}">N/A</span>
+                                </div>
+                            </td>
+
+                            <!-- Poste -->
+                            <td>
+                                <span class="fw-medium text-main" th:text="${demande.posteIntitule()}"></span>
+                            </td>
+
+                            <!-- Département -->
+                            <td>
+                                <span class="text-muted" th:text="${demande.departementTitre()}"></span>
+                            </td>
+
+                            <!-- Demandeur -->
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-muted" th:text="${demande.managerNom()}">Inconnu</span>
+                                </div>
+                            </td>
+
+                            <!-- Effectif -->
+                            <td class="text-center" style="min-width: 100px;">
+                                <div class="effectif-wrapper">
+                                    <span class="pill pill-neutre effectif-short"
+                                        th:attr="data-value=${demande.effectif()}">
+                                        <span th:text="${demande.effectif()}">1</span>
+                                    </span>
+
+                                    <span class="pill effectif-full" th:text="${demande.effectif()}">
+                                        1
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 border-top"
+                style="border-color: var(--color-border) !important; background-color: var(--color-surface-low);"
+                th:if="${demandes.totalPages >= 1}">
+                <span class="text-muted text-small">
+                    Affichage de <strong th:text="${demandes.number * demandes.size + 1}"></strong> à
+                    <strong th:text="${demandes.number * demandes.size + demandes.numberOfElements}"></strong> sur
+                    <strong th:text="${demandes.totalElements}"></strong> résultats
+                </span>
+
+                <nav>
+                    <ul class="pagination pagination-sm mb-0 gap-1">
+                        <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
+                            <a class="btn-soft btn-sm" th:href="@{/demandes(
+                                    page=${demandes.number - 1}, size=${demandes.size},
+                                    dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
+                                    idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
+                                    idManager=${filter.idManager}, idMotifDemande=${filter.idMotifDemande})}">
+                                Précédent
+                            </a>
+                        </li>
+
+                        <li class="page-item disabled">
+                            <span class="btn-brand btn-sm">
+                                Page <span th:text="${demandes.number + 1}"></span> / <span
+                                    th:text="${demandes.totalPages}"></span>
+                            </span>
+                        </li>
+
+                        <li class="page-item" th:classappend="${!demandes.hasNext()} ? 'readonly'">
+                            <a class="btn-soft btn-sm" th:href="@{/demandes(
+                                    page=${demandes.number + 1}, size=${demandes.size},
+                                    dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
+                                    idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
+                                    idManager=${filter.idManager}, idMotifDemande=${filter.idMotifDemande})}">
+                                Suivant
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Script pour la liste flottante et le formatage -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                // =========================================================
+                // 1. FORMATAGE DES EFFECTIFS (1K, 1M)
+                // =========================================================
+                function formatEffectif(value) {
+                    if (value >= 1000000000) return (value / 1000000000).toFixed(1).replace('.0', '') + 'B';
+                    if (value >= 1000000) return (value / 1000000).toFixed(1).replace('.0', '') + 'M';
+                    if (value >= 1000) return (value / 1000).toFixed(1).replace('.0', '') + 'K';
+                    return value;
+                }
+
+                const effectifBadges = document.querySelectorAll('.effectif-short');
+                effectifBadges.forEach(badge => {
+                    const realValue = parseInt(badge.getAttribute('data-value'));
+                    if (!isNaN(realValue)) {
+                        const formattedValue = formatEffectif(realValue);
+                        badge.innerHTML = formattedValue + (realValue > 1 ? ' postes' : ' poste');
+                    }
+                });
+
+                // =========================================================
+                // 2. GESTION DU FILTRE "POSTE" (Liste Flottante)
+                // =========================================================
+                const posteInput = document.getElementById('posteFilterSearch');
+                const posteHiddenSelect = document.getElementById('posteFilterSelect');
+                const posteDropdown = document.getElementById('posteFilterDropdown');
+
+                if (posteInput && posteHiddenSelect && posteDropdown) {
+
+                    if (posteHiddenSelect.value !== "") {
+                        posteInput.value = posteHiddenSelect.options[posteHiddenSelect.selectedIndex].text;
+                    }
+
+                    const options = Array.from(posteHiddenSelect.options).filter(opt => opt.value !== "");
+
+                    options.forEach(opt => {
+                        const div = document.createElement('div');
+                        div.className = 'custom-option';
+                        div.textContent = opt.text;
+                        div.dataset.value = opt.value;
+
+                        div.addEventListener('click', () => {
+                            posteInput.value = opt.text;
+                            posteHiddenSelect.value = opt.value;
+                            posteDropdown.classList.remove('show');
+                        });
+                        posteDropdown.appendChild(div);
+                    });
+
+                    posteInput.addEventListener('focus', () => {
+                        posteDropdown.classList.add('show');
+                        filterList();
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (!posteInput.contains(e.target) && !posteDropdown.contains(e.target)) {
+                            posteDropdown.classList.remove('show');
+
+                            if (posteInput.value.trim() === "") {
+                                posteHiddenSelect.value = "";
+                            }
+                            else if (posteHiddenSelect.value === "") {
+                                const selectedOption = posteHiddenSelect.options[posteHiddenSelect.selectedIndex];
+                                posteInput.value = selectedOption ? selectedOption.text : "";
+                            }
+                        }
+                    });
+
+                    posteInput.addEventListener('input', () => {
+                        filterList();
+                        posteDropdown.classList.add('show');
+                    });
+
+                    function filterList() {
+                        const filter = posteInput.value.toLowerCase();
+                        const items = posteDropdown.querySelectorAll('.custom-option');
+                        let hasVisible = false;
+
+                        items.forEach(item => {
+                            if (item.textContent.toLowerCase().includes(filter)) {
+                                item.style.display = 'block';
+                                hasVisible = true;
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+
+                        let noResultDiv = posteDropdown.querySelector('.no-result');
+                        if (!hasVisible) {
+                            if (!noResultDiv) {
+                                noResultDiv = document.createElement('div');
+                                noResultDiv.className = 'custom-option no-result';
+                                noResultDiv.textContent = 'Aucun poste trouvé';
+                                posteDropdown.appendChild(noResultDiv);
+                            }
+                            noResultDiv.style.display = 'block';
+                        } else if (noResultDiv) {
+                            noResultDiv.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        </script>
+    </main>
+</body>
+
+</html>

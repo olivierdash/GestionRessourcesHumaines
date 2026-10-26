@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="app-page">
+
+        <div class="mb-4">
+            <a th:href="@{/bloc2/offres}" class="back-link">&larr; Retour à la liste</a>
+            <h2 class="page-title">Créer une nouvelle offre</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card-x">
+                    <div class="p-4">
+
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                        <form th:action="@{/bloc2/offres/creer}" method="post">
+
+                            <div class="mb-4">
+                                <label for="idDemande" class="form-label">Demande de recrutement liée <span class="req">*</span></label>
+                                <select name="idDemande" id="idDemande" class="form-select" required>
+                                    <option value="">-- Sélectionnez une demande --</option>
+                                    <option th:each="dem : ${demandes}" 
+                                            th:value="${dem.idDemandeRecrutement}" 
+                                            th:text="${'Demande #' + dem.idDemandeRecrutement + ' - ' + dem.poste.intitule}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="titre" class="form-label">Titre de l'offre <span class="req">*</span></label>
+                                <input type="text" name="titre" id="titre" class="form-control" required placeholder="Ex: Développeur Java Senior">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="description" class="form-label">Description <span class="req">*</span></label>
+                                <textarea name="description" id="description" class="form-control" rows="5" required placeholder="Missions, profil recherché..."></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top" style="border-color: var(--surface-high) !important;">
+                                <a th:href="@{/bloc2/offres}" class="btn-soft me-3">Annuler</a>
+                                <button type="submit" class="btn-brand">Enregistrer en brouillon</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

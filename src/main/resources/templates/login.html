@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRH Pro - Connexion sécurisée</title>
+
+    <!-- Fichiers locaux -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+
+<body class="bg-canvas"> <!-- Utilisation de la classe pour le fond -->
+
+    <!-- Conteneur des messages Spring Security (flottants en haut) -->
+    <div class="login-messages-container">
+        <div th:if="${param.error}" class="alert alert-danger alert-floating auto-dismiss-alert">
+            Email ou mot de passe incorrect.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success alert-floating auto-dismiss-alert">
+            Vous avez été déconnecté avec succès.
+        </div>
+    </div>
+
+    <!-- WRAPPER DE CENTRAGE -->
+    <div class="d-flex justify-content-center align-items-center min-vh-100 w-100 p-3">
+
+        <!-- La Carte (Card) du formulaire -->
+        <div class="login-card">
+            <div class="mx-auto w-100" style="max-width: 380px;">
+
+                <!-- En-tête -->
+                <div class="mb-5 text-center">
+                    <div class="d-inline-flex align-items-center ">
+                        <h1 class="fw-bold text-main" style="font-size: 28px; letter-spacing: -0.5px;">Connexion</h1>
+                    </div>
+                </div>
+
+                <!-- Formulaire -->
+                <form th:action="@{/login}" method="post" class="needs-validation" novalidate id="loginForm">
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="email" class="form-label">
+                            Adresse email <span class="text-error">*</span>
+                        </label>
+                        <div class="input-icon-wrapper">
+                            <span class="ms">mail</span>
+                            <input type="email" id="email" name="email" class="form-control" required autofocus
+                                value="bob@sirh.com">
+                            <div class="invalid-feedback">
+                                Veuillez saisir une adresse email valide.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mot de passe -->
+                    <div class="mb-4">
+                        <label for="motDePasse" class="form-label">
+                            Mot de passe <span class="text-error">*</span>
+                        </label>
+                        <div class="input-icon-wrapper">
+                            <span class="ms">lock</span>
+                            <input type="password" id="motDePasse" name="motDePasse" class="form-control" required
+                                value="123">
+                            <div class="invalid-feedback">
+                                Le mot de passe est obligatoire.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bouton (Utilise la classe .btn-brand de ton design system) -->
+                    <div class="pt-3">
+                        <button type="submit"
+                            class="btn-brand w-100 d-flex align-items-center justify-content-center gap-2">
+                            Se connecter
+                            <span class="ms" style="font-size: 20px;">arrow_forward</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT 1 : Disparition des alertes -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const alerts = document.querySelectorAll('.auto-dismiss-alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.add('alert-fade-out');
+                    setTimeout(() => { alert.remove(); }, 500);
+                }, 3500);
+            });
+        });
+    </script>
+
+    <!-- SCRIPT 2 : Validation Bootstrap -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById('loginForm');
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    </script>
+
+</body>
+
+</html>

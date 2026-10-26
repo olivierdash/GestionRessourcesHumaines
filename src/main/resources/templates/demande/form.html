@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+    <main th:fragment="mainContent" class="app-page">
+
+        <div class="mb-4">
+            <a th:href="@{/demandes}" class="back-link">&larr; Retour à la liste</a>
+            <h2 class="page-title" th:text="${isBrouillon != null} ? 'Modifier la demande' : 'Nouvelle demande'"></h2>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card-x">
+                    <div class="card-pad">
+
+                        <form th:action="${isBrouillon != null} ? @{/demandes/update} : @{/demandes/create}"
+                            method="post" th:object="${demandeRecrutementForm}" id="demandeForm"
+                            class="needs-validation" novalidate>
+
+                            <input type="hidden" th:field="*{idDemandeRecrutement}" />
+
+                            <div class="mb-4">
+                                <label class="form-label">État actuel</label>
+                                <input type="text" class="form-control" readonly
+                                    th:value="${demandeRecrutementForm.etat != null ? demandeRecrutementForm.etat : 'Brouillon'}"
+                                    style="background-color: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-secondary); font-weight: 600; cursor: not-allowed;">
+                            </div>
+
+                            <!-- Manager -->
+                            <div class="mb-4">
+                                <label for="idManager" class="form-label">Manager responsable <span
+                                        class="text-error">*</span></label>
+                                <select class="form-select" id="idManager" th:field="*{idManager}" required>
+                                    <option value="" disabled>Sélectionnez un manager...</option>
+                                    <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
+                                        th:text="${manager.nom}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('idManager')}"
+                                    th:errors="*{idManager}"></div>
+                            </div>
+
+                            <!-- Poste (Custom Select) -->
+                            <div class="mb-4">
+                                <label for="posteSearch" class="form-label">Poste concerné <span
+                                        class="text-error">*</span></label>
+                                <div class="custom-select-wrapper">
+                                    <input type="text" class="form-control" id="posteSearch" placeholder="Rechercher..."
+                                        autocomplete="off" required>
+                                    <div class="custom-dropdown" id="posteDropdown"></div>
+                                    <select class="d-none" id="posteSelect" th:field="*{idPoste}" required>
+                                        <option value=""></option>
+                                        <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
+                                            th:text="${poste.intitule}"></option>
+                                    </select>
+                                </div>
+                                <div class="invalid-feedback" id="posteError" th:if="${#fields.hasErrors('idPoste')}"
+                                    th:errors="*{idPoste}"></div>
+                            </div>
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label for="dateSouhaitee" class="form-label">Date d'entrée <span
+                                            class="text-error">*</span></label>
+                                    <input type="date" class="form-control" id="dateSouhaitee"
+                                        th:field="*{dateSouhaitee}" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('dateSouhaitee')}"
+                                        th:errors="*{dateSouhaitee}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="effectif" class="form-label">Effectif requis <span
+                                            class="text-error">*</span></label>
+                                    <input type="number" class="form-control" id="effectif" th:field="*{effectif}"
+                                        min="1" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('effectif')}"
+                                        th:errors="*{effectif}"></div>
+                                </div>
+                            </div>
+
+                            <!-- Motif de la demande -->
+                            <div class="mb-4">
+                                <label for="idMotif" class="form-label">Motif de la demande <span
+                                        class="text-error">*</span></label>
+                                <select class="form-select" id="idMotif" th:field="*{motif.idMotifDemande}" required>
+                                    <option value="" disabled>Sélectionnez un motif...</option>
+                                    <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}"
+                                        th:text="${motif.libelle}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('motif.idMotifDemande')}"
+                                    th:errors="*{motif.idMotifDemande}"></div>
+                            </div>
+
+                            <div class="form-actions">
+                                <!-- Bouton secondaire : Enregistrer sans changer d'état (reste Brouillon) -->
+                                <button type="submit" name="action" value="save" class="btn-soft">
+                                    Enregistrer le brouillon
+                                </button>
+
+                                <!-- Bouton principal : Mettre à jour et Soumettre (passe à l'état Cree) -->
+                                <button type="submit" name="action" value="submit" class="btn-brand"
+                                    th:text="${isBrouillon != null} ? 'Mettre à jour et Soumettre' : 'Soumettre la demande'">
+                                    Enregistrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCRIPT UNIFIÉ ET FACTORISÉ POUR LA PAGE -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // 1. Récupération des éléments du DOM
+                const form = document.getElementById('demandeForm');
+                const searchInput = document.getElementById('posteSearch');
+                const hiddenSelect = document.getElementById('posteSelect');
+                const dropdown = document.getElementById('posteDropdown');
+                const effectifInput = document.getElementById('effectif');
+
+                // 2. Fonctions utilitaires (Logique métier)
+
+                function initDropdown() {
+                    const options = Array.from(hiddenSelect.options).filter(opt => opt.value !== "");
+
+                    options.forEach(opt => {
+                        const div = document.createElement('div');
+                        div.className = 'custom-option';
+                        div.textContent = opt.text;
+                        div.dataset.value = opt.value;
+
+                        // AJOUT : On vérifie si l'option est déjà sélectionnée au chargement
+                        if (opt.selected) {
+                            div.classList.add('active');
+                            searchInput.value = opt.text;
+                        }
+
+                        div.addEventListener('click', () => selectOption(opt, div));
+                        dropdown.appendChild(div);
+                    });
+                }
+
+                function selectOption(opt, divElement) {
+                    searchInput.value = opt.text;
+                    hiddenSelect.value = opt.value;
+                    searchInput.classList.remove('is-invalid');
+
+                    // AJOUT : On gère le surlignage visuel
+                    dropdown.querySelectorAll('.custom-option').forEach(el => el.classList.remove('active'));
+                    divElement.classList.add('active');
+
+                    closeDropdown();
+                }
+
+                function filterList() {
+                    const query = searchInput.value.toLowerCase();
+                    const items = dropdown.querySelectorAll('.custom-option:not(.no-result)');
+                    let hasVisible = false;
+
+                    items.forEach(item => {
+                        if (item.textContent.toLowerCase().includes(query)) {
+                            item.style.display = 'block';
+                            hasVisible = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    toggleNoResultMessage(!hasVisible);
+                }
+
+                function toggleNoResultMessage(show) {
+                    let noResultDiv = dropdown.querySelector('.no-result');
+
+                    if (show) {
+                        if (!noResultDiv) {
+                            noResultDiv = document.createElement('div');
+                            noResultDiv.className = 'custom-option no-result';
+                            noResultDiv.textContent = 'Aucun poste trouvé';
+                            dropdown.appendChild(noResultDiv);
+                        }
+                        noResultDiv.style.display = 'block';
+                    } else if (noResultDiv) {
+                        noResultDiv.style.display = 'none';
+                    }
+                }
+
+                function openDropdown() {
+                    dropdown.classList.add('show');
+                    filterList();
+                }
+
+                function closeDropdown() {
+                    dropdown.classList.remove('show');
+                }
+
+                function isFormValid() {
+                    let isValid = true;
+
+                    // 1. Vérification du poste (Custom Select)
+                    if (hiddenSelect.value === "") {
+                        searchInput.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        searchInput.classList.remove('is-invalid');
+                    }
+
+                    // 2. AJOUT : Vérification de l'effectif (> 0)
+                    if (effectifInput) {
+                        const effectifValue = parseInt(effectifInput.value, 10);
+                        if (isNaN(effectifValue) || effectifValue <= 0) {
+                            effectifInput.classList.add('is-invalid');
+                            isValid = false;
+                        } else {
+                            effectifInput.classList.remove('is-invalid');
+                        }
+                    }
+
+                    // 3. Vérification HTML5 standard (required, etc.)
+                    if (!form.checkValidity()) {
+                        isValid = false;
+                    }
+
+                    return isValid;
+                }
+
+                // 3. Attachement des événements (Listeners)
+
+                if (searchInput && hiddenSelect && dropdown) {
+                    searchInput.addEventListener('focus', openDropdown);
+
+                    searchInput.addEventListener('input', () => {
+                        hiddenSelect.value = ""; // Réinitialise la sélection cachée lors de la saisie
+                        openDropdown();
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                            closeDropdown();
+                            if (hiddenSelect.value === "") {
+                                searchInput.classList.add('is-invalid');
+                            }
+                        }
+                    });
+                }
+
+                // Nettoyage de l'erreur sur l'effectif quand on tape
+                if (effectifInput) {
+                    effectifInput.addEventListener('input', () => {
+                        if (parseInt(effectifInput.value, 10) > 0) {
+                            effectifInput.classList.remove('is-invalid');
+                        }
+                    });
+                }
+
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!isFormValid()) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    });
+                }
+
+                // 4. Initialisation au chargement de la page
+                if (hiddenSelect) {
+                    initDropdown();
+                }
+            });
+        </script>
+
+    </main>
+</body>
+
+</html>
