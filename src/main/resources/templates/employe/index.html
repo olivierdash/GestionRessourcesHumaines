@@ -37,9 +37,15 @@
 
                         <!-- Boucle sur les employés -->
                         <tr th:each="employe : ${employes.content}">
+<<<<<<< HEAD
                             <td class="ref"><a th:href="@{/employes/{id}(id=${employe.idEmployer})}" th:text="'#' + ${employe.idEmployer}"></a></td>
                             <td class="fw-medium" th:text="${employe.matricule}"></td>
                             <td class="text-outline" th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
+=======
+                            <td class="ref" th:text="'#' + ${employe.idEmployer}">#1</td>
+                            <td class="fw-medium" th:text="${employe.matricule}">MAT-2024-001</td>
+                            <td class="text-outline" th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}">01/01/2024</td>
+>>>>>>> e90ab66 (integration SPA fonctionnelle)
                         </tr>
                     </tbody>
                 </table>
