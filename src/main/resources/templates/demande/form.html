@@ -2,15 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{dashboard :: layout(content=~{::mainContent})}">
 
 <body>
-
     <main th:fragment="mainContent" class="app-page">
 
-        <!-- En-tête -->
         <div class="mb-4">
             <a th:href="@{/demandes}" class="back-link">&larr; Retour à la liste</a>
-            <h2 class="page-title">Nouvelle demande de recrutement</h2>
-            <p class="text-muted text-small mt-1 mb-0">Remplissez les informations ci-dessous pour initier le processus.
-            </p>
+            <h2 class="page-title" th:text="${isBrouillon != null} ? 'Modifier la demande' : 'Nouvelle demande'"></h2>
         </div>
 
         <div class="row">
@@ -18,6 +14,35 @@
                 <div class="card-x">
                     <div class="card-pad">
 
+                        <form th:action="${isBrouillon != null} ? @{/demandes/update} : @{/demandes/create}"
+                            method="post" th:object="${demandeRecrutementForm}" id="demandeForm"
+                            class="needs-validation" novalidate>
+
+                            <input type="hidden" th:field="*{idDemandeRecrutement}" />
+
+                            <div class="mb-4">
+                                <label class="form-label">État actuel</label>
+                                <input type="text" class="form-control" readonly
+                                    th:value="${demandeRecrutementForm.etat != null ? demandeRecrutementForm.etat : 'Brouillon'}"
+                                    style="background-color: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-secondary); font-weight: 600; cursor: not-allowed;">
+                            </div>
+
+                            <!-- Manager -->
+<<<<<<< HEAD
+                 git reset --soft origin/main           <div class="mb-4">
+=======
+                            <div class="mb-4">
+<<<<<<< HEAD
+>>>>>>> 3dbad29 (factorisation css)
+                                <label for="idManager" class="form-label">Manager demandeur <span
+=======
+                                <label for="idManager" class="form-label">Manager responsable <span
+>>>>>>> 24a41ed (validation demande recrutement terminee)
+                                        class="text-error">*</span></label>
+                                <select class="form-select" id="idManager" th:field="*{idManager}" required>
+                                    <option value="" disabled>Sélectionnez un manager...</option>
+                                    <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
+                                        th:text="${manager.nom}"></option>
                         <!-- Ajout de la classe needs-validation -->
                         <form th:action="@{/demandes}" method="post" id="demandeForm" class="needs-validation"
                             novalidate>
@@ -32,62 +57,106 @@
                                         th:text="${manager.nom + ' (' + manager.role.libelle + ')'}">
                                     </option>
                                 </select>
-                                <div class="invalid-feedback">Veuillez sélectionner un manager.</div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('idManager')}"
+                                    th:errors="*{idManager}"></div>
                             </div>
-
-                            <!-- Poste (Recherche + Liste Flottante) -->
+         
+                            <!-- Poste (Custom Select) -->
                             <div class="mb-4">
+<<<<<<< HEAD
+       mlns:th="http:                         <label for="posteSearch" class="form-label">Poste concerné <span
+=======
                                 <label for="posteSearch" class="form-label">Poste concerné <span
+>>>>>>> 3dbad29 (factorisation css)
                                         class="text-error">*</span></label>
                                 <div class="custom-select-wrapper">
-                                    <input type="text" class="form-control" id="posteSearch"
-                                        placeholder="Tapez pour rechercher un poste..." autocomplete="off" required>
+                                    <input type="text" class="form-control" id="posteSearch" placeholder="Rechercher..."
+                                        autocomplete="off" required>
                                     <div class="custom-dropdown" id="posteDropdown"></div>
-                                    <!-- Le select caché n'a pas besoin d'être requis côté HTML car le JS gère -->
-                                    <select class="d-none" id="posteSelect" name="idPoste" required>
+                                    <select class="d-none" id="posteSelect" th:field="*{idPoste}" required>
                                         <option value=""></option>
                                         <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
-                                            th:text="${poste.intitule + ' - ' + poste.departement.titre}">
-                                        </option>
+                                            th:text="${poste.intitule}"></option>
                                     </select>
                                 </div>
-                                <div class="invalid-feedback" id="posteError">Veuillez sélectionner un poste dans la
-                                    liste.</div>
+                                <div class="invalid-feedback" id="posteError" th:if="${#fields.hasErrors('idPoste')}"
+                                    th:errors="*{idPoste}"></div>
                             </div>
 
                             <div class="row g-4 mb-4">
                                 <div class="col-md-6">
-                                    <label for="dateSouhaitee" class="form-label">Date d'entrée souhaitée <span
+                                    <label for="dateSouhaitee" class="form-label">Date d'entrée <span
                                             class="text-error">*</span></label>
-                                    <input type="date" class="form-control" id="dateSouhaitee" name="dateSouhaitee"
-                                        required>
-                                    <div class="invalid-feedback">Veuillez choisir une date.</div>
+                                    <input type="date" class="form-control" id="dateSouhaitee"
+                                        th:field="*{dateSouhaitee}" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('dateSouhaitee')}"
+                                        th:errors="*{dateSouhaitee}"></div>
                                 </div>
-
                                 <div class="col-md-6">
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e345d44 (factorisation css)
+=======
+>>>>>>> 3dbad29 (factorisation css)
                                     <label for="effectif" class="form-label">Effectif requis <span
                                             class="text-error">*</span></label>
+<<<<<<< HEAD
                                     <input type="number" class="form-control" id="effectif" name="effectif" min="1"
                                         step="1" required placeholder="Ex: 2">
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======git reset --soft origin/main
+                                    <label for="effectif" class="form-label">Effectif requis <span class="req">*</span></label>
+                                    <input type="number" class="form-control" id="effectif" name="effectif" min="1" step="1" required placeholder="Ex: 2">
+>>>>>>> 4b2498f (integration SPA fonctionnelle)
+=======
+>>>>>>> e345d44 (factorisation css)
+=======
+                                    <label for="effectif" class="form-label">Effectif requis <span class="req">*</span></label>
+                                    <input type="number" class="form-control" id="effectif" name="effectif" min="1" step="1" required placeholder="Ex: 2">
+>>>>>>> df0901f (integration SPA fonctionnelle)
+=======
+>>>>>>> 3dbad29 (factorisation css)
                                     <div class="invalid-feedback">L'effectif doit être supérieur à 0.</div>
+=======
+                                    <input type="number" class="form-control" id="effectif" th:field="*{effectif}"
+                                        min="1" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('effectif')}"
+                                        th:errors="*{effectif}"></div>
+>>>>>>> 24a41ed (validation demande recrutement terminee)
                                 </div>
                             </div>
 
+                            <!-- Motif de la demande -->
                             <div class="mb-4">
-                                <label for="motif" class="form-label">Motif de la demande</label>
-                                <!-- Le textarea sera corrigé via le CSS -->
-                                <textarea class="form-control" id="motif" name="motif" rows="4"
-                                    placeholder="Expliquez brièvement la raison de ce recrutement..."></textarea>
+                                <label for="idMotif" class="form-label">Motif de la demande <span
+                                        class="text-error">*</span></label>
+                                <select class="form-select" id="idMotif" th:field="*{motif.idMotifDemande}" required>
+                                    <option value="" disabled>Sélectionnez un motif...</option>
+                                    <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}"
+                                        th:text="${motif.libelle}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('motif.idMotifDemande')}"
+                                    th:errors="*{motif.idMotifDemande}"></div>
                             </div>
 
-                            <!-- Actions -->
                             <div class="form-actions">
-                                <a th:href="@{/demandes}" class="btn-soft">Annuler</a>
-                                <button type="submit" class="btn-brand">Créer la demande</button>
+                                <!-- Bouton secondaire : Enregistrer sans changer d'état (reste Brouillon) -->
+                                <button type="submit" name="action" value="save" class="btn-soft">
+                                    Enregistrer le brouillon
+                                </button>
+
+                                <!-- Bouton principal : Mettre à jour et Soumettre (passe à l'état Cree) -->
+                                <button type="submit" name="action" value="submit" class="btn-brand"
+                                    th:text="${isBrouillon != null} ? 'Mettre à jour et Soumettre' : 'Soumettre la demande'">
+                                    Enregistrer
+                                </button>
                             </div>
 
                         </form>
-
                     </div>
                 </div>
             </div>
@@ -101,11 +170,11 @@
                 const searchInput = document.getElementById('posteSearch');
                 const hiddenSelect = document.getElementById('posteSelect');
                 const dropdown = document.getElementById('posteDropdown');
+                const effectifInput = document.getElementById('effectif');
 
                 // 2. Fonctions utilitaires (Logique métier)
 
                 function initDropdown() {
-                    // Génère les divs personnalisés à partir du select caché
                     const options = Array.from(hiddenSelect.options).filter(opt => opt.value !== "");
 
                     options.forEach(opt => {
@@ -114,7 +183,12 @@
                         div.textContent = opt.text;
                         div.dataset.value = opt.value;
 
-                        // Au clic sur une option, on la sélectionne
+                        // AJOUT : On vérifie si l'option est déjà sélectionnée au chargement
+                        if (opt.selected) {
+                            div.classList.add('active');
+                            searchInput.value = opt.text;
+                        }
+
                         div.addEventListener('click', () => selectOption(opt, div));
                         dropdown.appendChild(div);
                     });
@@ -124,6 +198,11 @@
                     searchInput.value = opt.text;
                     hiddenSelect.value = opt.value;
                     searchInput.classList.remove('is-invalid');
+
+                    // AJOUT : On gère le surlignage visuel
+                    dropdown.querySelectorAll('.custom-option').forEach(el => el.classList.remove('active'));
+                    divElement.classList.add('active');
+
                     closeDropdown();
                 }
 
@@ -162,7 +241,7 @@
 
                 function openDropdown() {
                     dropdown.classList.add('show');
-                    filterList(); // Applique le filtre à l'ouverture
+                    filterList();
                 }
 
                 function closeDropdown() {
@@ -170,48 +249,99 @@
                 }
 
                 function isFormValid() {
-                    // Vérification personnalisée : un poste a-t-il été sélectionné ?
+                    let isValid = true;
+
+                    // 1. Vérification du poste (Custom Select)
                     if (hiddenSelect.value === "") {
                         searchInput.classList.add('is-invalid');
-                        return false;
+                        isValid = false;
                     } else {
                         searchInput.classList.remove('is-invalid');
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+                                        }
+=======
                     }
+>>>>>>> e345d44 (factorisation css)
 
                     // Vérification HTML5 standard (champs required, types email, etc.)
                     return form.checkValidity();
+=======
+                        return true;
+                    }
+>>>>>>> df0901f (integration SPA fonctionnelle)
+=======
+                    }
+
+<<<<<<< HEAD
+                    // Vérification HTML5 standard (champs required, types email, etc.)
+                    return form.checkValidity();
+>>>>>>> 3dbad29 (factorisation css)
+=======
+                    // 2. AJOUT : Vérification de l'effectif (> 0)
+                    if (effectifInput) {
+                        const effectifValue = parseInt(effectifInput.value, 10);
+                        if (isNaN(effectifValue) || effectifValue <= 0) {
+                            effectifInput.classList.add('is-invalid');
+                            isValid = false;
+                        } else {
+                            effectifInput.classList.remove('is-invalid');
+                        }
+                    }
+
+                    // 3. Vérification HTML5 standard (required, etc.)
+                    if (!form.checkValidity()) {
+                        isValid = false;
+                    }
+
+                    return isValid;
+>>>>>>> 24a41ed (validation demande recrutement terminee)
                 }
 
                 // 3. Attachement des événements (Listeners)
 
-                searchInput.addEventListener('focus', openDropdown);
+                if (searchInput && hiddenSelect && dropdown) {
+                    searchInput.addEventListener('focus', openDropdown);
 
-                searchInput.addEventListener('input', () => {
-                    hiddenSelect.value = ""; // Réinitialise la sélection cachée lors de la saisie
-                    openDropdown();
-                });
+                    searchInput.addEventListener('input', () => {
+                        hiddenSelect.value = ""; // Réinitialise la sélection cachée lors de la saisie
+                        openDropdown();
+                    });
 
-                // Fermer le dropdown si on clique n'importe où ailleurs sur la page
-                document.addEventListener('click', (e) => {
-                    if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-                        closeDropdown();
-                        // Si on quitte le champ alors qu'il est vide, on affiche l'erreur
-                        if (hiddenSelect.value === "") {
-                            searchInput.classList.add('is-invalid');
+                    document.addEventListener('click', (e) => {
+                        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                            closeDropdown();
+                            if (hiddenSelect.value === "") {
+                                searchInput.classList.add('is-invalid');
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
-                form.addEventListener('submit', function (e) {
-                    if (!isFormValid()) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                });
+                // Nettoyage de l'erreur sur l'effectif quand on tape
+                if (effectifInput) {
+                    effectifInput.addEventListener('input', () => {
+                        if (parseInt(effectifInput.value, 10) > 0) {
+                            effectifInput.classList.remove('is-invalid');
+                        }
+                    });
+                }
+
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!isFormValid()) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    });
+                }
 
                 // 4. Initialisation au chargement de la page
-                initDropdown();
+                if (hiddenSelect) {
+                    initDropdown();
+                }
             });
         </script>
 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Erreur</title>
+    
+    <!-- Fichiers locaux -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+    <style>
+        /* Styles spécifiques à la page d'erreur */
+        body {
+            background: var(--color-canvas);
+            color: var(--color-text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Fond décoratif */
+        .blob { position: absolute; border-radius: 50%; pointer-events: none; }
+        .blob-top {
+            top: -8rem; right: -8rem; width: 24rem; height: 24rem;
+            background: rgba(221, 225, 255, .4); filter: blur(64px);
+        }
+        .blob-bottom {
+            bottom: 0; left: 2.5rem; width: 20rem; height: 20rem;
+            background: rgba(255, 220, 195, .3); filter: blur(40px);
+        }
+
+        .error-card { max-width: 56rem; }
+
+        /* Code HTTP */
+        .status-code {
+            font-size: 96px;
+            line-height: 104px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--color-surface-mid);
+            user-select: none;
+        }
+
+        .illustration {
+            width: 7rem; height: 7rem;
+            color: rgba(0, 40, 142, .8);
+            filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .07)) drop-shadow(0 2px 2px rgba(0, 0, 0, .06));
+        }
+
+        .error-title { font-size: 24px; line-height: 32px; font-weight: 600; max-width: 36rem; }
+        .error-desc  { font-size: 16px; line-height: 24px; color: var(--color-text-muted); max-width: 32rem; }
+    </style>
+</head>
+<body>
+
+<div class="position-relative d-flex flex-column align-items-center justify-content-center overflow-hidden w-100 min-vh-100 p-3 p-md-4">
+    <div class="blob blob-top"></div>
+    <div class="blob blob-bottom"></div>
+
+    <div class="error-card w-100 position-relative" style="z-index:10;">
+        <div class="d-flex flex-column align-items-center text-center p-4">
+
+            <!-- Code HTTP dynamique + illustration -->
+            <div class="position-relative d-flex align-items-center justify-content-center my-2">
+                <!-- Spring Boot injecte 'status' (404, 500, etc.) -->
+                <span class="status-code" th:text="${status != null ? status : '500'}">404</span>
+                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="pointer-events:none;">
+                    <svg class="illustration" fill="none" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                        <rect fill="currentColor" fill-opacity="0.08" height="72" rx="10" width="76" x="22" y="24"></rect>
+                        <path d="M38 42H82M38 56H68M38 70H54" stroke="currentColor" stroke-linecap="round" stroke-width="3"></path>
+                        <circle cx="74" cy="74" fill="#FFFFFF" r="18"></circle>
+                        <circle cx="74" cy="74" r="18" stroke="var(--color-secondary)" stroke-width="3.5"></circle>
+                        <line stroke="var(--color-secondary)" stroke-linecap="round" stroke-width="4" x1="87" x2="102" y1="87" y2="102"></line>
+                        <path d="M70 74H78M74 70V78" stroke="var(--color-primary)" stroke-linecap="round" stroke-width="2"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Texte dynamique -->
+            <!-- Spring Boot injecte 'error' (ex: Not Found) et 'message' -->
+            <h1 class="error-title mb-1" th:text="${error != null ? error : 'Ressource RH introuvable'}">
+                Ressource RH introuvable
+            </h1>
+            <p class="error-desc mb-4" th:text="${message != null ? message : 'La fiche collaborateur, le document contractuel ou la demande de recrutement demandée n''existe plus ou a été archivée.'}">
+                La fiche collaborateur, le document contractuel ou la demande de recrutement demandée n'existe plus ou a été archivée.
+            </p>
+
+            <!-- Bouton -->
+            <div class="d-flex flex-wrap align-items-center justify-content-center w-100 mb-4 gap-2">
+                <button type="button" class="btn-brand d-inline-flex align-items-center justify-content-center" onclick="window.history.back()">
+                    <span class="ms" style="font-size: 20px;">arrow_back</span>
+                    <span>Page précédente</span>
+                </button>
+                <!-- <a th:href="@{/dashboard}" class="btn-soft d-inline-flex align-items-center justify-content-center">
+                    <span class="ms" style="font-size: 20px;">dashboard</span>
+                    <span>Tableau de bord</span>
+                </a> -->
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

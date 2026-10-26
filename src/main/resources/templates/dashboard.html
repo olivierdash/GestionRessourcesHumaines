@@ -1,8 +1,29 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e345d44 (factorisation css)
 <html xmlns:th="http://www.thymeleaf.org" 
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
       lang="fr" th:fragment="layout(content)">
+=======
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr"
+    th:fragment="layout(content)">
+>>>>>>> 24a41ed (validation demande recrutement terminee)
+=======
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+      lang="fr" th:fragment="layout(content)">
+>>>>>>> e2abf46 (factorisation css)
 
+<<<<<<< HEAD
+=======
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:fragment="layout(content)">
+>>>>>>> 4b2498f (integration SPA fonctionnelle)
+=======
+>>>>>>> e345d44 (factorisation css)
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,8 +33,17 @@
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
+<<<<<<< HEAD
+<<<<<<< HEAD
 
 <body class="app-page"> <!-- Ajout de app-page ici -->
+=======
+<body>
+>>>>>>> 4b2498f (integration SPA fonctionnelle)
+=======
+
+<body class="app-page"> <!-- Ajout de app-page ici -->
+>>>>>>> e345d44 (factorisation css)
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -21,6 +51,8 @@
             <div class="sidebar-brand">
                 <span class="logo"><span class="ms">groups</span></span>SIRH Pro
             </div>
+<<<<<<< HEAD
+<<<<<<< HEAD
             <nav class="nav flex-column">
                 <!-- Tout le monde peut voir ses demandes -->
                 <a class="nav-link" th:href="@{/demandes}">
@@ -62,6 +94,55 @@
                     <span class="ms" style="font-size: 20px;">logout</span>
                 </button>
             </form>
+=======
+            <div class="sidebar-label">Menu principal</div>
+=======
+>>>>>>> e345d44 (factorisation css)
+            <nav class="nav flex-column">
+                <!-- Tout le monde peut voir ses demandes -->
+                <a class="nav-link" th:href="@{/demandes}">
+                    <span class="ms">assignment</span>Demandes de Recrutement
+                </a>
+
+                <!-- Seuls le RH, DG et Manager peuvent voir les employés -->
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" class="nav-link" th:href="@{/employes}">
+                    <span class="ms">badge</span>Employés
+                </a>
+
+                <!-- RÉFÉRENTIELS : Uniquement RH et DG -->
+                <a sec:authorize="hasAnyRole('RH', 'DG')" class="nav-link" th:href="@{/departements}">
+                    <span class="ms">apartment</span>Départements
+                </a>
+
+                <!-- CANDIDATS : Seulement RH et Manager (pour recruter) -->
+                <a sec:authorize="hasAnyRole('RH', 'MANAGER')" class="nav-link" th:href="@{/candidats}">
+                    <span class="ms">person_search</span>Candidats
+                </a>
+
+                <!-- FINANCE : Uniquement le rôle Finance et DG -->
+                <a sec:authorize="hasAnyRole('FINANCE', 'DG')" class="nav-link" th:href="@{/finance}">
+                    <span class="ms">payments</span>Validation Financière
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-user d-flex align-items-center justify-content-between">
+            <!-- Avatar avec les 2 premières lettres du nom (Variables du Design System) -->
+            <div class="avatar" 
+                 th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">
+                CD
+            </div>
+<<<<<<< HEAD
+>>>>>>> 4b2498f (integration SPA fonctionnelle)
+=======
+
+            <!-- Bouton de déconnexion -->
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button class="icon-btn" title="Déconnexion" type="submit">
+                    <span class="ms" style="font-size: 20px;">logout</span>
+                </button>
+            </form>
+>>>>>>> e345d44 (factorisation css)
         </div>
     </aside>
 
@@ -70,8 +151,26 @@
         <!-- Topbar -->
         <header class="topbar">
             <div class="d-flex align-items-center gap-2 flex-grow-1 me-3">
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
                 <button class="topbar-btn d-lg-none" type="button"
                     onclick="document.getElementById('sidebar').classList.toggle('show')" aria-label="Menu">
+=======
+                <button class="topbar-btn d-lg-none" type="button" onclick="document.getElementById('sidebar').classList.toggle('show')" aria-label="Menu">
+>>>>>>> 4b2498f (integration SPA fonctionnelle)
+=======
+                <button class="topbar-btn d-lg-none" type="button"
+                    onclick="document.getElementById('sidebar').classList.toggle('show')" aria-label="Menu">
+>>>>>>> e345d44 (factorisation css)
+=======
+                <button class="topbar-btn d-lg-none" type="button" onclick="document.getElementById('sidebar').classList.toggle('show')" aria-label="Menu">
+>>>>>>> df0901f (integration SPA fonctionnelle)
+=======
+                <button class="topbar-btn d-lg-none" type="button"
+                    onclick="document.getElementById('sidebar').classList.toggle('show')" aria-label="Menu">
+>>>>>>> 3dbad29 (factorisation css)
                     <span class="ms">menu</span>
                 </button>
                 <div class="search-box">
@@ -80,19 +179,89 @@
                 </div>
             </div>
             <div class="d-flex align-items-center gap-2">
+<<<<<<< HEAD
+<<<<<<< HEAD
                 <div class="position-relative">
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                <div class="position-relative">
+>>>>>>> 8fd0b30 (factorisation css)
                     <button class="topbar-btn" title="Notifications" type="button"><span
                             class="ms">notifications</span></button>
                     <span class="notif-dot"></span>
                 </div>
                 <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span
                         class="ms">help</span></button>
+<<<<<<< HEAD
+=======
+                    <button class="topbar-btn" title="Notifications" type="button"><span class="ms">notifications</span></button>
+                    <span class="notif-dot"></span>
+                </div>
+                <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span class="ms">help</span></button>
+>>>>>>> 4b2498f (integration SPA fonctionnelle)
+=======
+                    <button class="topbar-btn" title="Notifications" type="button"><span
+                            class="ms">notifications</span></button>
+                    <span class="notif-dot"></span>
+                </div>
+                <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span
+                        class="ms">help</span></button>
+>>>>>>> e345d44 (factorisation css)
+=======
+                    <button class="topbar-btn" title="Notifications" type="button"><span class="ms">notifications</span></button>
+                    <span class="notif-dot"></span>
+                </div>
+                <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span class="ms">help</span></button>
+>>>>>>> df0901f (integration SPA fonctionnelle)
+=======
+                    <button class="topbar-btn" title="Notifications" type="button"><span
+                            class="ms">notifications</span></button>
+                    <span class="notif-dot"></span>
+                </div>
+                <button class="topbar-btn d-none d-sm-inline-block" title="Aide et Support" type="button"><span
+                        class="ms">help</span></button>
+>>>>>>> 3dbad29 (factorisation css)
+=======
+                <a th:href="@{/demandes/validations}" class="topbar-btn position-relative"
+                    title="Notifications">
+                    <span class="ms">notifications</span>
+                    <!-- Badge rouge avec le nombre de validations -->
+                    <span th:if="${validationsEnAttenteCount > 0}"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 10px; padding: 4px 6px; border: 2px solid white;">
+                        <span th:text="${validationsEnAttenteCount}">3</span>
+                    </span>
+                </a>
+>>>>>>> 24a41ed (validation demande recrutement terminee)
+=======
+>>>>>>> 8fd0b30 (factorisation css)
             </div>
         </header>
 
         <!-- Zone d'injection du contenu -->
         <main>
             <div class="page">
+
+                <!-- Message de succès (flash attribute) -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mb-4" role="alert"
+                    style="border-radius: var(--radius-sm); border-left: 4px solid var(--color-success);">
+                    <span class="ms me-2">check_circle</span>
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Message d'erreur (flash attribute) -->
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mb-4" role="alert"
+                    style="border-radius: var(--radius-sm); border-left: 4px solid var(--color-error);">
+                    <span class="ms me-2">error</span>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Contenu dynamique de la page -->
                 <div th:replace="${content}"></div>
             </div>
         </main>
