@@ -64,7 +64,7 @@ public class DemandeRecrutementController {
                 dto.setEffectif(demande.getEffectif());
                 dto.setMotif(demande.getMotif());
                 dto.setEtat(demande.getEtatDemande().getIntitule());
-                return dto;
+                return dto; 
         }
 
         private boolean canValidate(String etat, String role) {

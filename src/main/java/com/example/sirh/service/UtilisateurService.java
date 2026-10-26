@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.UtilisateurRepository;
 
-@Service 
+@Service  
 public class UtilisateurService {
     private UtilisateurRepository utilisateurRepository;
     public UtilisateurService(UtilisateurRepository utilisateurRepository){

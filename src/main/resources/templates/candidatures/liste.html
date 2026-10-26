@@ -47,6 +47,27 @@
                                    class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-on-white hover:bg-primary-container text-xs font-medium transition-colors shadow-sm ml-2">
                                     Évaluer
                                 </a>
+
+                                <!-- 🔥 NOUVEAUX BOUTONS (Affichés seulement si le candidat n'est ni RETENU (3) ni REFUSE (4)) -->
+                                <div th:if="${cand.statutCandidature.id != 3 and cand.statutCandidature.id != 4}" style="display:inline-block;">
+                                    
+                                    <!-- Bouton RETENIR -->
+                                    <form th:action="@{/candidatures/{id}/retenir(id=${cand.idCandidature})}" method="post" style="display:inline;">
+                                        <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
+                                        <button type="submit" class="btn-soft btn-sm-x ms-1" style="color: #198754; border-color: #198754;" title="Retenir ce candidat">
+                                            Retenir
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Bouton REFUSER -->
+                                    <form th:action="@{/candidatures/{id}/refuser(id=${cand.idCandidature})}" method="post" style="display:inline;">
+                                        <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
+                                        <button type="submit" class="btn-soft btn-sm-x ms-1" style="color: #dc3545; border-color: #dc3545;" title="Refuser ce candidat">
+                                            Refuser
+                                        </button>
+                                    </form>
+                                    
+                                </div>
                             </td>
                         </tr>
                         <tr th:if="${candidatures.isEmpty()}">
