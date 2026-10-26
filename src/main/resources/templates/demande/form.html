@@ -28,46 +28,21 @@
                             </div>
 
                             <!-- Manager -->
-<<<<<<< HEAD
-                 git reset --soft origin/main           <div class="mb-4">
-=======
                             <div class="mb-4">
-<<<<<<< HEAD
->>>>>>> 3dbad29 (factorisation css)
                                 <label for="idManager" class="form-label">Manager demandeur <span
-=======
-                                <label for="idManager" class="form-label">Manager responsable <span
->>>>>>> 24a41ed (validation demande recrutement terminee)
                                         class="text-error">*</span></label>
                                 <select class="form-select" id="idManager" th:field="*{idManager}" required>
                                     <option value="" disabled>Sélectionnez un manager...</option>
                                     <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
-                                        th:text="${manager.nom}"></option>
-                        <!-- Ajout de la classe needs-validation -->
-                        <form th:action="@{/demandes}" method="post" id="demandeForm" class="needs-validation"
-                            novalidate>
-
-                            <!-- Manager -->
-                            <div class="mb-4">
-                                <label for="idManager" class="form-label">Manager demandeur <span
-                                        class="text-error">*</span></label>
-                                <select class="form-select" id="idManager" name="idManager" required>
-                                    <option value="" disabled selected>Sélectionnez un manager...</option>
-                                    <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
-                                        th:text="${manager.nom + ' (' + manager.role.libelle + ')'}">
-                                    </option>
+                                        th:text="${manager.nom + ' (' + manager.role.libelle + ')'}"></option>
                                 </select>
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('idManager')}"
                                     th:errors="*{idManager}"></div>
                             </div>
-         
+
                             <!-- Poste (Custom Select) -->
                             <div class="mb-4">
-<<<<<<< HEAD
-       mlns:th="http:                         <label for="posteSearch" class="form-label">Poste concerné <span
-=======
                                 <label for="posteSearch" class="form-label">Poste concerné <span
->>>>>>> 3dbad29 (factorisation css)
                                         class="text-error">*</span></label>
                                 <div class="custom-select-wrapper">
                                     <input type="text" class="form-control" id="posteSearch" placeholder="Rechercher..."
@@ -93,40 +68,12 @@
                                         th:errors="*{dateSouhaitee}"></div>
                                 </div>
                                 <div class="col-md-6">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e345d44 (factorisation css)
-=======
->>>>>>> 3dbad29 (factorisation css)
                                     <label for="effectif" class="form-label">Effectif requis <span
                                             class="text-error">*</span></label>
-<<<<<<< HEAD
-                                    <input type="number" class="form-control" id="effectif" name="effectif" min="1"
-                                        step="1" required placeholder="Ex: 2">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======git reset --soft origin/main
-                                    <label for="effectif" class="form-label">Effectif requis <span class="req">*</span></label>
-                                    <input type="number" class="form-control" id="effectif" name="effectif" min="1" step="1" required placeholder="Ex: 2">
->>>>>>> 4b2498f (integration SPA fonctionnelle)
-=======
->>>>>>> e345d44 (factorisation css)
-=======
-                                    <label for="effectif" class="form-label">Effectif requis <span class="req">*</span></label>
-                                    <input type="number" class="form-control" id="effectif" name="effectif" min="1" step="1" required placeholder="Ex: 2">
->>>>>>> df0901f (integration SPA fonctionnelle)
-=======
->>>>>>> 3dbad29 (factorisation css)
-                                    <div class="invalid-feedback">L'effectif doit être supérieur à 0.</div>
-=======
                                     <input type="number" class="form-control" id="effectif" th:field="*{effectif}"
                                         min="1" required>
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('effectif')}"
                                         th:errors="*{effectif}"></div>
->>>>>>> 24a41ed (validation demande recrutement terminee)
                                 </div>
                             </div>
 
@@ -183,7 +130,7 @@
                         div.textContent = opt.text;
                         div.dataset.value = opt.value;
 
-                        // AJOUT : On vérifie si l'option est déjà sélectionnée au chargement
+                        // Si l'option est déjà sélectionnée au chargement (ex: édition d'un brouillon)
                         if (opt.selected) {
                             div.classList.add('active');
                             searchInput.value = opt.text;
@@ -199,7 +146,6 @@
                     hiddenSelect.value = opt.value;
                     searchInput.classList.remove('is-invalid');
 
-                    // AJOUT : On gère le surlignage visuel
                     dropdown.querySelectorAll('.custom-option').forEach(el => el.classList.remove('active'));
                     divElement.classList.add('active');
 
@@ -257,29 +203,9 @@
                         isValid = false;
                     } else {
                         searchInput.classList.remove('is-invalid');
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                        }
-=======
-                    }
->>>>>>> e345d44 (factorisation css)
-
-                    // Vérification HTML5 standard (champs required, types email, etc.)
-                    return form.checkValidity();
-=======
-                        return true;
-                    }
->>>>>>> df0901f (integration SPA fonctionnelle)
-=======
                     }
 
-<<<<<<< HEAD
-                    // Vérification HTML5 standard (champs required, types email, etc.)
-                    return form.checkValidity();
->>>>>>> 3dbad29 (factorisation css)
-=======
-                    // 2. AJOUT : Vérification de l'effectif (> 0)
+                    // 2. Vérification de l'effectif (> 0)
                     if (effectifInput) {
                         const effectifValue = parseInt(effectifInput.value, 10);
                         if (isNaN(effectifValue) || effectifValue <= 0) {
@@ -296,7 +222,6 @@
                     }
 
                     return isValid;
->>>>>>> 24a41ed (validation demande recrutement terminee)
                 }
 
                 // 3. Attachement des événements (Listeners)

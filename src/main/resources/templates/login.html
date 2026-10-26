@@ -12,7 +12,7 @@
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 
-<body class="bg-canvas"> <!-- Utilisation de la classe pour le fond -->
+<body class="bg-canvas">
 
     <!-- Conteneur des messages Spring Security (flottants en haut) -->
     <div class="login-messages-container">
@@ -21,28 +21,6 @@
         </div>
         <div th:if="${param.logout}" class="alert alert-success alert-floating auto-dismiss-alert">
             Vous avez été déconnecté avec succès.
-            <!-- Formulaire géré par Spring Security -->
-            <form th:action="@{/login}" method="post">
-                
-                <div th:if="${param.error}" class="alert alert-danger">
-                    Email ou mot de passe incorrect.
-                </div>
-                <div th:if="${param.logout}" class="alert alert-success">
-                    Vous avez été déconnecté.
-                </div>
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required autofocus>
-                </div>
-
-                <div class="mb-4">
-                    <label for="motDePasse" class="form-label">Mot de passe</label>
-                    <input type="password" class="form-control" id="motDePasse" name="motDePasse" required>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 py-2">Se connecter</button>
-            </form>
         </div>
     </div>
 
@@ -55,9 +33,8 @@
 
                 <!-- En-tête -->
                 <div class="mb-5 text-center">
-                    <div class="d-inline-flex align-items-center ">
-                        <h1 class="fw-bold text-main" style="font-size: 28px; letter-spacing: -0.5px;">Connexion</h1>
-                    </div>
+                    <h1 class="fw-bold text-main" style="font-size: 28px; letter-spacing: -0.5px;">Connexion</h1>
+                    <p class="text-muted text-small mt-1">Accédez à votre espace RH sécurisé.</p>
                 </div>
 
                 <!-- Formulaire -->
@@ -71,7 +48,7 @@
                         <div class="input-icon-wrapper">
                             <span class="ms">mail</span>
                             <input type="email" id="email" name="email" class="form-control" required autofocus
-                                value="bob@sirh.com">
+                                placeholder="prenom.nom@entreprise.com" value="bob@sirh.com">
                             <div class="invalid-feedback">
                                 Veuillez saisir une adresse email valide.
                             </div>
@@ -86,14 +63,14 @@
                         <div class="input-icon-wrapper">
                             <span class="ms">lock</span>
                             <input type="password" id="motDePasse" name="motDePasse" class="form-control" required
-                                value="123">
+                                placeholder="••••••••••••" value="123">
                             <div class="invalid-feedback">
                                 Le mot de passe est obligatoire.
                             </div>
                         </div>
                     </div>
 
-                    <!-- Bouton (Utilise la classe .btn-brand de ton design system) -->
+                    <!-- Bouton -->
                     <div class="pt-3">
                         <button type="submit"
                             class="btn-brand w-100 d-flex align-items-center justify-content-center gap-2">
@@ -102,6 +79,7 @@
                         </button>
                     </div>
                 </form>
+
             </div>
         </div>
 
