@@ -12,7 +12,7 @@ import com.example.sirh.repository.EmployeRepository;
 import com.example.sirh.repository.GrilleSalarialRepository;
 import com.example.sirh.repository.PropositionEmbaucheRepository;
 import com.example.sirh.repository.StatutPropositionRepository;
-import com.example.sirh.repository.UtilisateurRepository;
+import com.example.sirh.repository.UtilisateurEmailRepository;
 import com.example.sirh.repository.ValidationPropositionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class PropositionService {
     private final CandidatureRepository candidatureRepo;
     private final EmployeRepository employeRepo;
     private final GrilleSalarialRepository grilleRepo;
-    private final UtilisateurRepository utilisateurRepo;
+    private final UtilisateurEmailRepository utilisateurRepo;
 
     // ---------- Lecture ----------
 

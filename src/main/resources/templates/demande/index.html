@@ -25,8 +25,8 @@
                     <!-- LIGNE DES FILTRES -->
                     <div class="row g-3 align-items-end mb-4">
 
-                        <!-- Département -->
-                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
+                        <!-- Département (2 colonnes) -->
+                        <div class="col-xl-2 col-lg-2 col-md-6" style="min-width: 0;">
                             <label class="form-label text-truncate">Département</label>
                             <select class="form-select w-100" name="idDepartement">
                                 <option value="">Tous</option>
@@ -36,8 +36,8 @@
                             </select>
                         </div>
 
-                        <!-- Manager -->
-                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
+                        <!-- Manager (2 colonnes) -->
+                        <div class="col-xl-2 col-lg-2 col-md-6" style="min-width: 0;">
                             <label class="form-label text-truncate">Manager</label>
                             <select class="form-select w-100" name="idManager">
                                 <option value="">Tous</option>
@@ -48,7 +48,7 @@
                         </div>
 
                         <!-- Poste -->
-                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
+                        <div class="col-xl-2 col-lg-2 col-md-6" style="min-width: 0;">
                             <label class="form-label text-truncate">Poste</label>
                             <div class="custom-select-wrapper">
 
@@ -70,21 +70,10 @@
                             </div>
                         </div>
 
-                        <!-- Motif (nouveau filtre) -->
-                        <div class="col-xl-2 col-lg-3 col-md-6" style="min-width: 0;">
-                            <label class="form-label text-truncate">Motif</label>
-                            <select class="form-select w-100" name="idMotifDemande">
-                                <option value="">Tous</option>
-                                <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}"
-                                    th:text="${motif.libelle}"
-                                    th:selected="${filter.idMotifDemande == motif.idMotifDemande}">
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Dates -->
-                        <div class="col-xl-4 col-lg-12 col-md-12" style="min-width: 0;">
+                        <!-- Dates (3 colonnes - on donne plus de place pour éviter l'overflow) -->
+                        <div class="col-xl-3 col-lg-12 col-md-12" style="min-width: 0;">
                             <label class="form-label text-truncate">Période de création</label>
+                            <!-- Utilisation d'un input-group pour souder les dates -->
                             <div class="input-group flex-nowrap">
                                 <input type="date" class="form-control px-2" name="dateMin" th:value="${filter.dateMin}"
                                     title="Date minimum">
@@ -101,6 +90,7 @@
                             <strong th:text="${demandes.totalElements}"></strong> demandes trouvées
                         </span>
 
+                        <!-- Boutons alignés à droite avec un espacement contrôlé -->
                         <div
                             class="col-md-6 col-12 d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-5">
                             <a th:href="@{/demandes}" class="btn-soft">
@@ -131,7 +121,7 @@
                     </thead>
                     <tbody>
                         <tr th:if="${demandes.content.isEmpty()}">
-                            <td colspan="6" class="text-center py-5 text-muted">
+                            <td colspan="7" class="text-center py-5 text-muted">
                                 Aucune demande de recrutement ne correspond à vos critères.
                             </td>
                         </tr>
@@ -156,31 +146,33 @@
                                 </div>
                             </td>
 
-                            <!-- Poste -->
+                            <!-- Poste (Sans icône) -->
                             <td>
-                                <span class="fw-medium text-main" th:text="${demande.posteIntitule()}"></span>
+                                <span class="fw-medium text-main" th:text="${demande.intitulePoste()}"></span>
                             </td>
 
                             <!-- Département -->
                             <td>
-                                <span class="text-muted" th:text="${demande.departementTitre()}"></span>
+                                <span class="text-muted" th:text="${demande.titreDepartement()}"></span>
                             </td>
 
                             <!-- Demandeur -->
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="text-muted" th:text="${demande.managerNom()}">Inconnu</span>
+                                    <span class="text-muted" th:text="${demande.nomManager()}">Inconnu</span>
                                 </div>
                             </td>
 
                             <!-- Effectif -->
                             <td class="text-center" style="min-width: 100px;">
                                 <div class="effectif-wrapper">
+                                    <!-- Badge court (sera formaté en JS, le data-value sert de base) -->
                                     <span class="pill pill-neutre effectif-short"
                                         th:attr="data-value=${demande.effectif()}">
                                         <span th:text="${demande.effectif()}">1</span>
                                     </span>
 
+                                    <!-- Badge long (valeur exacte) -->
                                     <span class="pill effectif-full" th:text="${demande.effectif()}">
                                         1
                                     </span>
@@ -194,7 +186,7 @@
             <!-- Pagination -->
             <div class="p-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 border-top"
                 style="border-color: var(--color-border) !important; background-color: var(--color-surface-low);"
-                th:if="${demandes.totalPages >= 1}">
+                th:if="${demandes.totalPages > 1}">
                 <span class="text-muted text-small">
                     Affichage de <strong th:text="${demandes.number * demandes.size + 1}"></strong> à
                     <strong th:text="${demandes.number * demandes.size + demandes.numberOfElements}"></strong> sur
@@ -203,12 +195,12 @@
 
                 <nav>
                     <ul class="pagination pagination-sm mb-0 gap-1">
-                        <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
+                        <li class="page-item" th:classappend="${demandes.first} ? 'disabled'">
                             <a class="btn-soft btn-sm" th:href="@{/demandes(
                                     page=${demandes.number - 1}, size=${demandes.size},
                                     dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
                                     idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
-                                    idManager=${filter.idManager}, idMotifDemande=${filter.idMotifDemande})}">
+                                    idManager=${filter.idManager})}">
                                 Précédent
                             </a>
                         </li>
@@ -220,12 +212,12 @@
                             </span>
                         </li>
 
-                        <li class="page-item" th:classappend="${!demandes.hasNext()} ? 'readonly'">
+                        <li class="page-item" th:classappend="${demandes.last} ? 'disabled'">
                             <a class="btn-soft btn-sm" th:href="@{/demandes(
                                     page=${demandes.number + 1}, size=${demandes.size},
                                     dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
                                     idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
-                                    idManager=${filter.idManager}, idMotifDemande=${filter.idMotifDemande})}">
+                                    idManager=${filter.idManager})}">
                                 Suivant
                             </a>
                         </li>
@@ -266,10 +258,12 @@
 
                 if (posteInput && posteHiddenSelect && posteDropdown) {
 
+                    // Au chargement, si un poste est déjà sélectionné (ex: après un filtre), on met à jour le champ texte
                     if (posteHiddenSelect.value !== "") {
                         posteInput.value = posteHiddenSelect.options[posteHiddenSelect.selectedIndex].text;
                     }
 
+                    // 1. Générer les options visuelles à partir du select caché
                     const options = Array.from(posteHiddenSelect.options).filter(opt => opt.value !== "");
 
                     options.forEach(opt => {
@@ -278,6 +272,7 @@
                         div.textContent = opt.text;
                         div.dataset.value = opt.value;
 
+                        // Au clic sur une option
                         div.addEventListener('click', () => {
                             posteInput.value = opt.text;
                             posteHiddenSelect.value = opt.value;
@@ -286,18 +281,22 @@
                         posteDropdown.appendChild(div);
                     });
 
+                    // 2. Ouvrir la liste au focus
                     posteInput.addEventListener('focus', () => {
                         posteDropdown.classList.add('show');
                         filterList();
                     });
 
+                    // 3. Fermer la liste si on clique ailleurs
                     document.addEventListener('click', (e) => {
                         if (!posteInput.contains(e.target) && !posteDropdown.contains(e.target)) {
                             posteDropdown.classList.remove('show');
 
+                            // Si on a effacé le texte, on remet le filtre sur "Tous"
                             if (posteInput.value.trim() === "") {
                                 posteHiddenSelect.value = "";
                             }
+                            // Si on a tapé du texte sans sélectionner, on remet la dernière valeur valide
                             else if (posteHiddenSelect.value === "") {
                                 const selectedOption = posteHiddenSelect.options[posteHiddenSelect.selectedIndex];
                                 posteInput.value = selectedOption ? selectedOption.text : "";
@@ -305,11 +304,13 @@
                         }
                     });
 
+                    // 4. Filtrer la liste pendant la saisie
                     posteInput.addEventListener('input', () => {
                         filterList();
                         posteDropdown.classList.add('show');
                     });
 
+                    // Fonction de filtrage
                     function filterList() {
                         const filter = posteInput.value.toLowerCase();
                         const items = posteDropdown.querySelectorAll('.custom-option');
@@ -324,6 +325,7 @@
                             }
                         });
 
+                        // Message "Aucun résultat"
                         let noResultDiv = posteDropdown.querySelector('.no-result');
                         if (!hasVisible) {
                             if (!noResultDiv) {
