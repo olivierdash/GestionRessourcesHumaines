@@ -45,7 +45,7 @@ public class CandidatureController {
             RedirectAttributes redirectAttributes) {
         candidatureService.changerStatutCandidature(id, 3); // 3 = RETENU
         redirectAttributes.addFlashAttribute("success", "Le candidat a été retenu !");
-        return "redirect:/bloc2/offres/" + idOffre + "/candidatures";
+        return "redirect:/offres/" + idOffre + "/candidatures";
     }
 
     // TÂCHE 12 bis : Refuser un candidat
@@ -57,7 +57,7 @@ public class CandidatureController {
     {
         candidatureService.changerStatutCandidature(id, 4); // 4 = REFUSE
         redirectAttributes.addFlashAttribute("success", "Le candidat a été refusé.");
-        return "redirect:/bloc2/offres/" + idOffre + "/candidatures";
+        return "redirect:/offres/" + idOffre + "/candidatures";
     }
 }
 
