@@ -14,28 +14,29 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/js/**", "/fonts/**").permitAll()
-                .requestMatchers("/login").permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login") // <-- Indique à Spring d'utiliser TA page
-                .loginProcessingUrl("/login") // L'URL vers laquelle le formulaire POST
-                .usernameParameter("email")
-                .passwordParameter("motDePasse")
-                .defaultSuccessUrl("/utilisateur/dashboard", true) // Où aller après connexion
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-            );
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**", "/js/**", "/fonts/**").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login") // <-- Indique à Spring d'utiliser TA page
+                        .loginProcessingUrl("/login") // L'URL vers laquelle le formulaire POST
+                        .usernameParameter("email")
+                        .passwordParameter("motDePasse")
+                        .defaultSuccessUrl("/utilisateur/dashboard", true) // Où aller après connexion
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll());
         return http.build();
     }
 
-    
 }
