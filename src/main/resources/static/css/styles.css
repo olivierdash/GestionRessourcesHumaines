@@ -65,6 +65,35 @@ body::-webkit-scrollbar {
 .custom-select-wrapper {
   position: relative;
 }
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, rgba(59, 130, 246, 0.45), rgba(150, 172, 214, 0.25));
+}
+.timeline-item { position: relative; padding-bottom: 1.4rem; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    border: 2px solid var(--color-surface);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+/* =========================================================
+   13. CUSTOM SELECT (liste flottante)
+   ========================================================= */
+.custom-select-wrapper { position: relative; }
 
 .custom-dropdown {
   position: absolute;
@@ -115,6 +144,7 @@ body::-webkit-scrollbar {
 .effectif-wrapper:hover .effectif-short {
   opacity: 0;
 }
+.effectif-wrapper:hover .effectif-short { opacity: 0; }
 
 .effectif-short {
   position: relative;
