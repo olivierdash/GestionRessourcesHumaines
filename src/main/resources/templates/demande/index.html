@@ -203,8 +203,18 @@
 
                 <nav>
                     <ul class="pagination pagination-sm mb-0 gap-1">
+<<<<<<< HEAD
                         <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
                             <a class="btn-soft btn-sm" th:href="@{/demandes(
+=======
+<<<<<<< HEAD
+                        <li class="page-item" th:classappend="${demandes.first} ? 'disabled'">
+                            <a class="page-btn" th:href="@{/demandes(
+=======
+                        <li class="page-item" th:classappend="${!demandes.hasPrevious()} ? 'readonly'">
+                            <a class="btn-soft btn-sm" th:href="@{/demandes(
+>>>>>>> 24a41ed (validation demande recrutement terminee)
+>>>>>>> 5e24d00 (validation demande recrutement terminee)
                                     page=${demandes.number - 1}, size=${demandes.size},
                                     dateMin=${filter.dateMin}, dateMax=${filter.dateMax},
                                     idPoste=${filter.idPoste}, idDepartement=${filter.idDepartement},
