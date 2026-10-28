@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="fr"
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+<main th:fragment="mainContent" class="app-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title">Référentiel des postes</h2>
+            <p class="text-outline">
+                Consultez les postes disponibles dans l'entreprise.
+            </p>
+        </div>
+
+        <a th:href="@{/postes/create}" class="btn-brand">
+            Nouveau poste
+        </a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(postes)}"
+         class="alert alert-info">
+        Aucun poste n'a encore été créé.
+    </div>
+
+    <div th:if="${!#lists.isEmpty(postes)}" class="card-x">
+        <div class="table-responsive">
+            <table class="table table-x">
+                <thead>
+                <tr>
+                    <th>Intitulé</th>
+                    <th>Département</th>
+                    <th>Lieu</th>
+                    <th>Durée hebdomadaire</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="poste : ${postes}">
+                    <td th:text="${poste.intitule}"></td>
+
+                    <td th:text="${poste.departement.titre}"></td>
+
+                    <td th:text="${poste.lieu != null ? poste.lieu : '-'}"></td>
+
+                    <td>
+                        <span th:if="${poste.dureeHebdo != null}"
+                              th:text="${poste.dureeHebdo + ' h/semaine'}">
+                        </span>
+                        <span th:if="${poste.dureeHebdo == null}">
+                            -
+                        </span>
+                    </td>
+
+                    <td class="text-end text-nowrap">
+                        <a th:href="@{/postes/{id}(id=${poste.idPoste})}"
+                           class="btn-soft btn-sm-x">
+                            Consulter
+                        </a>
+
+                        <a th:href="@{/postes/{id}/edit(id=${poste.idPoste})}"
+                           class="btn-brand btn-sm-x">
+                            Modifier
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

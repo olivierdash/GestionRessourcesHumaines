@@ -34,6 +34,12 @@
                           th:if="${validationsEnAttenteCount != null and validationsEnAttenteCount > 0}"
                           th:text="${validationsEnAttenteCount}">3</span>
                 </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG')"
+   class="nav-link"
+   th:href="@{/postes}">
+    <span class="ms">work</span>
+    Postes
+</a>
             </nav>
         </div>
 
