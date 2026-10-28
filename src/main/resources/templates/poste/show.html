@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="fr"
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+<main th:fragment="mainContent" class="app-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a th:href="@{/postes}" class="back-link">
+                &larr; Retour aux postes
+            </a>
+
+            <h2 class="page-title" th:text="${poste.intitule}">
+                Développeur Java
+            </h2>
+        </div>
+
+        <a th:href="@{/postes/{id}/edit(id=${poste.idPoste})}"
+           class="btn-brand">
+            Modifier
+        </a>
+    </div>
+
+    <div th:if="${error}"
+         class="alert alert-danger"
+         th:text="${error}">
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card-x">
+                <h5 class="card-head">Informations du poste</h5>
+
+                <div class="card-pad">
+                    <p>
+                        <strong>Intitulé :</strong>
+                        <span th:text="${poste.intitule}"></span>
+                    </p>
+
+                    <p>
+                        <strong>Département :</strong>
+                        <span th:text="${poste.departement.titre}"></span>
+                    </p>
+
+                    <p>
+                        <strong>Lieu :</strong>
+                        <span th:text="${poste.lieu != null
+                            ? poste.lieu : 'Non précisé'}">
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Date d'effet :</strong>
+                        <span th:text="${poste.dateEffet != null
+                            ? poste.dateEffet : 'Non précisée'}">
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Durée hebdomadaire :</strong>
+                        <span th:if="${poste.dureeHebdo != null}"
+                              th:text="${poste.dureeHebdo + ' heures'}">
+                        </span>
+                        <span th:if="${poste.dureeHebdo == null}">
+                            Non précisée
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card-x">
+                <h5 class="card-head">Ajouter une mission</h5>
+
+                <div class="card-pad">
+                    <form method="post"
+                          th:action="@{/postes/{id}/missions(id=${poste.idPoste})}">
+
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">
+                                Titre de la mission
+                            </label>
+
+                            <input type="text"
+                                   id="titre"
+                                   name="titre"
+                                   class="form-control"
+                                   maxlength="255"
+                                   required>
+                        </div>
+
+                        <button type="submit" class="btn-brand">
+                            Ajouter la mission
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card-x">
+                <h5 class="card-head">Missions du poste</h5>
+
+                <div class="card-pad">
+                    <div th:if="${#lists.isEmpty(missions)}"
+                         class="text-outline">
+                        Aucune mission n'est définie pour ce poste.
+                    </div>
+
+                    <div th:if="${!#lists.isEmpty(missions)}">
+                        <div th:each="mission : ${missions}"
+                             class="d-flex justify-content-between
+                                    align-items-center border-bottom py-3">
+
+                            <span th:text="${mission.titre}">
+                                Développer les fonctionnalités
+                            </span>
+
+                            <form method="post"
+                                  th:action="@{/postes/{id}/missions/{missionId}/delete(
+                                      id=${poste.idPoste},
+                                      missionId=${mission.idMission})}">
+
+                                <button type="submit"
+                                        class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm(
+                                            'Supprimer cette mission ?');">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+</body>
+</html>
