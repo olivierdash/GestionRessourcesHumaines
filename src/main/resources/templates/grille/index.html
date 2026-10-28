@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="fr"
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+<main th:fragment="mainContent" class="app-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title">Grilles salariales</h2>
+            <p class="text-outline">
+                Gérez les fourchettes salariales par poste.
+            </p>
+        </div>
+
+        <a th:href="@{/grilles/create}" class="btn-brand">
+            Nouvelle grille
+        </a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(grilles)}"
+         class="alert alert-info">
+        Aucune grille salariale n'est enregistrée.
+    </div>
+
+    <div th:if="${!#lists.isEmpty(grilles)}" class="card-x">
+        <div class="table-responsive">
+            <table class="table table-x">
+                <thead>
+                <tr>
+                    <th>Poste</th>
+                    <th>Département</th>
+                    <th>Salaire minimum</th>
+                    <th>Salaire moyen</th>
+                    <th>Salaire maximum</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="grille : ${grilles}">
+                    <td th:text="${grille.poste.intitule}"></td>
+
+                    <td th:text="${grille.departement.titre}"></td>
+
+                    <td th:text="${grille.salaireMin}"></td>
+
+                    <td th:text="${grille.salaireMoyen}"></td>
+
+                    <td th:text="${grille.salaireMax}"></td>
+
+                    <td class="text-end text-nowrap">
+                        <a th:href="@{/grilles/{id}(id=${grille.idGrille})}"
+                           class="btn-soft btn-sm-x">
+                            Consulter
+                        </a>
+
+                        <a th:href="@{/grilles/{id}/edit(id=${grille.idGrille})}"
+                           class="btn-brand btn-sm-x">
+                            Modifier
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>
