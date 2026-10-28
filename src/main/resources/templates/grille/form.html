@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="fr"
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+<main th:fragment="mainContent" class="app-page">
+
+    <div class="mb-4">
+        <a th:href="@{/grilles}" class="back-link">
+            &larr; Retour aux grilles
+        </a>
+
+        <h2 class="page-title"
+            th:text="${grille.idGrille == null
+                ? 'Nouvelle grille salariale'
+                : 'Modifier la grille salariale'}">
+        </h2>
+    </div>
+
+    <div th:if="${error}"
+         class="alert alert-danger"
+         th:text="${error}">
+    </div>
+
+    <div class="card-x">
+        <div class="p-4">
+
+            <form method="post"
+                  th:action="${grille.idGrille == null}
+                    ? @{/grilles}
+                    : @{/grilles/{id}(id=${grille.idGrille})}">
+
+                <div class="mb-3">
+                    <label for="idPoste" class="form-label">
+                        Poste *
+                    </label>
+
+                    <select id="idPoste"
+                            name="idPoste"
+                            class="form-select"
+                            required>
+
+                        <option value="">
+                            Sélectionner un poste
+                        </option>
+
+                        <option th:each="poste : ${postes}"
+                                th:value="${poste.idPoste}"
+                                th:text="${poste.intitule}"
+                                th:selected="${grille.poste != null
+                                    and grille.poste.idPoste
+                                    == poste.idPoste}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="idDepartement" class="form-label">
+                        Département *
+                    </label>
+
+                    <select id="idDepartement"
+                            name="idDepartement"
+                            class="form-select"
+                            required>
+
+                        <option value="">
+                            Sélectionner un département
+                        </option>
+
+                        <option th:each="departement : ${departements}"
+                                th:value="${departement.idDepartement}"
+                                th:text="${departement.titre}"
+                                th:selected="${grille.departement != null
+                                    and grille.departement.idDepartement
+                                    == departement.idDepartement}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="salaireMin" class="form-label">
+                        Salaire minimum *
+                    </label>
+
+                    <input type="number"
+                           id="salaireMin"
+                           name="salaireMin"
+                           class="form-control"
+                           step="0.01"
+                           min="0"
+                           th:value="${grille.salaireMin}"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="salaireMoyen" class="form-label">
+                        Salaire moyen *
+                    </label>
+
+                    <input type="number"
+                           id="salaireMoyen"
+                           name="salaireMoyen"
+                           class="form-control"
+                           step="0.01"
+                           min="0"
+                           th:value="${grille.salaireMoyen}"
+                           required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="salaireMax" class="form-label">
+                        Salaire maximum *
+                    </label>
+
+                    <input type="number"
+                           id="salaireMax"
+                           name="salaireMax"
+                           class="form-control"
+                           step="0.01"
+                           min="0"
+                           th:value="${grille.salaireMax}"
+                           required>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/grilles}" class="btn-soft">
+                        Annuler
+                    </a>
+
+                    <button type="submit" class="btn-brand">
+                        Enregistrer
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

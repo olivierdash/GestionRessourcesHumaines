@@ -40,6 +40,12 @@
     <span class="ms">work</span>
     Postes
 </a>
+<a sec:authorize="hasAnyRole('RH', 'DG')"
+   class="nav-link"
+   th:href="@{/grilles}">
+    <span class="ms">payments</span>
+    Grilles salariales
+</a>
             </nav>
         </div>
 
