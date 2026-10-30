@@ -4,14 +4,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    // Mots de passe en clair dans la base (projet de cours uniquement)
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -22,11 +27,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/utilisateur/login") // <-- Indique à Spring d'utiliser TA page
-                .loginProcessingUrl("/utilisateur/login") // L'URL vers laquelle le formulaire POST
+                .loginPage("/utilisateur/login")
+                .loginProcessingUrl("/utilisateur/login")
                 .usernameParameter("email")
                 .passwordParameter("motDePasse")
-                .defaultSuccessUrl("/utilisateur/dashboard", true) // Où aller après connexion
+                .defaultSuccessUrl("/utilisateur/dashboard", true)
                 .permitAll()
             )
             .logout(logout -> logout
@@ -36,5 +41,4 @@ public class SecurityConfig {
             );
         return http.build();
     }
-        model.addAttribute("idDepartement", idDepartement);
 }

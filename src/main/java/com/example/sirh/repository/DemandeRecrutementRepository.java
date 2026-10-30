@@ -22,16 +22,19 @@ public interface DemandeRecrutementRepository extends JpaRepository<DemandeRecru
         JOIN d.manager m
         JOIN d.poste p
         JOIN p.departement dep
-        WHERE (CAST(:#{#filter.dateMin} AS timestamp) IS NULL OR d.dateCreation >= :#{#filter.dateMin.atStartOfDay()})
-          AND (CAST(:#{#filter.dateMax} AS timestamp) IS NULL OR d.dateCreation <= :#{#filter.dateMax.atTime(T(java.time.LocalTime).MAX)})
-          AND (CAST(:#{#filter.idPoste} AS integer) IS NULL OR p.idPoste = :#{#filter.idPoste})
-          AND (CAST(:#{#filter.effectifMin} AS integer) IS NULL OR d.effectif >= :#{#filter.effectifMin})
-          AND (CAST(:#{#filter.effectifMax} AS integer) IS NULL OR d.effectif <= :#{#filter.effectifMax})
-          AND (CAST(:#{#filter.idManager} AS integer) IS NULL OR m.idUtilisateur = :#{#filter.idManager})
-          AND (CAST(:#{#filter.idDepartement} AS integer) IS NULL OR dep.idDepartement = :#{#filter.idDepartement})
+        WHERE d.dateCreation >= :#{#filter.dateMin == null ? T(java.time.LocalDate).of(1900,1,1).atStartOfDay() : #filter.dateMin.atStartOfDay()}
+          AND d.dateCreation <= :#{#filter.dateMax == null ? T(java.time.LocalDate).of(2999,12,31).atTime(T(java.time.LocalTime).MAX) : #filter.dateMax.atTime(T(java.time.LocalTime).MAX)}
+          AND (:#{#filter.idPoste == null ? -1 : #filter.idPoste} = -1
+               OR p.idPoste = :#{#filter.idPoste == null ? -1 : #filter.idPoste})
+          AND d.effectif >= :#{#filter.effectifMin == null ? 0 : #filter.effectifMin}
+          AND d.effectif <= :#{#filter.effectifMax == null ? T(java.lang.Integer).MAX_VALUE : #filter.effectifMax}
+          AND (:#{#filter.idManager == null ? -1 : #filter.idManager} = -1
+               OR m.idUtilisateur = :#{#filter.idManager == null ? -1 : #filter.idManager})
+          AND (:#{#filter.idDepartement == null ? -1 : #filter.idDepartement} = -1
+               OR dep.idDepartement = :#{#filter.idDepartement == null ? -1 : #filter.idDepartement})
     """)
     Page<DemandeRecrutementLib> findAllLib(
-            @Param("filter") DemandeRecrutementFilter filter, 
+            @Param("filter") DemandeRecrutementFilter filter,
             Pageable pageable
     );
 }
