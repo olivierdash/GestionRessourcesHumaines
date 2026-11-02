@@ -1,143 +1,88 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="fr"
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
-
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
-<main th:fragment="mainContent" class="app-page">
 
-    <div class="mb-4">
-        <a th:href="@{/grilles}" class="back-link">
-            &larr; Retour aux grilles
-        </a>
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-2xl mx-auto flex flex-col gap-6 w-full">
 
-        <h2 class="page-title"
-            th:text="${grille.idGrille == null
-                ? 'Nouvelle grille salariale'
-                : 'Modifier la grille salariale'}">
-        </h2>
-    </div>
-
-    <div th:if="${error}"
-         class="alert alert-danger"
-         th:text="${error}">
-    </div>
-
-    <div class="card-x">
-        <div class="p-4">
-
-            <form method="post"
-                  th:action="${grille.idGrille == null}
-                    ? @{/grilles}
-                    : @{/grilles/{id}(id=${grille.idGrille})}">
-
-                <div class="mb-3">
-                    <label for="idPoste" class="form-label">
-                        Poste *
-                    </label>
-
-                    <select id="idPoste"
-                            name="idPoste"
-                            class="form-select"
-                            required>
-
-                        <option value="">
-                            Sélectionner un poste
-                        </option>
-
-                        <option th:each="poste : ${postes}"
-                                th:value="${poste.idPoste}"
-                                th:text="${poste.intitule}"
-                                th:selected="${grille.poste != null
-                                    and grille.poste.idPoste
-                                    == poste.idPoste}">
-                        </option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="idDepartement" class="form-label">
-                        Département *
-                    </label>
-
-                    <select id="idDepartement"
-                            name="idDepartement"
-                            class="form-select"
-                            required>
-
-                        <option value="">
-                            Sélectionner un département
-                        </option>
-
-                        <option th:each="departement : ${departements}"
-                                th:value="${departement.idDepartement}"
-                                th:text="${departement.titre}"
-                                th:selected="${grille.departement != null
-                                    and grille.departement.idDepartement
-                                    == departement.idDepartement}">
-                        </option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="salaireMin" class="form-label">
-                        Salaire minimum *
-                    </label>
-
-                    <input type="number"
-                           id="salaireMin"
-                           name="salaireMin"
-                           class="form-control"
-                           step="0.01"
-                           min="0"
-                           th:value="${grille.salaireMin}"
-                           required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="salaireMoyen" class="form-label">
-                        Salaire moyen *
-                    </label>
-
-                    <input type="number"
-                           id="salaireMoyen"
-                           name="salaireMoyen"
-                           class="form-control"
-                           step="0.01"
-                           min="0"
-                           th:value="${grille.salaireMoyen}"
-                           required>
-                </div>
-
-                <div class="mb-4">
-                    <label for="salaireMax" class="form-label">
-                        Salaire maximum *
-                    </label>
-
-                    <input type="number"
-                           id="salaireMax"
-                           name="salaireMax"
-                           class="form-control"
-                           step="0.01"
-                           min="0"
-                           th:value="${grille.salaireMax}"
-                           required>
-                </div>
-
-                <div class="d-flex justify-content-end gap-2">
-                    <a th:href="@{/grilles}" class="btn-soft">
-                        Annuler
-                    </a>
-
-                    <button type="submit" class="btn-brand">
-                        Enregistrer
-                    </button>
-                </div>
-
-            </form>
+        <!-- En-tête -->
+        <div>
+            <a th:href="@{/grilles}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                &larr; Retour aux grilles
+            </a>
+            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" 
+                th:text="${grille.idGrille == null ? 'Nouvelle grille salariale' : 'Modifier la grille salariale'}">
+            </h2>
         </div>
-    </div>
 
-</main>
+        <!-- Message d'erreur -->
+        <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${error}"></div>
+
+        <!-- Formulaire -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                <form method="post" 
+                      th:action="${grille.idGrille == null} ? @{/grilles} : @{/grilles/{id}(id=${grille.idGrille})}"
+                      class="flex flex-col gap-5">
+
+                    <!-- Poste -->
+                    <div>
+                        <label for="idPoste" class="block text-sm font-semibold text-on-surface mb-2">Poste <span class="text-red-500">*</span></label>
+                        <select id="idPoste" name="idPoste" required
+                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option value="">Sélectionner un poste</option>
+                            <option th:each="poste : ${postes}" th:value="${poste.idPoste}" th:text="${poste.intitule}"
+                                    th:selected="${grille.poste != null and grille.poste.idPoste == poste.idPoste}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Département -->
+                    <div>
+                        <label for="idDepartement" class="block text-sm font-semibold text-on-surface mb-2">Département <span class="text-red-500">*</span></label>
+                        <select id="idDepartement" name="idDepartement" required
+                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option value="">Sélectionner un département</option>
+                            <option th:each="departement : ${departements}" th:value="${departement.idDepartement}" th:text="${departement.titre}"
+                                    th:selected="${grille.departement != null and grille.departement.idDepartement == departement.idDepartement}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Salaire Min -->
+                    <div>
+                        <label for="salaireMin" class="block text-sm font-semibold text-on-surface mb-2">Salaire minimum <span class="text-red-500">*</span></label>
+                        <input type="number" id="salaireMin" name="salaireMin" step="0.01" min="0" th:value="${grille.salaireMin}" required
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+
+                    <!-- Salaire Moyen -->
+                    <div>
+                        <label for="salaireMoyen" class="block text-sm font-semibold text-on-surface mb-2">Salaire moyen <span class="text-red-500">*</span></label>
+                        <input type="number" id="salaireMoyen" name="salaireMoyen" step="0.01" min="0" th:value="${grille.salaireMoyen}" required
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+
+                    <!-- Salaire Max -->
+                    <div>
+                        <label for="salaireMax" class="block text-sm font-semibold text-on-surface mb-2">Salaire maximum <span class="text-red-500">*</span></label>
+                        <input type="number" id="salaireMax" name="salaireMax" step="0.01" min="0" th:value="${grille.salaireMax}" required
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high mt-2">
+                        <a th:href="@{/grilles}" class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high flex items-center">
+                            Annuler
+                        </a>
+                        <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
 </body>
 </html>

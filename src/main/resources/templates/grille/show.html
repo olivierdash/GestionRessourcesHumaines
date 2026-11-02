@@ -1,73 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="fr"
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
-
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
-<main th:fragment="mainContent" class="app-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <a th:href="@{/grilles}" class="back-link">
-                &larr; Retour aux grilles
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <a th:href="@{/grilles}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                    &larr; Retour aux grilles
+                </a>
+                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Grille salariale</h2>
+            </div>
+            <a th:href="@{/grilles/{id}/edit(id=${grille.idGrille})}" 
+               class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+                Modifier
             </a>
-
-            <h2 class="page-title">
-                Grille salariale
-            </h2>
         </div>
 
-        <a th:href="@{/grilles/{id}/edit(id=${grille.idGrille})}"
-           class="btn-brand">
-            Modifier
-        </a>
-    </div>
-
-    <div class="card-x">
-        <h5 class="card-head">Détails de la grille</h5>
-
-        <div class="card-pad">
-            <div class="row g-4">
-
-                <div class="col-md-6">
-                    <span class="lbl">Poste</span>
-                    <div class="fw-semibold"
-                         th:text="${grille.poste.intitule}">
+        <!-- Détails -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
+                <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Détails de la grille</h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-1">Poste</span>
+                        <div class="text-base font-semibold text-on-surface" th:text="${grille.poste.intitule}"></div>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-1">Département</span>
+                        <div class="text-base font-semibold text-on-surface" th:text="${grille.departement.titre}"></div>
                     </div>
                 </div>
-
-                <div class="col-md-6">
-                    <span class="lbl">Département</span>
-                    <div class="fw-semibold"
-                         th:text="${grille.departement.titre}">
+                <hr class="my-6 border-surface-container-high">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-1">Salaire minimum</span>
+                        <div class="text-lg font-bold text-on-surface font-mono" th:text="${grille.salaireMin}"></div>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-1">Salaire moyen</span>
+                        <div class="text-lg font-bold text-on-surface font-mono" th:text="${grille.salaireMoyen}"></div>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-1">Salaire maximum</span>
+                        <div class="text-lg font-bold text-on-surface font-mono" th:text="${grille.salaireMax}"></div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <span class="lbl">Salaire minimum</span>
-                    <div class="fw-semibold"
-                         th:text="${grille.salaireMin}">
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <span class="lbl">Salaire moyen</span>
-                    <div class="fw-semibold"
-                         th:text="${grille.salaireMoyen}">
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <span class="lbl">Salaire maximum</span>
-                    <div class="fw-semibold"
-                         th:text="${grille.salaireMax}">
-                    </div>
-                </div>
-
             </div>
         </div>
-    </div>
 
-</main>
+    </main>
 </body>
 </html>

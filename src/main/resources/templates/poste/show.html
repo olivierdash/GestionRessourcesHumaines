@@ -1,134 +1,84 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="fr"
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
-
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
-<main th:fragment="mainContent" class="app-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <a th:href="@{/postes}" class="back-link">
-                &larr; Retour aux postes
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <a th:href="@{/postes}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                    &larr; Retour aux postes
+                </a>
+                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" th:text="${poste.intitule}"></h2>
+            </div>
+            <a th:href="@{/postes/{id}/edit(id=${poste.idPoste})}" 
+               class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+                Modifier
             </a>
-
-            <h2 class="page-title" th:text="${poste.intitule}">
-                Développeur Java
-            </h2>
         </div>
 
-        <a th:href="@{/postes/{id}/edit(id=${poste.idPoste})}"
-           class="btn-brand">
-            Modifier
-        </a>
-    </div>
+        <!-- Message d'erreur -->
+        <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${error}"></div>
 
-    <div th:if="${error}"
-         class="alert alert-danger"
-         th:text="${error}">
-    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-    <div class="row g-4">
-
-        <div class="col-lg-6">
-            <div class="card-x">
-                <h5 class="card-head">Informations du poste</h5>
-
-                <div class="card-pad">
-                    <p>
-                        <strong>Intitulé :</strong>
-                        <span th:text="${poste.intitule}"></span>
-                    </p>
-
-                    <p>
-                        <strong>Département :</strong>
-                        <span th:text="${poste.departement.titre}"></span>
-                    </p>
-
-                    <p>
-                        <strong>Lieu :</strong>
-                        <span th:text="${poste.lieu != null
-                            ? poste.lieu : 'Non précisé'}">
-                        </span>
-                    </p>
-
-                    <p>
-                        <strong>Date d'effet :</strong>
-                        <span th:text="${poste.dateEffet != null
-                            ? poste.dateEffet : 'Non précisée'}">
-                        </span>
-                    </p>
-
-                    <p>
-                        <strong>Durée hebdomadaire :</strong>
-                        <span th:if="${poste.dureeHebdo != null}"
-                              th:text="${poste.dureeHebdo + ' heures'}">
-                        </span>
-                        <span th:if="${poste.dureeHebdo == null}">
-                            Non précisée
-                        </span>
+            <!-- Colonne Gauche : Infos -->
+            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+                <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
+                    <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Informations du poste</h3>
+                </div>
+                <div class="p-6 flex flex-col gap-3">
+                    <p class="m-0"><strong class="text-on-surface">Intitulé :</strong> <span class="text-on-surface-variant" th:text="${poste.intitule}"></span></p>
+                    <p class="m-0"><strong class="text-on-surface">Département :</strong> <span class="text-on-surface-variant" th:text="${poste.departement.titre}"></span></p>
+                    <p class="m-0"><strong class="text-on-surface">Lieu :</strong> <span class="text-on-surface-variant" th:text="${poste.lieu != null ? poste.lieu : 'Non précisé'}"></span></p>
+                    <p class="m-0"><strong class="text-on-surface">Date d'effet :</strong> <span class="text-on-surface-variant" th:text="${poste.dateEffet != null ? poste.dateEffet : 'Non précisée'}"></span></p>
+                    <p class="m-0">
+                        <strong class="text-on-surface">Durée hebdomadaire :</strong> 
+                        <span class="text-on-surface-variant" th:if="${poste.dureeHebdo != null}" th:text="${poste.dureeHebdo + ' heures'}"></span>
+                        <span class="text-on-surface-variant" th:if="${poste.dureeHebdo == null}">Non précisée</span>
                     </p>
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-6">
-            <div class="card-x">
-                <h5 class="card-head">Ajouter une mission</h5>
-
-                <div class="card-pad">
-                    <form method="post"
-                          th:action="@{/postes/{id}/missions(id=${poste.idPoste})}">
-
-                        <div class="mb-3">
-                            <label for="titre" class="form-label">
-                                Titre de la mission
-                            </label>
-
-                            <input type="text"
-                                   id="titre"
-                                   name="titre"
-                                   class="form-control"
-                                   maxlength="255"
-                                   required>
+            <!-- Colonne Droite : Ajouter mission -->
+            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+                <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
+                    <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Ajouter une mission</h3>
+                </div>
+                <div class="p-6">
+                    <form method="post" th:action="@{/postes/{id}/missions(id=${poste.idPoste})}" class="flex flex-col gap-4">
+                        <div>
+                            <label for="titre" class="block text-sm font-semibold text-on-surface mb-2">Titre de la mission</label>
+                            <input type="text" id="titre" name="titre" maxlength="255" required
+                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                         </div>
-
-                        <button type="submit" class="btn-brand">
+                        <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm self-start">
                             Ajouter la mission
                         </button>
                     </form>
                 </div>
             </div>
-        </div>
 
-        <div class="col-12">
-            <div class="card-x">
-                <h5 class="card-head">Missions du poste</h5>
-
-                <div class="card-pad">
-                    <div th:if="${#lists.isEmpty(missions)}"
-                         class="text-outline">
+            <!-- Ligne du bas : Missions -->
+            <div class="lg:col-span-2 bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+                <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
+                    <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Missions du poste</h3>
+                </div>
+                <div class="p-6">
+                    <div th:if="${#lists.isEmpty(missions)}" class="text-sm text-outline py-2">
                         Aucune mission n'est définie pour ce poste.
                     </div>
 
-                    <div th:if="${!#lists.isEmpty(missions)}">
-                        <div th:each="mission : ${missions}"
-                             class="d-flex justify-content-between
-                                    align-items-center border-bottom py-3">
+                    <div th:if="${!#lists.isEmpty(missions)}" class="flex flex-col">
+                        <div th:each="mission : ${missions}" class="flex justify-between items-center border-b border-surface-container-high py-3 last:border-0">
+                            <span class="text-sm font-medium text-on-surface" th:text="${mission.titre}"></span>
 
-                            <span th:text="${mission.titre}">
-                                Développer les fonctionnalités
-                            </span>
-
-                            <form method="post"
-                                  th:action="@{/postes/{id}/missions/{missionId}/delete(
-                                      id=${poste.idPoste},
-                                      missionId=${mission.idMission})}">
-
-                                <button type="submit"
-                                        class="btn btn-outline-danger btn-sm"
-                                        onclick="return confirm(
-                                            'Supprimer cette mission ?');">
+                            <form method="post" th:action="@{/postes/{id}/missions/{missionId}/delete(id=${poste.idPoste}, missionId=${mission.idMission})}" class="m-0">
+                                <button type="submit" class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors border border-red-200 font-medium text-xs"
+                                        onclick="return confirm('Supprimer cette mission ?');">
                                     Supprimer
                                 </button>
                             </form>
@@ -136,10 +86,9 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
-    </div>
-
-</main>
+    </main>
 </body>
 </html>
