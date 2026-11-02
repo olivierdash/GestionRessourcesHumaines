@@ -12,29 +12,21 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.sirh.model.Onboarding;
-import com.example.sirh.repository.TypeDocumentRepository;
-import com.example.sirh.repository.UtilisateurRepository;
+import com.example.sirh.model.Utilisateur;
 import com.example.sirh.service.DocumentService;
 import com.example.sirh.service.OnboardingService;
+import com.example.sirh.service.UtilisateurService;
+
+import lombok.AllArgsConstructor;
 
 @Controller
 @RequestMapping("/onboarding")
+@AllArgsConstructor
 public class OnboardingController {
 
     private final OnboardingService onboardingService;
     private final DocumentService documentService;
-    private final TypeDocumentRepository typeDocumentRepository;
-    private final UtilisateurRepository utilisateurRepository;
-
-    public OnboardingController(OnboardingService onboardingService,
-            DocumentService documentService,
-            TypeDocumentRepository typeDocumentRepository,
-            UtilisateurRepository utilisateurRepository) {
-        this.onboardingService = onboardingService;
-        this.documentService = documentService;
-        this.typeDocumentRepository = typeDocumentRepository;
-        this.utilisateurRepository = utilisateurRepository;
-    }
+    private final UtilisateurService utilisateurService;
 
     @PostMapping("/taches/{idTache}/documents")
     public String deposer(@PathVariable Integer idTache,
@@ -44,11 +36,10 @@ public class OnboardingController {
             Authentication auth,
             RedirectAttributes redirect) {
         try {
-            Integer idUtilisateur = utilisateurRepository.findByEmail(auth.getName())
-                    .orElseThrow(() -> new IllegalStateException("Utilisateur connecté introuvable"))
-                    .getIdUtilisateur();
+            // APPEL AU SERVICE Utilisateur
+            Utilisateur utilisateur = utilisateurService.getByEmail(auth.getName());
 
-            documentService.deposer(idEmploye, idTypeDocument, idTache, idUtilisateur, fichier);
+            documentService.deposer(idEmploye, idTypeDocument, idTache, utilisateur.getIdUtilisateur(), fichier);
             redirect.addFlashAttribute("succes", "Document déposé");
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
@@ -79,7 +70,10 @@ public class OnboardingController {
         model.addAttribute("onboarding", onboarding);
         model.addAttribute("taches", onboardingService.taches(onboarding.getId()));
         model.addAttribute("progression", onboardingService.progression(onboarding.getId()));
-        model.addAttribute("typesDocument", typeDocumentRepository.findAll());
+        
+        // APPEL AU SERVICE Document (qui gérera les types de documents)
+        model.addAttribute("typesDocument", documentService.getAllTypesDocument());
+        
         return "onboarding/checklist";
     }
 }

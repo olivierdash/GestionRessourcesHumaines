@@ -1,8 +1,7 @@
 package com.example.sirh.controller;
 
-
 import com.example.sirh.model.Candidat;
-import com.example.sirh.repository.CandidatRepository;
+import com.example.sirh.service.CandidatService;
 import com.example.sirh.service.CandidatureService;
 import com.example.sirh.service.OffreEmploieService;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CandidatureController {
 
     private final CandidatureService candidatureService;
-    private final OffreEmploieService offreService; // Utile pour récupérer le titre de l'offre
-    private final CandidatRepository candidatRepo;
+    private final OffreEmploieService offreService;
+    private final CandidatService candidatService; // Injection du Service
 
     // TÂCHE 10 : Candidatures d'une offre
     @GetMapping("/offres/{idOffre}/candidatures")
@@ -30,8 +29,8 @@ public class CandidatureController {
     // TÂCHE 11 : Fiche Candidat
     @GetMapping("/candidats/{idCandidat}")
     public String ficheCandidat(@PathVariable Integer idCandidat, Model model) {
-        Candidat candidat = candidatRepo.findById(idCandidat)
-            .orElseThrow(() -> new RuntimeException("Candidat introuvable"));
+        // Appel au Service au lieu du Repository
+        Candidat candidat = candidatService.getCandidatById(idCandidat);
         
         model.addAttribute("candidat", candidat);
         model.addAttribute("candidatures", candidatureService.listeCandidatureByCandidat(idCandidat));
@@ -53,11 +52,9 @@ public class CandidatureController {
     public String refuserCandidat(
         @PathVariable Integer id, 
         @RequestParam Integer idOffre, 
-        RedirectAttributes redirectAttributes) 
-    {
+        RedirectAttributes redirectAttributes) {
         candidatureService.changerStatutCandidature(id, 4); // 4 = REFUSE
         redirectAttributes.addFlashAttribute("success", "Le candidat a été refusé.");
         return "redirect:/offres/" + idOffre + "/candidatures";
     }
 }
-

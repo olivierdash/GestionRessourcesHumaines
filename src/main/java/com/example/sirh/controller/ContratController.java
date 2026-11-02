@@ -13,30 +13,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.sirh.model.Contrat;
-import com.example.sirh.repository.EmployeRepository;
-import com.example.sirh.repository.PosteRepository;
-import com.example.sirh.repository.TypeContractRepository;
 import com.example.sirh.service.ContratService;
+import com.example.sirh.service.PosteService;
+import com.example.sirh.service.TypeContratService;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/contrats")
+@RequiredArgsConstructor
 public class ContratController {
 
     private final ContratService contratService;
-
-    private final TypeContractRepository typeContratRepository;
-    private final PosteRepository posteRepository;
-    private final EmployeRepository employeRepository;
-
-    public ContratController(ContratService contratService,
-            TypeContractRepository typeContratRepository,
-            PosteRepository posteRepository,
-            EmployeRepository employeRepository) {
-        this.contratService = contratService;
-        this.typeContratRepository = typeContratRepository;
-        this.posteRepository = posteRepository;
-        this.employeRepository = employeRepository;
-    }
+    private final TypeContratService typeContratService; // Service au lieu du Repository
+    private final PosteService posteService;             // Service au lieu du Repository
 
     @PostMapping("/{idContrat}/renouveler")
     public String renouveler(@PathVariable Integer idContrat,
@@ -46,18 +36,12 @@ public class ContratController {
             @RequestParam(required = false) LocalDate dateFin,
             @RequestParam BigDecimal salaireMensuel,
             RedirectAttributes redirect) {
+        
         Integer idEmploye = contratService.trouver(idContrat).getEmploye().getIdEmployer();
+        
         try {
-            Contrat nouveau = new Contrat();
-            nouveau.setTypeContrat(typeContratRepository.findById(idTypeContrat)
-                    .orElseThrow(() -> new IllegalArgumentException("Type introuvable")));
-            nouveau.setPoste(posteRepository.findById(idPoste)
-                    .orElseThrow(() -> new IllegalArgumentException("Poste introuvable")));
-            nouveau.setDateDebut(dateDebut);
-            nouveau.setDateFin(dateFin);
-            nouveau.setSalaireMensuel(salaireMensuel);
-
-            contratService.renouveler(idContrat, nouveau);
+            // Appel au service qui gère l'assemblage
+            contratService.renouvelerAvecDetails(idContrat, idTypeContrat, idPoste, dateDebut, dateFin, salaireMensuel);
             redirect.addFlashAttribute("succes", "Contrat renouvelé");
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
@@ -73,8 +57,8 @@ public class ContratController {
 
         model.addAttribute("idEmploye", ancien.getEmploye().getIdEmployer());
         model.addAttribute("ancien", ancien);
-        model.addAttribute("types", typeContratRepository.findAll());
-        model.addAttribute("postes", posteRepository.findAll());
+        model.addAttribute("types", typeContratService.getAllTypes()); // Appel au service
+        model.addAttribute("postes", posteService.getAllPostes());      // Appel au service
         return "contrats/form";
     }
 
@@ -87,18 +71,8 @@ public class ContratController {
             @RequestParam BigDecimal salaireMensuel,
             RedirectAttributes redirect) {
         try {
-            Contrat contrat = new Contrat();
-            contrat.setEmploye(employeRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Salarié introuvable")));
-            contrat.setTypeContrat(typeContratRepository.findById(idTypeContrat)
-                    .orElseThrow(() -> new IllegalArgumentException("Type introuvable")));
-            contrat.setPoste(posteRepository.findById(idPoste)
-                    .orElseThrow(() -> new IllegalArgumentException("Poste introuvable")));
-            contrat.setDateDebut(dateDebut);
-            contrat.setDateFin(dateFin);
-            contrat.setSalaireMensuel(salaireMensuel);
-
-            contratService.creer(contrat);
+            // Appel au service qui gère l'assemblage
+            contratService.creerAvecDetails(id, idTypeContrat, idPoste, dateDebut, dateFin, salaireMensuel);
             redirect.addFlashAttribute("succes", "Contrat enregistré");
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
@@ -111,8 +85,8 @@ public class ContratController {
     @GetMapping("/employe/{id}/nouveau")
     public String nouveau(@PathVariable Integer id, Model model) {
         model.addAttribute("idEmploye", id);
-        model.addAttribute("types", typeContratRepository.findAll());
-        model.addAttribute("postes", posteRepository.findAll());
+        model.addAttribute("types", typeContratService.getAllTypes()); // Appel au service
+        model.addAttribute("postes", posteService.getAllPostes());      // Appel au service
         return "contrats/form";
     }
 

@@ -18,134 +18,139 @@ import java.util.List;
 @Transactional
 public class PosteReferentielService {
 
-    private final PosteRepository posteRepository;
-    private final PosteMissionRepository missionRepository;
-    private final DepartementRepository departementRepository;
+        private final PosteRepository posteRepository;
+        private final PosteMissionRepository missionRepository;
+        private final DepartementRepository departementRepository;
 
-    @Transactional(readOnly = true)
-    public List<Poste> listerPostes() {
-        return posteRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Poste trouverPoste(Integer id) {
-        return posteRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Poste introuvable"));
-    }
-
-    public Poste creerPoste(
-            String intitule,
-            Integer idDepartement,
-            LocalDate dateEffet,
-            String lieu,
-            Integer dureeHebdo) {
-
-        verifierChamps(intitule, idDepartement, dureeHebdo);
-
-        if (posteRepository
-                .existsByIntituleIgnoreCaseAndDepartement_IdDepartement(
-                        intitule.trim(), idDepartement)) {
-            throw new IllegalArgumentException(
-                    "Ce poste existe déjà dans ce département.");
+        @Transactional(readOnly = true)
+        public List<Poste> listerPostes() {
+                return posteRepository.findAll();
         }
 
-        Departement departement = departementRepository.findById(idDepartement)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Département introuvable"));
-
-        Poste poste = Poste.builder()
-                .intitule(intitule.trim())
-                .departement(departement)
-                .dateEffet(dateEffet)
-                .lieu(lieu)
-                .dureeHebdo(dureeHebdo)
-                .build();
-
-        return posteRepository.save(poste);
-    }
-
-    public Poste modifierPoste(
-            Integer id,
-            String intitule,
-            Integer idDepartement,
-            LocalDate dateEffet,
-            String lieu,
-            Integer dureeHebdo) {
-
-        verifierChamps(intitule, idDepartement, dureeHebdo);
-
-        if (posteRepository
-                .existsByIntituleIgnoreCaseAndDepartement_IdDepartementAndIdPosteNot(
-                        intitule.trim(), idDepartement, id)) {
-            throw new IllegalArgumentException(
-                    "Ce poste existe déjà dans ce département.");
+        @Transactional(readOnly = true)
+        public Poste trouverPoste(Integer id) {
+                return posteRepository.findById(id)
+                                .orElseThrow(() -> new IllegalArgumentException("Poste introuvable"));
         }
 
-        Poste poste = trouverPoste(id);
-        Departement departement = departementRepository.findById(idDepartement)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Département introuvable"));
+        public Poste creerPoste(
+                        String intitule,
+                        Integer idDepartement,
+                        LocalDate dateEffet,
+                        String lieu,
+                        Integer dureeHebdo) {
 
-        poste.setIntitule(intitule.trim());
-        poste.setDepartement(departement);
-        poste.setDateEffet(dateEffet);
-        poste.setLieu(lieu);
-        poste.setDureeHebdo(dureeHebdo);
+                verifierChamps(intitule, idDepartement, dureeHebdo);
 
-        return posteRepository.save(poste);
-    }
+                if (posteRepository
+                                .existsByIntituleIgnoreCaseAndDepartement_IdDepartement(
+                                                intitule.trim(), idDepartement)) {
+                        throw new IllegalArgumentException(
+                                        "Ce poste existe déjà dans ce département.");
+                }
 
-    public PosteMission ajouterMission(Integer idPoste, String titre) {
-        if (titre == null || titre.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Le titre de la mission est obligatoire.");
+                Departement departement = departementRepository.findById(idDepartement)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Département introuvable"));
+
+                Poste poste = Poste.builder()
+                                .intitule(intitule.trim())
+                                .departement(departement)
+                                .dateEffet(dateEffet)
+                                .lieu(lieu)
+                                .dureeHebdo(dureeHebdo)
+                                .build();
+
+                return posteRepository.save(poste);
         }
 
-        if (missionRepository.existsByPosteIdPosteAndTitreIgnoreCase(
-                idPoste, titre.trim())) {
-            throw new IllegalArgumentException(
-                    "Cette mission existe déjà pour ce poste.");
+        public Poste modifierPoste(
+                        Integer id,
+                        String intitule,
+                        Integer idDepartement,
+                        LocalDate dateEffet,
+                        String lieu,
+                        Integer dureeHebdo) {
+
+                verifierChamps(intitule, idDepartement, dureeHebdo);
+
+                if (posteRepository
+                                .existsByIntituleIgnoreCaseAndDepartement_IdDepartementAndIdPosteNot(
+                                                intitule.trim(), idDepartement, id)) {
+                        throw new IllegalArgumentException(
+                                        "Ce poste existe déjà dans ce département.");
+                }
+
+                Poste poste = trouverPoste(id);
+                Departement departement = departementRepository.findById(idDepartement)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Département introuvable"));
+
+                poste.setIntitule(intitule.trim());
+                poste.setDepartement(departement);
+                poste.setDateEffet(dateEffet);
+                poste.setLieu(lieu);
+                poste.setDureeHebdo(dureeHebdo);
+
+                return posteRepository.save(poste);
         }
 
-        PosteMission mission = PosteMission.builder()
-                .poste(trouverPoste(idPoste))
-                .titre(titre.trim())
-                .build();
+        public PosteMission ajouterMission(Integer idPoste, String titre) {
+                if (titre == null || titre.isBlank()) {
+                        throw new IllegalArgumentException(
+                                        "Le titre de la mission est obligatoire.");
+                }
 
-        return missionRepository.save(mission);
-    }
+                if (missionRepository.existsByPosteIdPosteAndTitreIgnoreCase(
+                                idPoste, titre.trim())) {
+                        throw new IllegalArgumentException(
+                                        "Cette mission existe déjà pour ce poste.");
+                }
 
-    public void supprimerMission(Integer idPoste, Integer idMission) {
-        PosteMission mission = missionRepository.findById(idMission)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Mission introuvable"));
+                PosteMission mission = PosteMission.builder()
+                                .poste(trouverPoste(idPoste))
+                                .titre(titre.trim())
+                                .build();
 
-        if (!mission.getPoste().getIdPoste().equals(idPoste)) {
-            throw new IllegalArgumentException(
-                    "Cette mission n'appartient pas à ce poste.");
+                return missionRepository.save(mission);
         }
 
-        missionRepository.delete(mission);
-    }
+        public void supprimerMission(Integer idPoste, Integer idMission) {
+                PosteMission mission = missionRepository.findById(idMission)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Mission introuvable"));
 
-    private void verifierChamps(
-            String intitule,
-            Integer idDepartement,
-            Integer dureeHebdo) {
+                if (!mission.getPoste().getIdPoste().equals(idPoste)) {
+                        throw new IllegalArgumentException(
+                                        "Cette mission n'appartient pas à ce poste.");
+                }
 
-        if (intitule == null || intitule.isBlank()) {
-            throw new IllegalArgumentException(
-                    "L'intitulé du poste est obligatoire.");
+                missionRepository.delete(mission);
         }
 
-        if (idDepartement == null) {
-            throw new IllegalArgumentException(
-                    "Le département est obligatoire.");
+        @Transactional(readOnly = true)
+        public List<PosteMission> getMissionsByPosteId(Integer idPoste) {
+                return missionRepository.findByPosteIdPoste(idPoste);
         }
 
-        if (dureeHebdo != null && dureeHebdo <= 0) {
-            throw new IllegalArgumentException(
-                    "La durée hebdomadaire doit être positive.");
+        private void verifierChamps(
+                        String intitule,
+                        Integer idDepartement,
+                        Integer dureeHebdo) {
+
+                if (intitule == null || intitule.isBlank()) {
+                        throw new IllegalArgumentException(
+                                        "L'intitulé du poste est obligatoire.");
+                }
+
+                if (idDepartement == null) {
+                        throw new IllegalArgumentException(
+                                        "Le département est obligatoire.");
+                }
+
+                if (dureeHebdo != null && dureeHebdo <= 0) {
+                        throw new IllegalArgumentException(
+                                        "La durée hebdomadaire doit être positive.");
+                }
         }
-    }
 }

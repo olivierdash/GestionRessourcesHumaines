@@ -1,11 +1,18 @@
 package com.example.sirh.service;
 
 import com.example.sirh.model.Contrat;
+import com.example.sirh.model.Employe;
 import com.example.sirh.model.GrilleSalarial;
+import com.example.sirh.model.Poste;
 import com.example.sirh.model.StatutContrat;
+import com.example.sirh.model.TypeContrat;
 import com.example.sirh.repository.ContratRepository;
+import com.example.sirh.repository.EmployeRepository;
 import com.example.sirh.repository.GrilleSalarialRepository;
+import com.example.sirh.repository.PosteRepository;
 import com.example.sirh.repository.StatutContratRepository;
+import com.example.sirh.repository.TypeContractRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +27,24 @@ public class ContratService {
     private final ContratRepository contratRepository;
     private final GrilleSalarialRepository grilleSalarialRepository;
     private final StatutContratRepository statutContratRepository;
+    // Nouvelles injections pour l'assemblage
+    private final EmployeRepository employeRepository;
+    private final PosteRepository posteRepository;
+    private final TypeContractRepository typeContratRepository;
 
     public ContratService(ContratRepository contratRepository,
             GrilleSalarialRepository grilleSalarialRepository,
-            StatutContratRepository statutContratRepository) {
+            StatutContratRepository statutContratRepository,
+            EmployeRepository employeRepository,
+            PosteRepository posteRepository,
+            TypeContractRepository typeContratRepository) {
         this.contratRepository = contratRepository;
         this.grilleSalarialRepository = grilleSalarialRepository;
         this.statutContratRepository = statutContratRepository;
+        this.employeRepository = employeRepository;
+        this.posteRepository = posteRepository;
+        this.typeContratRepository = typeContratRepository;
     }
-
     public Contrat trouver(Integer idContrat) {
         return contratRepository.findById(idContrat)
                 .orElseThrow(() -> new IllegalArgumentException("Contrat introuvable"));
@@ -91,6 +107,46 @@ public class ContratService {
                     "Le salaire doit être compris entre "
                             + grille.getSalaireMin() + " et " + grille.getSalaireMax());
         }
+    }
+
+    @Transactional
+    public Contrat creerAvecDetails(Integer idEmploye, Integer idTypeContrat, Integer idPoste,
+            LocalDate dateDebut, LocalDate dateFin, BigDecimal salaireMensuel) {
+        Employe employe = employeRepository.findById(idEmploye)
+                .orElseThrow(() -> new IllegalArgumentException("Salarié introuvable"));
+
+        Contrat contrat = new Contrat();
+        contrat.setEmploye(employe);
+        contrat.setTypeContrat(getTypeContrat(idTypeContrat));
+        contrat.setPoste(getPoste(idPoste));
+        contrat.setDateDebut(dateDebut);
+        contrat.setDateFin(dateFin);
+        contrat.setSalaireMensuel(salaireMensuel);
+
+        return creer(contrat);
+    }
+
+    @Transactional
+    public Contrat renouvelerAvecDetails(Integer idAncienContrat, Integer idTypeContrat, Integer idPoste,
+            LocalDate dateDebut, LocalDate dateFin, BigDecimal salaireMensuel) {
+        Contrat nouveau = new Contrat();
+        nouveau.setTypeContrat(getTypeContrat(idTypeContrat));
+        nouveau.setPoste(getPoste(idPoste));
+        nouveau.setDateDebut(dateDebut);
+        nouveau.setDateFin(dateFin);
+        nouveau.setSalaireMensuel(salaireMensuel);
+
+        return renouveler(idAncienContrat, nouveau);
+    }
+
+    private TypeContrat getTypeContrat(Integer id) {
+        return typeContratRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Type de contrat introuvable"));
+    }
+
+    private Poste getPoste(Integer id) {
+        return posteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Poste introuvable"));
     }
 
     private void verifierPasDeChevauchement(Integer idEmploye, LocalDate debut, LocalDate fin) {

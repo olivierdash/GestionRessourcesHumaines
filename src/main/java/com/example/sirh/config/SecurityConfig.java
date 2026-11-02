@@ -50,9 +50,4 @@ public class SecurityConfig {
                         .permitAll());
         return http.build();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // À remplacer par BCrypt en production
-    }
 }

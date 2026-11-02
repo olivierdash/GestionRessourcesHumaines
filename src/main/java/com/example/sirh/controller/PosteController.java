@@ -1,12 +1,10 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.model.Poste;
-import com.example.sirh.repository.DepartementRepository;
-import com.example.sirh.repository.PosteMissionRepository;
+import com.example.sirh.service.DepartementService;
 import com.example.sirh.service.PosteReferentielService;
 
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-
 import static org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Controller
@@ -23,8 +20,7 @@ import static org.springframework.format.annotation.DateTimeFormat.ISO;
 public class PosteController {
 
     private final PosteReferentielService posteService;
-    private final DepartementRepository departementRepository;
-    private final PosteMissionRepository missionRepository;
+    private final DepartementService departementService; // Injection du Service au lieu du Repository
 
     @GetMapping
     public String index(Model model) {
@@ -35,7 +31,7 @@ public class PosteController {
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("poste", new Poste());
-        model.addAttribute("departements", departementRepository.findAll());
+        model.addAttribute("departements", departementService.getAllDepartements()); // Appel au Service
         return "poste/form";
     }
 
@@ -43,18 +39,14 @@ public class PosteController {
     public String store(
             @RequestParam String intitule,
             @RequestParam Integer idDepartement,
-            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE)
-                    LocalDate dateEffet,
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate dateEffet,
             @RequestParam(required = false) String lieu,
             @RequestParam(required = false) Integer dureeHebdo,
             RedirectAttributes redirect) {
 
         try {
-            Poste poste = posteService.creerPoste(
-                    intitule, idDepartement, dateEffet, lieu, dureeHebdo);
-
+            Poste poste = posteService.creerPoste(intitule, idDepartement, dateEffet, lieu, dureeHebdo);
             return "redirect:/postes/" + poste.getIdPoste();
-
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
             return "redirect:/postes/create";
@@ -66,9 +58,8 @@ public class PosteController {
         Poste poste = posteService.trouverPoste(id);
 
         model.addAttribute("poste", poste);
-        model.addAttribute(
-                "missions",
-                missionRepository.findByPosteIdPoste(id));
+        // Appel au Service au lieu du Repository
+        model.addAttribute("missions", posteService.getMissionsByPosteId(id));
 
         return "poste/show";
     }
@@ -76,7 +67,7 @@ public class PosteController {
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Integer id, Model model) {
         model.addAttribute("poste", posteService.trouverPoste(id));
-        model.addAttribute("departements", departementRepository.findAll());
+        model.addAttribute("departements", departementService.getAllDepartements()); // Appel au Service
         return "poste/form";
     }
 
@@ -85,19 +76,14 @@ public class PosteController {
             @PathVariable Integer id,
             @RequestParam String intitule,
             @RequestParam Integer idDepartement,
-            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE)
-                    LocalDate dateEffet,
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate dateEffet,
             @RequestParam(required = false) String lieu,
             @RequestParam(required = false) Integer dureeHebdo,
             RedirectAttributes redirect) {
 
         try {
-            posteService.modifierPoste(
-                    id, intitule, idDepartement,
-                    dateEffet, lieu, dureeHebdo);
-
+            posteService.modifierPoste(id, intitule, idDepartement, dateEffet, lieu, dureeHebdo);
             return "redirect:/postes/" + id;
-
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
             return "redirect:/postes/" + id + "/edit";
@@ -115,7 +101,6 @@ public class PosteController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-
         return "redirect:/postes/" + id;
     }
 
@@ -130,7 +115,6 @@ public class PosteController {
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
         }
-
         return "redirect:/postes/" + id;
     }
 }
