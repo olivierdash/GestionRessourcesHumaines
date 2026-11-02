@@ -1,58 +1,65 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="app-page">
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
 
         <!-- En-tête -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h2 class="page-title">Départements</h2>
-                <p class="text-outline mt-1 mb-0">Gérez la structure de l'entreprise.</p>
+                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Départements</h2>
+                <p class="text-sm text-on-surface-variant mt-1">Gérez la structure de l'entreprise.</p>
             </div>
-            <a th:href="@{/departements/create}" class="btn-brand">+ Nouveau Département</a>
+            <a th:href="@{/departements/create}" 
+               class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Nouveau Département
+            </a>
         </div>
 
         <!-- Tableau -->
-        <div class="card-x">
-            <div class="table-responsive">
-                <table class="table table-x">
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
                     <thead>
                         <tr>
-                            <th style="width: 40%;">Nom du département</th>
-                            <th style="width: 30%;">Manager</th>
-                            <th style="width: 30%;" class="text-end">Actions</th>
+                            <th scope="col" class="w-2/5">Nom du département</th>
+                            <th scope="col" class="w-1/3">Manager</th>
+                            <th scope="col" class="w-1/4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Si la liste est vide -->
+                        <!-- Ligne vide -->
                         <tr th:if="${#lists.isEmpty(departements)}">
-                            <td colspan="3" class="text-center py-5 text-outline">
+                            <td colspan="3" class="td-empty">
                                 Aucun département n'a été créé pour le moment.
                             </td>
                         </tr>
 
-                        <!-- Boucle sur les départements -->
+                        <!-- Boucle -->
                         <tr th:each="dept : ${departements}">
-                            <td class="fw-semibold fs-6" th:text="${dept.titre}">
-                            </td>
+                            <td class="font-semibold text-on-surface text-base" th:text="${dept.titre}"></td>
+                            
                             <td>
-                                <!-- Affichage du Manager -->
-                                <div th:if="${dept.manager != null}" class="d-flex align-items-center gap-2">
-                                    <span class="fw-medium" th:text="${dept.manager.nom}"><strong>N/A</strong></span>
+                                <div th:if="${dept.manager != null}" class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                                        <span th:text="${#strings.substring(dept.manager.nom, 0, 1)}">J</span>
+                                    </div>
+                                    <span class="font-medium text-on-surface" th:text="${dept.manager.nom}"></span>
                                 </div>
-                                <span th:if="${dept.manager == null}" class="pill st-autre">
+                                <span th:if="${dept.manager == null}" class="inline-flex px-2.5 py-1 rounded-full bg-surface-container text-outline text-xs font-semibold">
                                     Non assigné
                                 </span>
                             </td>
-                            <td class="text-end text-nowrap">
+                            
+                            <td class="text-right whitespace-nowrap">
                                 <a th:href="@{/departements/{id}(id=${dept.idDepartement})}" 
-                                   class="btn-soft btn-sm-x me-1" title="Voir la fiche">
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-xs transition-colors border border-surface-container-high">
                                     Voir
                                 </a>
                                 <a th:href="@{/departements/{id}/edit(id=${dept.idDepartement})}" 
-                                   class="btn-brand btn-sm-x" title="Modifier">
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-xs transition-colors shadow-sm ml-2">
                                     Modifier
                                 </a>
                             </td>

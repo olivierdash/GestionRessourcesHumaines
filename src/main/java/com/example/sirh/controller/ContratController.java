@@ -75,7 +75,7 @@ public class ContratController {
         model.addAttribute("ancien", ancien);
         model.addAttribute("types", typeContratRepository.findAll());
         model.addAttribute("postes", posteRepository.findAll());
-        return "bloc4/contrats/form";
+        return "contrats/form";
     }
 
     @PostMapping("/employe/{id}")
@@ -113,7 +113,7 @@ public class ContratController {
         model.addAttribute("idEmploye", id);
         model.addAttribute("types", typeContratRepository.findAll());
         model.addAttribute("postes", posteRepository.findAll());
-        return "bloc4/contrats/form";
+        return "contrats/form";
     }
 
     // Page 17 : historique des contrats d'un salarié
@@ -122,6 +122,6 @@ public class ContratController {
         model.addAttribute("idEmploye", id);
         model.addAttribute("contrats", contratService.historique(id));
         model.addAttribute("contratActif", contratService.contratActif(id).orElse(null));
-        return "bloc4/contrats/historique";
+        return "contrats/historique";
     }
 }

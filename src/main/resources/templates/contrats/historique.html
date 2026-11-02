@@ -1,46 +1,73 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Historique des contrats</title>
-</head>
-<body class="container mt-4">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
 
-    <h1>Historique des contrats</h1>
-    <a th:href="@{/contrats/employe/{id}/nouveau(id=${idEmploye})}"
-    class="btn btn-primary mb-3">Nouveau contrat</a>
-    <div class="alert alert-success" th:if="${succes}" th:text="${succes}"></div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Type</th>
-                <th>Poste</th>
-                <th>Début</th>
-                <th>Fin</th>
-                <th>Salaire mensuel</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="c : ${contrats}" 
-            th:classappend="${c.statut.libelle == 'actif'} ? 'table-success fw-bold' : ''">
-                <td th:text="${c.typeContrat.libelle}"></td>
-                <td th:text="${c.poste.intitule}"></td>
-                <td th:text="${c.dateDebut}"></td>
-                <td th:text="${c.dateFin} ?: 'En cours'"></td>
-                <td th:text="${c.salaireMensuel}"></td>
-                <td th:text="${c.statut.libelle}"></td>
-                <td>
-                    <a th:if="${c.statut.libelle == 'actif'}"
-                    th:href="@{/contrats/{id}/renouveler(id=${c.idContract})}"
-                    class="btn btn-sm btn-outline-primary">Renouveler</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
 
-    <p th:if="${#lists.isEmpty(contrats)}">Aucun contrat pour ce salarié.</p>
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Historique des contrats</h2>
+            <a th:href="@{/contrats/employe/{id}/nouveau(id=${idEmploye})}" 
+               class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Nouveau contrat
+            </a>
+        </div>
 
+        <!-- Message de succès -->
+        <div th:if="${succes}" class="p-4 rounded-lg bg-green-50 text-green-700 border border-green-200 text-sm font-medium" th:text="${succes}"></div>
+
+        <!-- Tableau -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Type</th>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Début</th>
+                            <th scope="col">Fin</th>
+                            <th scope="col">Salaire mensuel</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${contrats}" 
+                            th:classappend="${c.statut.libelle == 'actif'} ? 'bg-green-50/40' : ''">
+                            
+                            <td class="font-medium" th:text="${c.typeContrat.libelle}"></td>
+                            <td th:text="${c.poste.intitule}"></td>
+                            <td class="whitespace-nowrap" th:text="${c.dateDebut}"></td>
+                            <td class="whitespace-nowrap" th:text="${c.dateFin} ?: 'En cours'"></td>
+                            <td class="font-mono" th:text="${c.salaireMensuel}"></td>
+                            <td>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                                      th:classappend="${c.statut.libelle == 'actif' ? 'bg-green-100 text-green-700' : 'bg-surface-container text-on-surface-variant'}"
+                                      th:text="${c.statut.libelle}">
+                                </span>
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <a th:if="${c.statut.libelle == 'actif'}"
+                                   th:href="@{/contrats/{id}/renouveler(id=${c.idContract})}"
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-primary hover:bg-surface-container-high text-xs font-medium transition-colors border border-surface-container-high">
+                                    Renouveler
+                                </a>
+                            </td>
+                        </tr>
+                        
+                        <!-- Ligne vide -->
+                        <tr th:if="${#lists.isEmpty(contrats)}">
+                            <td colspan="7" class="td-empty">
+                                Aucun contrat pour ce salarié.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
 </body>
 </html>

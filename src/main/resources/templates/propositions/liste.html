@@ -1,45 +1,53 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Propositions d'embauche</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
-<div class="container py-4">
-    <h1 class="h3 mb-4">Propositions d'embauche</h1>
 
-    <table class="table table-striped align-middle">
-        <thead>
-        <tr>
-            <th>N°</th>
-            <th>Candidat</th>
-            <th>Poste</th>
-            <th>Salaire proposé</th>
-            <th>Expiration</th>
-            <th>Statut</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="p : ${propositions}">
-            <td th:text="${p.idProposition}"></td>
-            <td th:text="${p.candidature.candidat.prenom + ' ' + p.candidature.candidat.nom}"></td>
-            <td th:text="${p.candidature.demandeRecrutement.poste.intitule}"></td>
-            <td th:text="${p.salairePropose}"></td>
-            <td th:text="${#temporals.format(p.dateExpiration, 'dd/MM/yyyy HH:mm')}"></td>
-            <td><span class="badge bg-secondary" th:text="${p.statut.libelle}"></span></td>
-            <td>
-                <a class="btn btn-sm btn-primary"
-                   th:href="@{/propositions/{id}(id=${p.idProposition})}">Ouvrir</a>
-            </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(propositions)}">
-            <td colspan="7" class="text-center text-muted">Aucune proposition.</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+
+        <div>
+            <h1 class="font-headline-xl text-headline-xl text-on-surface font-bold">Propositions d'embauche</h1>
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">N°</th>
+                            <th scope="col">Candidat</th>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Salaire proposé</th>
+                            <th scope="col">Expiration</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${propositions}">
+                            <td class="font-code-num text-outline" th:text="${p.idProposition}"></td>
+                            <td class="font-medium" th:text="${p.candidature.candidat.prenom + ' ' + p.candidature.candidat.nom}"></td>
+                            <td th:text="${p.candidature.demandeRecrutement.poste.intitule}"></td>
+                            <td class="font-mono" th:text="${p.salairePropose}"></td>
+                            <td class="text-on-surface-variant whitespace-nowrap" th:text="${#temporals.format(p.dateExpiration, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <span class="inline-flex px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant text-xs font-semibold" th:text="${p.statut.libelle}"></span>
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <a th:href="@{/propositions/{id}(id=${p.idProposition})}" 
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-white hover:bg-primary-container text-xs font-medium transition-colors shadow-sm">
+                                    Ouvrir
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(propositions)}">
+                            <td colspan="7" class="td-empty">Aucune proposition.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
 </body>
 </html>

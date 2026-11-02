@@ -1,61 +1,73 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="app-page">
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
 
-        <!-- En-tête de la page -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <a th:href="@{/departements}" class="back-link">&larr; Retour aux départements</a>
-                <h2 class="page-title d-flex flex-wrap align-items-center gap-2">
-                    <span th:text="${departement.titre}">Ressources Humaines</span>
-                    <span class="pill pill-id" th:text="'#' + ${departement.idDepartement}">#1</span>
+                <a th:href="@{/departements}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                    &larr; Retour aux départements
+                </a>
+                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold flex items-center gap-3">
+                    <span th:text="${departement.titre}"></span>
+                    <span class="px-3 py-1 bg-surface-container text-primary font-code-num text-sm rounded-full font-semibold"
+                          th:text="'#' + ${departement.idDepartement}">
+                    </span>
                 </h2>
             </div>
             <div>
-                <a th:href="@{/departements/{id}/edit(id=${departement.idDepartement})}" class="btn-brand">Modifier</a>
+                <a th:href="@{/departements/{id}/edit(id=${departement.idDepartement})}" 
+                   class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                    Modifier
+                </a>
             </div>
         </div>
 
-        <!-- Contenu principal -->
-        <div class="row g-4">
+        <!-- Contenu principal (Grille 2 colonnes) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Colonne de gauche (Infos) -->
+            <div class="lg:col-span-2">
+                <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high h-full overflow-hidden">
+                    <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
+                        <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Informations du département</h3>
+                    </div>
+                    <div class="p-6">
+                        
+                        <div class="mb-6">
+                            <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-2">Titre du département</span>
+                            <div class="text-xl font-bold text-on-surface" th:text="${departement.titre}"></div>
+                        </div>
 
-            <!-- Colonne de gauche (Infos générales) -->
-            <div class="col-lg-7">
-                <div class="card-x h-100">
-                    <h5 class="card-head">Informations du département</h5>
-                    <div class="card-pad">
+                        <hr class="my-6 border-surface-container-high">
 
-                        <span class="lbl">Titre du département</span>
-                        <div class="fw-bold" style="font-size: 20px; letter-spacing: -.015em;" th:text="${departement.titre}">Informatique</div>
-
-                        <hr class="divider">
-
-                        <div class="mb-4">
-                            <span class="lbl mb-2">Manager assigné</span>
-
-                            <!-- Si un manager existe -->
-                            <div th:if="${departement.manager != null}" class="bg-light rounded p-3 d-flex align-items-center gap-3">
-                                <div class="avatar avatar-lg" style="width: 44px; height: 44px; font-size: 18px;">
-                                    <span th:text="${#strings.substring(departement.manager.nom, 0, 1)}">J</span>
+                        <div class="mb-6">
+                            <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-2">Manager assigné</span>
+                            
+                            <div th:if="${departement.manager != null}" class="bg-surface-container-low rounded-lg p-4 flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg">
+                                    <span th:text="${#strings.substring(departement.manager.nom, 0, 1)}"></span>
                                 </div>
                                 <div>
-                                    <div class="fw-semibold" th:text="${departement.manager.nom}">Jean Dupont</div>
-                                    <span class="text-outline" style="font-size: 13px;" th:text="${departement.manager.email}">jean.dupont@sirh.com</span>
+                                    <div class="font-bold text-on-surface" th:text="${departement.manager.nom}"></div>
+                                    <div class="text-sm text-on-surface-variant" th:text="${departement.manager.email}"></div>
                                 </div>
                             </div>
 
-                            <!-- Si aucun manager -->
-                            <div th:if="${departement.manager == null}" class="alert alert-warning m-0" style="font-size: 13px; border: none; border-radius: .5rem;">
+                            <div th:if="${departement.manager == null}" class="p-4 rounded-lg bg-orange-50 text-orange-700 border border-orange-200 text-sm">
                                 Aucun manager n'est actuellement assigné à ce département.
                             </div>
                         </div>
 
                         <div>
-                            <span class="lbl">Effectif actuel</span>
-                            <span class="val"><span th:text="${nombreEmployes}">0</span> employé(s) dans ce département</span>
+                            <span class="block text-xs font-semibold text-outline uppercase tracking-wider mb-2">Effectif actuel</span>
+                            <div class="text-base font-medium text-on-surface">
+                                <span th:text="${nombreEmployes}"></span> employé(s) dans ce département
+                            </div>
                         </div>
 
                     </div>
@@ -63,22 +75,24 @@
             </div>
 
             <!-- Colonne de droite (Actions) -->
-            <div class="col-lg-5">
-                <div class="card-x">
-                    <h6 class="card-head">Actions rapides</h6>
-                    <div class="card-pad">
-                        <div class="d-grid gap-2">
-                            <!-- Lien vers la liste des employés filtrée -->
-                            <a th:href="@{/employes(idDepartement=${departement.idDepartement})}" class="btn-soft justify-content-start">
-                                Accéder à la liste des employés
-                            </a>
-                            <a th:href="@{/demandes}" class="btn-soft justify-content-start">
-                                Voir les demandes de recrutement
-                            </a>
-                        </div>
+            <div class="lg:col-span-1">
+                <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high h-full overflow-hidden">
+                    <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
+                        <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Actions rapides</h3>
+                    </div>
+                    <div class="p-6 flex flex-col gap-3">
+                        <a th:href="@{/employes(idDepartement=${departement.idDepartement})}" 
+                           class="w-full flex items-center justify-start h-10 px-4 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high">
+                            Accéder à la liste des employés
+                        </a>
+                        <a th:href="@{/demandes}" 
+                           class="w-full flex items-center justify-start h-10 px-4 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high">
+                            Voir les demandes de recrutement
+                        </a>
                     </div>
                 </div>
             </div>
+            
         </div>
 
     </main>

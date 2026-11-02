@@ -1,52 +1,56 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="app-page">
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
 
         <!-- En-tête -->
-        <div class="mb-4">
-            <a th:href="@{//offres}" class="back-link">&larr; Retour aux offres</a>
-            <h2 class="page-title">
-                Candidatures pour l'offre : <span style="color: var(--primary-container);" th:text="${offre.titre}"></span>
+        <div>
+            <a th:href="@{/offres}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                &larr; Retour aux offres
+            </a>
+            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">
+                Candidatures pour l'offre : <span class="text-primary" th:text="${offre.titre}"></span>
             </h2>
         </div>
 
         <!-- Tableau -->
-        <div class="card-x">
-            <div class="table-responsive">
-                <table class="table table-x">
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
                     <thead>
                         <tr>
-                            <th>Candidat</th>
-                            <th>Email</th>
-                            <th>Date de dépôt</th>
-                            <th>Statut</th>
-                            <th class="text-end">Actions</th>
+                            <th scope="col">Candidat</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Date de dépôt</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:each="cand : ${candidatures}">
-                            <td class="fw-medium" th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
-                            <td class="text-outline" th:text="${cand.candidat.email}"></td>
-                            <td class="text-outline text-nowrap" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td class="font-medium text-on-surface" th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
+                            <td class="text-on-surface-variant" th:text="${cand.candidat.email}"></td>
+                            <td class="text-on-surface-variant whitespace-nowrap" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy HH:mm')}"></td>
                             <td>
-                                <span class="pill st-rh" th:text="${cand.statutCandidature.libelle}"></span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant text-xs font-semibold" 
+                                      th:text="${cand.statutCandidature.libelle}">
+                                </span>
                             </td>
-                            <td class="text-end text-nowrap">
+                            <td class="text-right whitespace-nowrap">
                                 <a th:href="@{/candidats/{id}(id=${cand.candidat.idCandidat})}" 
-                                   class="btn-soft btn-sm-x me-1">
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high text-xs font-medium transition-colors border border-surface-container-high">
                                     Fiche Candidat
                                 </a>
                                 <a th:href="@{/candidatures/{id}/evaluer(id=${cand.idCandidature})}" 
-                                   class="btn-brand btn-sm-x">
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-on-white hover:bg-primary-container text-xs font-medium transition-colors shadow-sm ml-2">
                                     Évaluer
                                 </a>
                             </td>
                         </tr>
                         <tr th:if="${candidatures.isEmpty()}">
-                            <td colspan="5" class="text-center py-5 text-outline">
+                            <td colspan="5" class="td-empty">
                                 Aucune candidature pour cette offre.
                             </td>
                         </tr>

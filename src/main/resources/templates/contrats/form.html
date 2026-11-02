@@ -1,58 +1,90 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Nouveau contrat</title>
-</head>
-<body class="container mt-4">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
 
-    <h1 th:text="${ancien != null} ? 'Renouveler le contrat' : 'Nouveau contrat'"></h1>
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-2xl mx-auto flex flex-col gap-6 w-full">
 
-    <div class="alert alert-danger" th:if="${erreur}" th:text="${erreur}"></div>
-
-    <form th:action="${ancien != null}
-                    ? @{/contrats/{idc}/renouveler(idc=${ancien.idContract})}
-                    : @{/contrats/employe/{id}(id=${idEmploye})}"
-        method="post">
-
-        <div class="mb-3">
-            <label class="form-label">Type de contrat</label>
-            <select name="idTypeContrat" class="form-select" required>
-                <option th:each="t : ${types}"
-                    th:value="${t.idTypeContrat}"
-                    th:text="${t.libelle}"
-                    th:selected="${ancien != null and ancien.typeContrat.idTypeContrat == t.idTypeContrat}"></option>
-            </select>
+        <!-- Titre -->
+        <div>
+            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" 
+                th:text="${ancien != null} ? 'Renouveler le contrat' : 'Nouveau contrat'">
+            </h2>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Poste</label>
-            <select name="idPoste" class="form-select" required>
-                <option th:each="p : ${postes}"
-                    th:value="${p.idPoste}"
-                    th:text="${p.intitule}"
-                    th:selected="${ancien != null and ancien.poste.idPoste == p.idPoste}"></option>
-            </select>
+        <!-- Message d'erreur -->
+        <div th:if="${erreur}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${erreur}"></div>
+
+        <!-- Formulaire -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                <form th:action="${ancien != null}
+                                ? @{/contrats/{idc}/renouveler(idc=${ancien.idContract})}
+                                : @{/contrats/employe/{id}(id=${idEmploye})}"
+                      method="post" class="flex flex-col gap-5">
+
+                    <!-- Type de contrat -->
+                    <div>
+                        <label class="block text-sm font-semibold text-on-surface mb-2">Type de contrat</label>
+                        <select name="idTypeContrat" required
+                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option th:each="t : ${types}"
+                                    th:value="${t.idTypeContrat}"
+                                    th:text="${t.libelle}"
+                                    th:selected="${ancien != null and ancien.typeContrat.idTypeContrat == t.idTypeContrat}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Poste -->
+                    <div>
+                        <label class="block text-sm font-semibold text-on-surface mb-2">Poste</label>
+                        <select name="idPoste" required
+                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option th:each="p : ${postes}"
+                                    th:value="${p.idPoste}"
+                                    th:text="${p.intitule}"
+                                    th:selected="${ancien != null and ancien.poste.idPoste == p.idPoste}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-on-surface mb-2">Date de début</label>
+                            <input type="date" name="dateDebut" required
+                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-on-surface mb-2">Date de fin (CDD)</label>
+                            <input type="date" name="dateFin"
+                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Salaire -->
+                    <div>
+                        <label class="block text-sm font-semibold text-on-surface mb-2">Salaire mensuel</label>
+                        <input type="number" step="0.01" name="salaireMensuel" required
+                               th:value="${ancien != null} ? ${ancien.salaireMensuel} : ''"
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high mt-2">
+                        <a th:href="@{/contrats/employe/{id}(id=${idEmploye})}" 
+                           class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high flex items-center">
+                            Annuler
+                        </a>
+                        <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Date de début</label>
-            <input type="date" name="dateDebut" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Date de fin (obligatoire pour un CDD)</label>
-            <input type="date" name="dateFin" class="form-control">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Salaire mensuel</label>
-            <input type="number" step="0.01" name="salaireMensuel" class="form-control" required
-                th:value="${ancien != null} ? ${ancien.salaireMensuel} : ''">        </div>
-
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-        <a th:href="@{/contrats/employe/{id}(id=${idEmploye})}" class="btn btn-secondary">Annuler</a>
-    </form>
-
+    </main>
 </body>
 </html>
