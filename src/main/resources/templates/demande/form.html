@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-4xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div>
+            <a th:href="@{/demandes}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                &larr; Retour à la liste
+            </a>
+            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" 
+                th:text="${isBrouillon != null} ? 'Modifier la demande' : 'Nouvelle demande'">
+            </h2>
+        </div>
+
+        <!-- Carte du formulaire -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                <form th:action="${isBrouillon != null} ? @{/demandes/update} : @{/demandes/create}"
+                      method="post" th:object="${demandeRecrutementForm}" id="demandeForm" novalidate>
+
+                    <input type="hidden" th:field="*{idDemandeRecrutement}" />
+
+                    <!-- État actuel -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-on-surface-variant mb-2">État actuel</label>
+                        <input type="text" readonly
+                               th:value="${demandeRecrutementForm.etat != null ? demandeRecrutementForm.etat : 'Brouillon'}"
+                               class="w-full h-11 px-3 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-semibold cursor-not-allowed outline-none">
+                    </div>
+
+                    <!-- Manager -->
+                    <div class="mb-6">
+                        <label for="idManager" class="block text-sm font-semibold text-on-surface mb-2">Manager demandeur <span class="text-red-500">*</span></label>
+                        <select class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all cursor-pointer" 
+                                id="idManager" th:field="*{idManager}" required>
+                            <option value="" disabled>Sélectionnez un manager...</option>
+                            <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
+                                th:text="${manager.nom + ' (' + manager.role.libelle + ')'}"></option>
+                        </select>
+                        <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('idManager')}" th:errors="*{idManager}"></p>
+                    </div>
+
+                    <!-- Poste (Custom Select) -->
+                    <div class="mb-6">
+                        <label for="posteSearch" class="block text-sm font-semibold text-on-surface mb-2">Poste concerné <span class="text-red-500">*</span></label>
+                        <div class="custom-select-wrapper">
+                            <input type="text" id="posteSearch" placeholder="Rechercher..." autocomplete="off" required
+                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all">
+                            <div class="custom-dropdown" id="posteDropdown"></div>
+                            <select class="hidden" id="posteSelect" th:field="*{idPoste}" required>
+                                <option value=""></option>
+                                <option th:each="poste : ${postes}" th:value="${poste.idPoste}" th:text="${poste.intitule}"></option>
+                            </select>
+                        </div>
+                        <p class="mt-1 text-xs text-red-500" id="posteError" th:if="${#fields.hasErrors('idPoste')}" th:errors="*{idPoste}"></p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Date -->
+                        <div>
+                            <label for="dateSouhaitee" class="block text-sm font-semibold text-on-surface mb-2">Date d'entrée <span class="text-red-500">*</span></label>
+                            <input type="date" id="dateSouhaitee" th:field="*{dateSouhaitee}" required
+                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all">
+                            <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('dateSouhaitee')}" th:errors="*{dateSouhaitee}"></p>
+                        </div>
+                        <!-- Effectif -->
+                        <div>
+                            <label for="effectif" class="block text-sm font-semibold text-on-surface mb-2">Effectif requis <span class="text-red-500">*</span></label>
+                            <input type="number" id="effectif" th:field="*{effectif}" min="1" required
+                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all">
+                            <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('effectif')}" th:errors="*{effectif}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Motif -->
+                    <div class="mb-8">
+                        <label for="idMotif" class="block text-sm font-semibold text-on-surface mb-2">Motif de la demande <span class="text-red-500">*</span></label>
+                        <select id="idMotif" th:field="*{motif.idMotifDemande}" required
+                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all cursor-pointer">
+                            <option value="" disabled>Sélectionnez un motif...</option>
+                            <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}" th:text="${motif.libelle}"></option>
+                        </select>
+                        <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('motif.idMotifDemande')}" th:errors="*{motif.idMotifDemande}"></p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high">
+                        <button type="submit" name="action" value="save" 
+                                class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high">
+                            Enregistrer le brouillon
+                        </button>
+                        <button type="submit" name="action" value="submit" 
+                                class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm"
+                                th:text="${isBrouillon != null} ? 'Mettre à jour et Soumettre' : 'Soumettre la demande'">
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SCRIPT (Inchangé, gère la liste flottante) -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById('demandeForm');
+                const searchInput = document.getElementById('posteSearch');
+                const hiddenSelect = document.getElementById('posteSelect');
+                const dropdown = document.getElementById('posteDropdown');
+                const effectifInput = document.getElementById('effectif');
+
+                function initDropdown() {
+                    const options = Array.from(hiddenSelect.options).filter(opt => opt.value !== "");
+                    options.forEach(opt => {
+                        const div = document.createElement('div');
+                        div.className = 'custom-option';
+                        div.textContent = opt.text;
+                        div.dataset.value = opt.value;
+                        if (opt.selected) {
+                            div.classList.add('active');
+                            searchInput.value = opt.text;
+                        }
+                        div.addEventListener('click', () => selectOption(opt, div));
+                        dropdown.appendChild(div);
+                    });
+                }
+
+                function selectOption(opt, divElement) {
+                    searchInput.value = opt.text;
+                    hiddenSelect.value = opt.value;
+                    searchInput.classList.remove('border-red-500');
+                    dropdown.querySelectorAll('.custom-option').forEach(el => el.classList.remove('active'));
+                    divElement.classList.add('active');
+                    closeDropdown();
+                }
+
+                function filterList() {
+                    const query = searchInput.value.toLowerCase();
+                    const items = dropdown.querySelectorAll('.custom-option:not(.no-result)');
+                    let hasVisible = false;
+                    items.forEach(item => {
+                        if (item.textContent.toLowerCase().includes(query)) {
+                            item.style.display = 'block';
+                            hasVisible = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    toggleNoResultMessage(!hasVisible);
+                }
+
+                function toggleNoResultMessage(show) {
+                    let noResultDiv = dropdown.querySelector('.no-result');
+                    if (show) {
+                        if (!noResultDiv) {
+                            noResultDiv = document.createElement('div');
+                            noResultDiv.className = 'custom-option no-result';
+                            noResultDiv.textContent = 'Aucun poste trouvé';
+                            dropdown.appendChild(noResultDiv);
+                        }
+                        noResultDiv.style.display = 'block';
+                    } else if (noResultDiv) {
+                        noResultDiv.style.display = 'none';
+                    }
+                }
+
+                function openDropdown() { dropdown.classList.add('show'); filterList(); }
+                function closeDropdown() { dropdown.classList.remove('show'); }
+
+                function isFormValid() {
+                    let isValid = true;
+                    if (hiddenSelect.value === "") {
+                        searchInput.classList.add('border-red-500'); // Classe Tailwind pour l'erreur
+                        isValid = false;
+                    } else {
+                        searchInput.classList.remove('border-red-500');
+                    }
+                    if (effectifInput) {
+                        const effectifValue = parseInt(effectifInput.value, 10);
+                        if (isNaN(effectifValue) || effectifValue <= 0) {
+                            effectifInput.classList.add('border-red-500');
+                            isValid = false;
+                        } else {
+                            effectifInput.classList.remove('border-red-500');
+                        }
+                    }
+                    if (!form.checkValidity()) isValid = false;
+                    return isValid;
+                }
+
+                if (searchInput && hiddenSelect && dropdown) {
+                    searchInput.addEventListener('focus', openDropdown);
+                    searchInput.addEventListener('input', () => {
+                        hiddenSelect.value = "";
+                        openDropdown();
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                            closeDropdown();
+                            if (hiddenSelect.value === "") searchInput.classList.add('border-red-500');
+                        }
+                    });
+                }
+
+                if (effectifInput) {
+                    effectifInput.addEventListener('input', () => {
+                        if (parseInt(effectifInput.value, 10) > 0) effectifInput.classList.remove('border-red-500');
+                    });
+                }
+
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!isFormValid()) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    });
+                }
+
+                if (hiddenSelect) initDropdown();
+            });
+        </script>
+
+    </main>
+</body>
+</html>

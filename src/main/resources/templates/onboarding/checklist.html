@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div>
+            <h1 class="text-3xl font-bold text-on-surface">Onboarding</h1>
+        </div>
+
+        <!-- Messages de succès / erreur -->
+        <div th:if="${succes}" class="p-4 rounded-lg bg-green-50 text-green-700 border border-green-200 text-sm font-medium" th:text="${succes}"></div>
+        <div th:if="${erreur}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${erreur}"></div>
+
+        <!-- Barre de progression -->
+        <div class="w-full bg-surface-container rounded-full h-5 mb-2 overflow-hidden shadow-inner">
+            <div class="bg-primary h-5 rounded-full text-white text-xs font-bold flex items-center justify-center transition-all duration-500 ease-out" 
+                 role="progressbar" 
+                 th:style="'width: ' + ${progression} + '%;'" 
+                 th:text="${progression} + ' %'">
+            </div>
+        </div>
+
+        <!-- Tableau -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Document</th>
+                            <th scope="col">Tâche</th>
+                            <th scope="col">Responsable</th>
+                            <th scope="col">Échéance</th>
+                            <th scope="col">Obligatoire</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${taches}">
+                            <!-- Formulaire de dépôt de document -->
+                            <td class="align-top min-w-[200px]">
+                                <form th:action="@{/onboarding/taches/{id}/documents(id=${t.id})}" method="post" enctype="multipart/form-data" class="flex flex-col gap-1.5 m-0">
+                                    <input type="hidden" name="idEmploye" th:value="${idEmploye}">
+
+                                    <select name="idTypeDocument" required
+                                            class="w-full h-8 px-2 bg-surface-container-low border border-transparent rounded-lg text-xs text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                                        <option th:each="td : ${typesDocument}" th:value="${td.idTypeDocument}" th:text="${td.libelle}"></option>
+                                    </select>
+
+                                    <input type="file" name="fichier" required
+                                           class="block w-full text-xs text-on-surface file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                                    
+                                    <button type="submit" class="h-8 px-3 rounded-lg bg-surface-container text-primary hover:bg-surface-container-high font-medium text-xs transition-colors border border-surface-container-high w-full">
+                                        Déposer
+                                    </button>
+                                </form>
+                            </td>
+                            
+                            <td class="font-medium text-on-surface" th:text="${t.titre}"></td>
+                            <td class="text-on-surface-variant" th:text="${t.responsable.nom}"></td>
+                            <td class="text-on-surface-variant whitespace-nowrap" th:text="${t.dateEcheance}"></td>
+                            <td>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold"
+                                      th:classappend="${t.obligatoire} ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'"
+                                      th:text="${t.obligatoire} ? 'Oui' : 'Non'">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                                      th:classappend="${t.statut.libelle == 'terminée' ? 'bg-green-100 text-green-700' : 'bg-surface-container text-on-surface-variant'}"
+                                      th:text="${t.statut.libelle}">
+                                </span>
+                            </td>
+                            <td class="text-right align-top">
+                                <form th:if="${t.statut.libelle != 'terminée'}"
+                                      th:action="@{/onboarding/taches/{id}/terminer(id=${t.id})}"
+                                      method="post" class="m-0">
+                                    <input type="hidden" name="idEmploye" th:value="${idEmploye}">
+                                    <button type="submit" class="h-8 px-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-medium text-xs transition-colors shadow-sm">
+                                        Terminer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

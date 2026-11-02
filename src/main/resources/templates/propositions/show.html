@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-4xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div>
+            <a th:href="@{/propositions}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                &larr; Retour à la liste
+            </a>
+            <h1 class="font-headline-xl text-headline-xl text-on-surface font-bold flex flex-wrap items-center gap-3">
+                Proposition n° <span th:text="${proposition.idProposition}"></span>
+                <span class="px-3 py-1 bg-surface-container text-primary font-code-num text-sm rounded-full font-semibold"
+                      th:text="${proposition.statut.libelle}">
+                </span>
+            </h1>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${succes}" class="p-4 rounded-lg bg-green-50 text-green-700 border border-green-200 text-sm font-medium" th:text="${succes}"></div>
+        <div th:if="${erreur}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${erreur}"></div>
+        <div th:if="${alerteGrille != null}" class="p-4 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 text-sm font-medium" th:text="${alerteGrille}"></div>
+
+        <!-- Carte d'informations -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8 flex flex-col gap-2">
+                <p class="m-0"><strong class="text-on-surface">Candidat :</strong>
+                    <span class="text-on-surface-variant" th:text="${proposition.candidature.candidat.prenom + ' ' + proposition.candidature.candidat.nom}"></span></p>
+                <p class="m-0"><strong class="text-on-surface">Poste :</strong>
+                    <span class="text-on-surface-variant" th:text="${proposition.candidature.demandeRecrutement.poste.intitule}"></span></p>
+                <p class="m-0"><strong class="text-on-surface">Salaire proposé :</strong>
+                    <span class="text-on-surface-variant" th:text="${proposition.salairePropose}"></span></p>
+                <p class="m-0" th:if="${proposition.salaireFinal != null}"><strong class="text-on-surface">Salaire final :</strong>
+                    <span class="text-on-surface-variant" th:text="${proposition.salaireFinal}"></span></p>
+                <p class="m-0"><strong class="text-on-surface">Expiration :</strong>
+                    <span class="text-on-surface-variant" th:text="${#temporals.format(proposition.dateExpiration, 'dd/MM/yyyy HH:mm')}"></span></p>
+                <p class="m-0" th:if="${proposition.dateDecision != null}"><strong class="text-on-surface">Décision le :</strong>
+                    <span class="text-on-surface-variant" th:text="${#temporals.format(proposition.dateDecision, 'dd/MM/yyyy HH:mm')}"></span></p>
+                <p class="m-0" th:if="${proposition.remarque != null}"><strong class="text-on-surface">Remarque du candidat :</strong>
+                    <span class="text-on-surface-variant" th:text="${proposition.remarque}"></span></p>
+            </div>
+        </div>
+
+        <!-- EN_ATTENTE -->
+        <div th:if="${proposition.statut.libelle == 'EN_ATTENTE'}" class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                <h2 class="text-lg font-bold text-on-surface mb-4">Préparer la proposition</h2>
+                
+                <form th:action="@{/propositions/{id}/modifier-salaire(id=${proposition.idProposition})}" method="post" class="flex flex-wrap items-center gap-3 mb-4">
+                    <input type="number" step="0.01" min="0" name="salaire" th:value="${proposition.salairePropose}" required
+                           class="w-48 h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <button type="submit" class="h-11 px-4 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high border border-surface-container-high font-medium text-sm transition-colors">
+                        Modifier le salaire
+                    </button>
+                </form>
+                
+                <form th:action="@{/propositions/{id}/soumettre(id=${proposition.idProposition})}" method="post" class="m-0">
+                    <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                        Soumettre à validation
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- SOUMISE -->
+        <div th:if="${proposition.statut.libelle == 'SOUMISE'}" class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                <h2 class="text-lg font-bold text-on-surface mb-4">Validation (Direction ou Finance)</h2>
+                <form th:action="@{/propositions/{id}/valider(id=${proposition.idProposition})}" method="post" class="flex flex-col gap-4">
+                    <div>
+                        <label for="decision" class="block text-sm font-semibold text-on-surface mb-2">Décision</label>
+                        <select id="decision" name="decision" class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option value="APPROUVER">Approuver</option>
+                            <option value="REFUSER">Refuser</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="commentaire" class="block text-sm font-semibold text-on-surface mb-2">Commentaire (obligatoire pour un refus)</label>
+                        <textarea id="commentaire" name="commentaire" rows="2" class="w-full p-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            Enregistrer la décision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- APPROUVEE -->
+        <div th:if="${proposition.statut.libelle == 'APPROUVEE'}" class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                <h2 class="text-lg font-bold text-on-surface mb-4">Réponse du candidat</h2>
+                <form th:action="@{/propositions/{id}/repondre(id=${proposition.idProposition})}" method="post" class="flex flex-col gap-4">
+                    <div>
+                        <label for="reponse" class="block text-sm font-semibold text-on-surface mb-2">Réponse</label>
+                        <select id="reponse" name="reponse" class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option value="ACCEPTER">Accepter</option>
+                            <option value="PATIENTER">Patienter (repousse l'expiration de 7 jours)</option>
+                            <option value="REFUSER">Refuser</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="remarque" class="block text-sm font-semibold text-on-surface mb-2">Remarque</label>
+                        <textarea id="remarque" name="remarque" rows="2" class="w-full p-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            Enregistrer la réponse
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ACCEPTE : créer le dossier -->
+        <div th:if="${proposition.statut.libelle == 'ACCEPTE' and employe == null}" class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                <h2 class="text-lg font-bold text-on-surface mb-4">Convertir en salarié</h2>
+                <form th:action="@{/propositions/{id}/dossier(id=${proposition.idProposition})}" method="post" class="flex flex-col gap-4">
+                    <div>
+                        <label for="idTypeContrat" class="block text-sm font-semibold text-on-surface mb-2">Type de contrat</label>
+                        <select id="idTypeContrat" name="idTypeContrat" class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option value="1">CDI</option>
+                            <option value="2">CDD</option>
+                            <option value="3">CE</option>
+                            <option value="4">STAGE</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="dateDebut" class="block text-sm font-semibold text-on-surface mb-2">Date de début</label>
+                            <input type="date" id="dateDebut" name="dateDebut" required class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div>
+                            <label for="dateFin" class="block text-sm font-semibold text-on-surface mb-2">Date de fin (CDD, stage)</label>
+                            <input type="date" id="dateFin" name="dateFin" class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="h-11 px-6 rounded-lg bg-green-600 text-white hover:bg-green-700 font-medium text-sm transition-colors shadow-sm">
+                            Créer dossier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${employe != null}" class="p-4 rounded-lg bg-green-50 text-green-700 border border-green-200 text-sm font-medium">
+            Dossier créé. Matricule : <strong th:text="${employe.matricule}"></strong>.
+            <a th:href="@{/employes/{id}(id=${employe.idEmployer})}" class="underline font-bold hover:text-green-900 ml-1">Voir la fiche salarié</a>
+        </div>
+
+        <!-- REFUSE / EXPIREE -->
+        <div th:if="${proposition.statut.libelle == 'REFUSE' or proposition.statut.libelle == 'EXPIREE'}" class="p-4 rounded-lg bg-surface-container text-on-surface border border-surface-container-high text-sm">
+            Proposition clôturée.
+            <a th:href="@{/candidatures/{id}/proposer(id=${proposition.candidature.idCandidature})}" class="text-primary font-bold hover:underline ml-1">Faire une nouvelle proposition</a>
+        </div>
+
+        <!-- Historique des validations -->
+        <h2 class="text-lg font-bold text-on-surface mt-4">Historique des validations</h2>
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Validateur</th>
+                            <th scope="col">Décision</th>
+                            <th scope="col">Commentaire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${validations}">
+                            <td class="text-on-surface-variant whitespace-nowrap" th:text="${v.dateValidationProposition != null} ? ${#temporals.format(v.dateValidationProposition, 'dd/MM/yyyy HH:mm')} : '-'"></td>
+                            <td class="font-medium" th:text="${v.validateur.nom}"></td>
+                            <td th:text="${v.decision}"></td>
+                            <td class="text-on-surface-variant" th:text="${v.commentaire}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(validations)}">
+                            <td colspan="4" class="td-empty">Aucune validation pour le moment.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

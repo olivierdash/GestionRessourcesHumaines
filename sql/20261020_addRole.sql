@@ -1,9 +1,0 @@
-CREATE ROLE admin WITH
-    LOGIN
-    PASSWORD 'admin'
-    SUPERUSER
-    CREATEDB
-    CREATEROLE
-    INHERIT;
-
-CREATE DATABASE sirh OWNER admin;

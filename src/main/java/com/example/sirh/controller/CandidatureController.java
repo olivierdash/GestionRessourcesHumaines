@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/bloc2")
 @RequiredArgsConstructor
 public class CandidatureController {
 
@@ -24,7 +24,7 @@ public class CandidatureController {
     public String listeCandidatures(@PathVariable Integer idOffre, Model model) {
         model.addAttribute("offre", offreService.getOffreEmploiById(idOffre));
         model.addAttribute("candidatures", candidatureService.listeCandidatureByOffre(idOffre));
-        return "bloc2/candidatures/liste";
+        return "candidatures/liste";
     }
 
     // TÂCHE 11 : Fiche Candidat
@@ -35,7 +35,29 @@ public class CandidatureController {
         
         model.addAttribute("candidat", candidat);
         model.addAttribute("candidatures", candidatureService.listeCandidatureByCandidat(idCandidat));
-        return "bloc2/candidats/fiche";
+        return "candidats/fiche";
+    }
+
+    @PostMapping("/candidatures/{id}/retenir")
+    public String retenirCandidat(
+            @PathVariable Integer id, 
+            @RequestParam Integer idOffre, 
+            RedirectAttributes redirectAttributes) {
+        candidatureService.changerStatutCandidature(id, 3); // 3 = RETENU
+        redirectAttributes.addFlashAttribute("success", "Le candidat a été retenu !");
+        return "redirect:/offres/" + idOffre + "/candidatures";
+    }
+
+    // TÂCHE 12 bis : Refuser un candidat
+    @PostMapping("/candidatures/{id}/refuser")
+    public String refuserCandidat(
+        @PathVariable Integer id, 
+        @RequestParam Integer idOffre, 
+        RedirectAttributes redirectAttributes) 
+    {
+        candidatureService.changerStatutCandidature(id, 4); // 4 = REFUSE
+        redirectAttributes.addFlashAttribute("success", "Le candidat a été refusé.");
+        return "redirect:/offres/" + idOffre + "/candidatures";
     }
 }
 

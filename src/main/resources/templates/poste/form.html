@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="fr"
+      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+
+<body>
+<main th:fragment="mainContent" class="app-page">
+
+    <div class="mb-4">
+        <a th:href="@{/postes}" class="back-link">
+            &larr; Retour aux postes
+        </a>
+
+        <h2 class="page-title"
+            th:text="${poste.idPoste == null
+                ? 'Nouveau poste'
+                : 'Modifier le poste'}">
+        </h2>
+    </div>
+
+    <div th:if="${error}"
+         class="alert alert-danger"
+         th:text="${error}">
+    </div>
+
+    <div class="card-x">
+        <div class="p-4">
+
+            <form method="post"
+                  th:action="${poste.idPoste == null}
+                    ? @{/postes}
+                    : @{/postes/{id}(id=${poste.idPoste})}">
+
+                <div class="mb-3">
+                    <label for="intitule" class="form-label">
+                        Intitulé du poste *
+                    </label>
+
+                    <input type="text"
+                           id="intitule"
+                           name="intitule"
+                           class="form-control"
+                           th:value="${poste.intitule}"
+                           required
+                           maxlength="255">
+                </div>
+
+                <div class="mb-3">
+                    <label for="idDepartement" class="form-label">
+                        Département *
+                    </label>
+
+                    <select id="idDepartement"
+                            name="idDepartement"
+                            class="form-select"
+                            required>
+
+                        <option value="">
+                            Sélectionner un département
+                        </option>
+
+                        <option th:each="departement : ${departements}"
+                                th:value="${departement.idDepartement}"
+                                th:text="${departement.titre}"
+                                th:selected="${poste.departement != null
+                                    and poste.departement.idDepartement
+                                    == departement.idDepartement}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dateEffet" class="form-label">
+                        Date d'effet
+                    </label>
+
+                    <input type="date"
+                           id="dateEffet"
+                           name="dateEffet"
+                           class="form-control"
+                           th:value="${poste.dateEffet}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="lieu" class="form-label">
+                        Lieu
+                    </label>
+
+                    <input type="text"
+                           id="lieu"
+                           name="lieu"
+                           class="form-control"
+                           th:value="${poste.lieu}"
+                           maxlength="255">
+                </div>
+
+                <div class="mb-4">
+                    <label for="dureeHebdo" class="form-label">
+                        Durée hebdomadaire
+                    </label>
+
+                    <input type="number"
+                           id="dureeHebdo"
+                           name="dureeHebdo"
+                           class="form-control"
+                           th:value="${poste.dureeHebdo}"
+                           min="1"
+                           max="168">
+
+                    <div class="form-text">
+                        Durée en heures par semaine.
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/postes}" class="btn-soft">
+                        Annuler
+                    </a>
+
+                    <button type="submit" class="btn-brand">
+                        Enregistrer
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

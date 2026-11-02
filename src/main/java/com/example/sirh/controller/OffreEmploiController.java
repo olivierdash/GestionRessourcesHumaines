@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/bloc2/offres")
+@RequestMapping("/offres")
 @RequiredArgsConstructor 
 public class OffreEmploiController {
 
@@ -21,14 +21,14 @@ public class OffreEmploiController {
     @GetMapping
     public String listeOffres(Model model) {
         model.addAttribute("offres", offreService.listAllEmploie());
-        return "bloc2/offres/liste";
+        return "offres/liste";
     }
 
     // TÂCHE 9 : Formulaire de création
     @GetMapping("/creer")
     public String formCreerOffre(Model model) {
         model.addAttribute("demandes", demandeRepo.findAll());
-        return "bloc2/offres/form";
+        return "offres/form";
     }
 
     // TÂCHE 9 : Enregistrement de l'offre
@@ -38,14 +38,14 @@ public class OffreEmploiController {
                              @RequestParam String description,
                              RedirectAttributes redirectAttributes) {
         try {
-            offreService.createNewOffer(idDemande, titre, description, 1); 
-            redirectAttributes.addFlashAttribute("success", "Offre créée en brouillon.");
+            offreService.createNewOffer(idDemande, titre, description, 2); 
+            redirectAttributes.addFlashAttribute("success", "Offre créée avec success");
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             redirectAttributes.addFlashAttribute("error", "Erreur : Une offre existe déjà pour cette demande.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur : " + e.getMessage());
         }
-        return "redirect:/bloc2/offres";
+        return "redirect:/offres";
     }
 
     // TÂCHE 9 bis : Publication de l'offre
@@ -57,6 +57,6 @@ public class OffreEmploiController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/bloc2/offres";
+        return "redirect:/offres";
     }
 }

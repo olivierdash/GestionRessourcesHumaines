@@ -35,8 +35,9 @@ build/
 ### mon environnement de développement ###
 docker-compose.yml
 .devcontainer/**/*
+Dockerfile
+*.sh
 
 ### connexion en base de donnée :
-src/main/resources/application.properties
 src/main/resources/application.properties
 *.properties

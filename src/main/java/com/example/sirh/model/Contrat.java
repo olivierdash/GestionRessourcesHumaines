@@ -5,10 +5,16 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity @Table(name = "contract")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Entity
+@Table(name = "contract")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Contrat {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_contract")
     private Integer idContract;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -26,6 +32,15 @@ public class Contrat {
     private LocalDate dateFin;
     @Column(name = "salaire_mensuel", nullable = false)
     private BigDecimal salaireMensuel;
-    @Column(nullable = false)
-    private String status;
+    @ManyToOne
+    @JoinColumn(name = "id_statut_contrat", nullable = false)
+    private StatutContrat statut;
+
+    public StatutContrat getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutContrat statut) {
+        this.statut = statut;
+    }
 }

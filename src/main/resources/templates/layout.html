@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+      lang="fr" th:fragment="layout(content)">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SIRH Pro</title>
+    
+    <!-- Tailwind CSS (CDN pour l'instant, on verra pour le local après) -->
+       <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 2. LA CONFIGURATION (Indispensable pour tes couleurs) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00236f",
+                        "primary-container": "#1e3a8a",
+                        secondary: "#4b41e1",
+                        background: "#faf8ff",
+                        surface: "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f2f3ff",
+                        "surface-container": "#eaedff",
+                        "surface-container-high": "#e2e7ff",
+                        "on-surface": "#131b2e",
+                        "on-surface-variant": "#444653",
+                        outline: "#757682",
+                        error: "#ba1a1a",
+                        "tertiary-container": "#5c3800",
+                        "tertiary-fixed": "#ffddb8"
+                    },
+                    spacing: {
+                        "space-xs": "0.25rem",
+                        "space-sm": "0.5rem",
+                        "space-md": "1rem",
+                        "space-lg": "1.5rem",
+                        "space-xl": "2rem",
+                        "margin": "2rem",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 3. TON CSS (pour les polices et animations) -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased h-screen overflow-hidden flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-primary text-white flex flex-col justify-between h-full flex-shrink-0">
+        <div class="flex flex-col flex-1 min-h-0">
+            <div class="h-16 px-6 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center font-bold text-lg">S</div>
+                <div class="flex flex-col">
+                    <span class="font-bold tracking-tight text-white">SIRH Pro</span>
+                    <span class="text-[10px] uppercase tracking-wider text-blue-200">Enterprise Suite</span>
+                </div>
+            </div>
+            <nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+                <!-- Liens avec autorisations dynamiques (sec:authorize) -->
+                 <a th:href="@{/}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                    <span class="text-sm">Tableau de bord</span>
+                </a>
+                <a th:href="@{/demandes}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <span class="material-symbols-outlined text-[20px]">post_add</span>
+                    <span class="text-sm">Demandes</span>
+                </a>
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/employes}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <span class="material-symbols-outlined text-[20px]">badge</span>
+                    <span class="text-sm">Employés</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/departements}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <span class="material-symbols-outlined text-[20px]">domain</span>
+                    <span class="text-sm">Départements</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'MANAGER')" th:href="@{/candidats}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <span class="material-symbols-outlined text-[20px]">group</span>
+                    <span class="text-sm">Candidats</span>
+                </a>
+                <a sec:authorize="hasAnyRole('FINANCE', 'DG', 'RH')" th:href="@{/demandes/validations}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px]">fact_check</span>
+                        <span class="text-sm">Validations</span>
+                    </div>
+                    <!-- Badge dynamique -->
+                    <span th:if="${validationsEnAttenteCount > 0}" class="px-2 py-0.5 rounded-full bg-secondary text-white text-xs font-bold" th:text="${validationsEnAttenteCount}"></span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 m-2 bg-blue-900/50 rounded-xl">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-bold text-white" th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}">CL</div>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-sm font-semibold text-white truncate" th:text="${#authentication.principal.utilisateur.nom}">Claire L.</span>
+                    <span class="text-xs text-blue-200 truncate" th:text="${#authentication.principal.utilisateur.role.libelle}">Directrice</span>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-blue-800/50 hover:bg-blue-800 text-blue-100 text-xs font-medium transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">logout</span>
+                    Déconnexion
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        <!-- TOPBAR -->
+        <header class="h-16 bg-white/80 backdrop-blur-xl shadow-sm flex items-center justify-between px-6 z-10 flex-shrink-0">
+            <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3 text-gray-400">search</span>
+                <input class="w-80 h-10 pl-10 pr-4 rounded-lg bg-surface-low text-sm focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="Rechercher..." type="text"/>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ZONE D'INJECTION DYNAMIQUE -->
+        <main class="flex-1 overflow-y-auto bg-background p-6">
+            <!-- C'EST ICI QUE LE CONTENU DE CHAQUE PAGE SERA INJECTÉ -->
+            <div th:replace="${content}"></div>
+        </main>
+    </div>
+
+</body>
+</html>

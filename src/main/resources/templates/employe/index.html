@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Liste des employés</h2>
+                <p class="text-sm text-on-surface-variant mt-1">Gérez les employés de l'entreprise.</p>
+            </div>
+            <a th:href="@{/employes/create}" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Ajouter un employé
+            </a>
+        </div>
+
+        <!-- Tableau -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden flex flex-col">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Réf.</th>
+                            <th scope="col">Matricule</th>
+                            <th scope="col">Date d'embauche</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${employes.content.isEmpty()}">
+                            <td colspan="3" class="td-empty">
+                                Aucun employé enregistré pour le moment.
+                            </td>
+                        </tr>
+
+                        <tr th:each="employe : ${employes.content}">
+                            <td class="font-code-num text-outline whitespace-nowrap">
+                                <a th:href="@{/employes/{id}(id=${employe.idEmployer})}" class="hover:underline text-primary font-semibold" th:text="'#' + ${employe.idEmployer}"></a>
+                            </td>
+                            <td class="font-medium text-on-surface" th:text="${employe.matricule}"></td>
+                            <td class="text-on-surface-variant" th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-4 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-4" th:if="${employes.totalPages > 1}">
+                <span class="text-sm text-on-surface-variant">
+                    Affichage de <span class="font-semibold text-on-surface" th:text="${employes.number * employes.size + 1}"></span> à 
+                    <span class="font-semibold text-on-surface" th:text="${employes.number * employes.size + employes.numberOfElements}"></span> sur 
+                    <span class="font-semibold text-on-surface" th:text="${employes.totalElements}"></span> employés
+                </span>
+
+                <form th:action="@{/employes}" method="get" class="flex items-center gap-2 m-0">
+                    <input type="hidden" name="size" th:value="${employes.size}">
+                    <input type="hidden" name="idDepartement" th:value="${idDepartement}">
+
+                    <button type="submit" name="page" th:value="${employes.number - 1}"
+                            class="px-3 py-1.5 bg-surface-container-lowest rounded-lg text-sm font-medium hover:bg-surface-container-high transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            th:disabled="${employes.first}">
+                        Précédent
+                    </button>
+                    
+                    <span class="px-3 py-1.5 bg-surface-container text-on-surface text-sm font-semibold rounded-lg">
+                        Page <span th:text="${employes.number + 1}"></span> / <span th:text="${employes.totalPages}"></span>
+                    </span>
+
+                    <button type="submit" name="page" th:value="${employes.number + 1}"
+                            class="px-3 py-1.5 bg-surface-container-lowest rounded-lg text-sm font-medium hover:bg-surface-container-high transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            th:disabled="${employes.last}">
+                        Suivant
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

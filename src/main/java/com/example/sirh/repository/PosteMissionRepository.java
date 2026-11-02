@@ -8,7 +8,18 @@ import org.springframework.stereotype.Repository;
 import com.example.sirh.model.Poste;
 import com.example.sirh.model.PosteMission;
 
-@Repository 
-public interface PosteMissionRepository extends JpaRepository<PosteMission,Integer> {
-    List<PosteMission> findByPosteIdPoste(Integer id_poste);
+@Repository
+public interface PosteMissionRepository
+        extends JpaRepository<PosteMission, Integer> {
+
+    List<PosteMission> findByPosteIdPoste(Integer idPoste);
+
+    boolean existsByPosteIdPosteAndTitreIgnoreCase(
+            Integer idPoste,
+            String titre);
+
+    boolean existsByPosteIdPosteAndTitreIgnoreCaseAndIdMissionNot(
+            Integer idPoste,
+            String titre,
+            Integer idMission);
 }
