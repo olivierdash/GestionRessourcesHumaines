@@ -1,9 +1,9 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.model.GrilleSalarial;
-import com.example.sirh.repository.DepartementRepository;
-import com.example.sirh.repository.PosteRepository;
+import com.example.sirh.service.DepartementService;
 import com.example.sirh.service.GrilleSalarialService;
+import com.example.sirh.service.PosteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 public class GrilleSalarialController {
 
     private final GrilleSalarialService grilleService;
-    private final PosteRepository posteRepository;
-    private final DepartementRepository departementRepository;
+    private final PosteService posteService;             // Injection du Service au lieu du Repository
+    private final DepartementService departementService; // Injection du Service au lieu du Repository
 
     @GetMapping
     public String index(Model model) {
@@ -30,8 +30,8 @@ public class GrilleSalarialController {
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("grille", new GrilleSalarial());
-        model.addAttribute("postes", posteRepository.findAll());
-        model.addAttribute("departements", departementRepository.findAll());
+        model.addAttribute("postes", posteService.getAllPostes());
+        model.addAttribute("departements", departementService.getAllDepartements());
         return "grille/form";
     }
 
@@ -69,8 +69,8 @@ public class GrilleSalarialController {
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Integer id, Model model) {
         model.addAttribute("grille", grilleService.trouver(id));
-        model.addAttribute("postes", posteRepository.findAll());
-        model.addAttribute("departements", departementRepository.findAll());
+        model.addAttribute("postes", posteService.getAllPostes());
+        model.addAttribute("departements", departementService.getAllDepartements());
         return "grille/form";
     }
 

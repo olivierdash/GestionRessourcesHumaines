@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -89,5 +90,9 @@ public class DocumentService {
             throw new IllegalStateException("Impossible d'enregistrer le fichier", e);
         }
         return nomStocke;
+    }
+
+    public List<TypeDocument> getAllTypesDocument() {
+        return typeDocumentRepository.findAll();
     }
 }

@@ -1,34 +1,28 @@
 package com.example.sirh.controller;
 
-import com.example.sirh.model.Candidature;
 import com.example.sirh.model.Employe;
-import com.example.sirh.repository.CandidatureRepository;
-import com.example.sirh.repository.EmployeRepository;
+import com.example.sirh.service.CandidatureService;
+import com.example.sirh.service.EmployeService;
+
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Controller
 @RequestMapping("/employes")
+@AllArgsConstructor
 public class EmployeController {
 
-    private final EmployeRepository employeRepository;
-    private final CandidatureRepository candidatureRepository;
-
-    public EmployeController(EmployeRepository employeRepository, CandidatureRepository candidatureRepository) {
-        this.employeRepository = employeRepository;
-        this.candidatureRepository = candidatureRepository;
-    }
+    private final EmployeService employeService;
+    private final CandidatureService candidatureService;
 
     @GetMapping
     public String index(
@@ -40,7 +34,7 @@ public class EmployeController {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 100),
                 Sort.by("hiringDate").descending());
 
-        Page<Employe> employesPage = employeRepository.findAll(pageable);
+        Page<Employe> employesPage = employeService.getAllEmployes(pageable);
 
         model.addAttribute("employes", employesPage);
         model.addAttribute("idDepartement", idDepartement);
@@ -53,10 +47,8 @@ public class EmployeController {
     // -----------------------------------------------------------------
     @GetMapping("/create")
     public String create(Model model) {
-        // On récupère toutes les candidatures (Idéalement, il faudrait filtrer celles qui n'ont pas encore d'employé)
-        List<Candidature> candidatures = candidatureRepository.findCandidaturesSansEmploye();
-        
-        model.addAttribute("candidatures", candidatures);
+        // Appel au service de candidature
+        model.addAttribute("candidatures", candidatureService.getCandidaturesSansEmploye());
         return "employe/form";
     }
 
@@ -70,17 +62,8 @@ public class EmployeController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hiringDate,
             @RequestParam String statusEmployer) {
 
-        Candidature candidature = candidatureRepository.findById(idCandidature)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Candidature introuvable"));
-
-        Employe employe = Employe.builder()
-                .candidature(candidature)
-                .matricule(matricule)
-                .hiringDate(hiringDate)
-                .statusEmployer(statusEmployer)
-                .build();
-
-        employeRepository.save(employe);
+        // Le service s'occupe de la validation et de la création
+        employeService.createEmploye(idCandidature, matricule, hiringDate, statusEmployer);
 
         return "redirect:/employes";
     }

@@ -1,45 +1,34 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.model.Departement;
-import com.example.sirh.model.Utilisateur;
-import com.example.sirh.repository.DepartementRepository;
-import com.example.sirh.repository.EmployeRepository;
-import com.example.sirh.repository.UtilisateurRepository;
+import com.example.sirh.service.DepartementService;
+import com.example.sirh.service.UtilisateurService;
+
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/departements")
+@AllArgsConstructor
 public class DepartementController {
 
-    private final DepartementRepository departementRepository;
-    private final UtilisateurRepository utilisateurRepository;
-    private final EmployeRepository employeRepository;
-
-    public DepartementController(DepartementRepository departementRepository,
-            UtilisateurRepository utilisateurRepository, EmployeRepository employeRepository) {
-        this.departementRepository = departementRepository;
-        this.utilisateurRepository = utilisateurRepository;
-        this.employeRepository = employeRepository;
-    }
+    // On injecte uniquement les Services
+    private final DepartementService departementService;
+    private final UtilisateurService utilisateurService;
 
     @GetMapping
     public String index(Model model) {
-        model.addAttribute("departements", departementRepository.findAll());
+        model.addAttribute("departements", departementService.getAllDepartements());
         return "departement/index";
     }
 
     @GetMapping("/create")
     public String create(Model model) {
-        List<Utilisateur> managers = utilisateurRepository.findAll().stream()
-                .filter(u -> "MANAGER".equalsIgnoreCase(u.getRole().getLibelle()))
-                .toList();
-        model.addAttribute("managers", managers);
+        model.addAttribute("managers", utilisateurService.getManagers());
         model.addAttribute("departement", new Departement());
         return "departement/form";
     }
@@ -49,39 +38,29 @@ public class DepartementController {
             @RequestParam String titre,
             @RequestParam(required = false) Integer idManager,
             Model model) {
-
-        // VALIDATION SERVEUR : Vérification de l'unicité
-        if (departementRepository.existsByTitreIgnoreCase(titre.trim())) {
-            model.addAttribute("error", "Un département avec ce titre existe déjà.");
-            model.addAttribute("managers", utilisateurRepository.findAll().stream()
-                    .filter(u -> "MANAGER".equalsIgnoreCase(u.getRole().getLibelle()))
-                    .toList());
+        try {
+            departementService.createDepartement(titre, idManager);
+            return "redirect:/departements";
+        } catch (IllegalArgumentException e) {
+            // En cas d'erreur (ex: titre déjà existant)
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("managers", utilisateurService.getManagers());
+            
+            // On garde la saisie de l'utilisateur
             Departement dep = new Departement();
             dep.setTitre(titre);
             model.addAttribute("departement", dep);
-            return "departement/form"; // Retour au formulaire avec l'erreur
+            
+            return "departement/form";
         }
-
-        Departement departement = new Departement();
-        departement.setTitre(titre.trim());
-
-        if (idManager != null) {
-            utilisateurRepository.findById(idManager).ifPresent(departement::setManager);
-        }
-
-        departementRepository.save(departement);
-        return "redirect:/departements";
     }
 
-    /** GET /departements/{id} - Fiche détail. */
     @GetMapping("/{id}")
     public String show(@PathVariable Integer id, Model model) {
-        Departement departement = departementRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Département introuvable"));
-
-        // Récupération du vrai nombre d'employés
-        long nombreEmployes = employeRepository
-                .countByCandidature_DemandeRecrutement_Poste_Departement_IdDepartement(id);
+        Departement departement = departementService.getById(id);
+        
+        // Appel au service pour compter les employés
+        long nombreEmployes = departementService.countEmployesByDepartement(id);
 
         model.addAttribute("departement", departement);
         model.addAttribute("nombreEmployes", nombreEmployes);
@@ -91,11 +70,8 @@ public class DepartementController {
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Integer id, Model model) {
-        Departement departement = departementRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Département introuvable"));
-        model.addAttribute("managers", utilisateurRepository.findAll().stream()
-                .filter(u -> "MANAGER".equalsIgnoreCase(u.getRole().getLibelle()))
-                .toList());
+        Departement departement = departementService.getById(id);
+        model.addAttribute("managers", utilisateurService.getManagers());
         model.addAttribute("departement", departement);
         return "departement/form";
     }
@@ -106,49 +82,28 @@ public class DepartementController {
             @RequestParam String titre,
             @RequestParam(required = false) Integer idManager,
             Model model) {
-
-        Departement departement = departementRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Département introuvable"));
-
-        // VALIDATION SERVEUR : Vérification de l'unicité (en excluant l'ID actuel)
-        if (departementRepository.existsByTitreIgnoreCaseAndIdDepartementNot(titre.trim(), id)) {
-            model.addAttribute("error", "Un autre département porte déjà ce titre.");
-            model.addAttribute("managers", utilisateurRepository.findAll().stream()
-                    .filter(u -> "MANAGER".equalsIgnoreCase(u.getRole().getLibelle()))
-                    .toList());
-            // On garde les modifications temporaires pour ne pas perdre la saisie
-            departement.setTitre(titre);
-            model.addAttribute("departement", departement);
+        try {
+            departementService.updateDepartement(id, titre, idManager);
+            return "redirect:/departements";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("managers", utilisateurService.getManagers());
+            
+            // On garde les modifications temporaires
+            Departement dep = departementService.getById(id);
+            dep.setTitre(titre); 
+            model.addAttribute("departement", dep);
+            
             return "departement/form";
         }
-
-        departement.setTitre(titre.trim());
-
-        if (idManager != null) {
-            utilisateurRepository.findById(idManager).ifPresent(departement::setManager);
-        } else {
-            departement.setManager(null);
-        }
-
-        departementRepository.save(departement);
-        return "redirect:/departements";
     }
 
-    // -----------------------------------------------------------------
-    // API POUR LA VALIDATION JAVASCRIPT (AJAX)
-    // -----------------------------------------------------------------
     @GetMapping("/check-titre")
     @ResponseBody
     public boolean checkTitreDisponible(
             @RequestParam String titre,
             @RequestParam(required = false) Integer idDepartement) {
-
-        if (idDepartement == null) {
-            // Création
-            return !departementRepository.existsByTitreIgnoreCase(titre.trim());
-        } else {
-            // Modification
-            return !departementRepository.existsByTitreIgnoreCaseAndIdDepartementNot(titre.trim(), idDepartement);
-        }
+        // Le service gère la logique de vérification
+        return departementService.isTitreDisponible(titre, idDepartement);
     }
 }
