@@ -151,6 +151,7 @@ body::-webkit-scrollbar {
   z-index: 2;
   transition: opacity 0.2s ease;
 }
+.effectif-wrapper:hover .effectif-short { opacity: 0; }
 
 .effectif-full {
   position: absolute;
