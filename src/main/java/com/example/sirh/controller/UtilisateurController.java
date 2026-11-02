@@ -20,6 +20,6 @@ public class UtilisateurController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        return "redirect:/demandes"; // Renvoie templates/dashboard.html
+        return "utilisateur/dashboard"; // Renvoie templates/dashboard.html
     }
 }

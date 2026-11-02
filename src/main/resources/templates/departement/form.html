@@ -1,66 +1,70 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="app-page">
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-2xl mx-auto flex flex-col gap-6 w-full">
 
-        <div class="mb-4">
-            <a th:href="@{/departements}" class="back-link">&larr; Retour à la liste</a>
-            <h2 class="page-title" th:text="${departement.idDepartement == null ? 'Nouveau Département' : 'Modifier le Département'}"></h2>
+        <!-- En-tête -->
+        <div>
+            <a th:href="@{/departements}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
+                &larr; Retour à la liste
+            </a>
+            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" 
+                th:text="${departement.idDepartement == null ? 'Nouveau Département' : 'Modifier le Département'}">
+            </h2>
         </div>
 
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="card-x">
-                    <div class="p-4">
+        <!-- Carte du formulaire -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="p-6 md:p-8">
+                
+                <!-- Message d'erreur serveur -->
+                <div th:if="${error}" class="mb-6 p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${error}"></div>
 
-                        <!-- Message d'erreur serveur -->
-                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                <form th:action="${departement.idDepartement == null} ? @{/departements} : @{/departements/{id}(id=${departement.idDepartement})}" 
+                      method="post" id="departementForm" novalidate>
 
-                        <!-- Formulaire avec gestion du PUT via _method -->
-                        <form th:action="${departement.idDepartement == null} ? @{/departements} : @{/departements/{id}(id=${departement.idDepartement})}" 
-                              method="post" 
-                              id="departementForm"
-                              novalidate>
+                    <!-- Champ caché pour simuler le PUT -->
+                    <input type="hidden" name="_method" value="put" th:if="${departement.idDepartement != null}">
 
-                            <!-- Champ caché pour simuler le PUT -->
-                            <input type="hidden" name="_method" value="put" th:if="${departement.idDepartement != null}">
-
-                            <!-- Titre -->
-                            <div class="mb-4">
-                                <label for="titre" class="form-label">Titre du département <span class="req">*</span></label>
-                                <input type="text" class="form-control" id="titre" name="titre" 
-                                       th:value="${departement.titre}" required>
-                                <div class="invalid-feedback" id="titreError">
-                                    Veuillez saisir un titre unique.
-                                </div>
-                            </div>
-
-                            <!-- Manager -->
-                            <div class="mb-4">
-                                <label for="idManager" class="form-label">Manager assigné</label>
-                                <select class="form-select" id="idManager" name="idManager">
-                                    <option value="">— Aucun —</option>
-                                    <option th:each="manager : ${managers}" 
-                                            th:value="${manager.idUtilisateur}" 
-                                            th:text="${manager.nom}"
-                                            th:selected="${departement.manager != null and departement.manager.idUtilisateur == manager.idUtilisateur}">
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top" style="border-color: var(--surface-high) !important;">
-                                <a th:href="@{/departements}" class="btn-soft me-3">Annuler</a>
-                                <button type="submit" class="btn-brand" id="btnSubmit">Enregistrer</button>
-                            </div>
-                        </form>
+                    <!-- Titre -->
+                    <div class="mb-6">
+                        <label for="titre" class="block text-sm font-semibold text-on-surface mb-2">
+                            Titre du département <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="titre" name="titre" th:value="${departement.titre}" required
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <!-- Message d'erreur JS -->
+                        <p class="mt-2 text-xs text-red-500 hidden" id="titreError">Veuillez saisir un titre unique.</p>
                     </div>
-                </div>
+
+                    <!-- Manager -->
+                    <div class="mb-8">
+                        <label for="idManager" class="block text-sm font-semibold text-on-surface mb-2">Manager assigné</label>
+                        <select id="idManager" name="idManager"
+                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option value="">— Aucun —</option>
+                            <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}" th:text="${manager.nom}"
+                                    th:selected="${departement.manager != null and departement.manager.idUtilisateur == manager.idUtilisateur}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high">
+                        <a th:href="@{/departements}" class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high flex items-center">
+                            Annuler
+                        </a>
+                        <button type="submit" id="btnSubmit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <!-- SCRIPT DE VALIDATION JAVASCRIPT -->
+        <!-- SCRIPT DE VALIDATION JAVASCRIPT (Adapté pour Tailwind) -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const form = document.getElementById('departementForm');
@@ -77,7 +81,8 @@
                     const titreValue = titreInput.value.trim();
 
                     if (titreValue === "") {
-                        titreInput.classList.add('is-invalid');
+                        titreInput.classList.add('border-red-500');
+                        titreError.classList.remove('hidden');
                         titreError.textContent = "Le titre est obligatoire.";
                         return;
                     }
@@ -97,10 +102,11 @@
                             btnSubmit.textContent = "Enregistrer";
 
                             if (isUnique) {
-                                titreInput.classList.remove('is-invalid');
+                                titreInput.classList.remove('border-red-500');
                                 form.submit(); 
                             } else {
-                                titreInput.classList.add('is-invalid');
+                                titreInput.classList.add('border-red-500');
+                                titreError.classList.remove('hidden');
                                 titreError.textContent = "Ce titre de département est déjà utilisé.";
                             }
                         })
@@ -113,7 +119,8 @@
                 });
 
                 titreInput.addEventListener('input', function() {
-                    titreInput.classList.remove('is-invalid');
+                    titreInput.classList.remove('border-red-500');
+                    titreError.classList.add('hidden');
                 });
             });
         </script>

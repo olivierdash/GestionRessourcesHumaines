@@ -1,95 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" class="h-100">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" class="h-full">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRH Pro - Connexion sécurisée</title>
 
-    <!-- Fichiers locaux -->
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <!-- 1. Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: "#00236f",
+                        "primary-container": "#1e3a8a",
+                        background: "#faf8ff",
+                        surface: "#ffffff",
+                        "surface-low": "#f2f3ff",
+                        "on-surface": "#131b2e",
+                        outline: "#757682",
+                        error: "#ba1a1a"
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- 2. Ton fichier styles.css (pour les polices et animations) -->
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
     <style>
-        body { background-color: var(--primary-blue); height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 100%; max-width: 400px; padding: 2rem; border-radius: 12px; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 
-<body class="bg-canvas">
+<body class="bg-background h-full font-sans antialiased text-on-surface">
 
-    <!-- Conteneur des messages Spring Security (flottants en haut) -->
-    <div class="login-messages-container">
-        <div th:if="${param.error}" class="alert alert-danger alert-floating auto-dismiss-alert">
+    <!-- Conteneur des messages Spring Security (flottants) -->
+    <div class="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-md z-50 pointer-events-none px-4">
+        <div th:if="${param.error}" class="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 text-center text-sm font-medium shadow-sm alert-floating auto-dismiss-alert">
             Email ou mot de passe incorrect.
         </div>
-        <div th:if="${param.logout}" class="alert alert-success alert-floating auto-dismiss-alert">
+        <div th:if="${param.logout}" class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-center text-sm font-medium shadow-sm alert-floating auto-dismiss-alert">
             Vous avez été déconnecté avec succès.
         </div>
     </div>
 
     <!-- WRAPPER DE CENTRAGE -->
-    <div class="d-flex justify-content-center align-items-center min-vh-100 w-100 p-3">
+    <div class="flex justify-center items-center min-h-screen w-full p-4">
 
         <!-- La Carte (Card) du formulaire -->
-        <div class="login-card">
-            <div class="mx-auto w-100" style="max-width: 380px;">
+        <div class="bg-white rounded-2xl border border-gray-100 w-full max-w-md p-8">
+            
+            <!-- En-tête -->
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold text-on-surface tracking-tight mb-2">Connexion</h1>
+                <p class="text-sm text-outline">Accédez à votre espace RH sécurisé.</p>
+            </div>
 
-                <!-- En-tête -->
-                <div class="mb-5 text-center">
-                    <h1 class="fw-bold text-main" style="font-size: 28px; letter-spacing: -0.5px;">Connexion</h1>
-                    <p class="text-muted text-small mt-1">Accédez à votre espace RH sécurisé.</p>
+            <!-- Formulaire -->
+            <form th:action="@{/login}" method="post" id="loginForm" class="space-y-6">
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-semibold text-on-surface mb-2">
+                        Adresse email <span class="text-error">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="ms absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">mail</span>
+                        <input type="email" id="email" name="email" required autofocus
+                            class="w-full h-12 pl-12 pr-4 bg-surface-low border border-transparent rounded-xl text-sm text-on-surface placeholder-outline focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+                            placeholder="prenom.nom@entreprise.com" value="bob@sirh.com">
+                    </div>
                 </div>
 
-                <!-- Formulaire -->
-                <form th:action="@{/login}" method="post" class="needs-validation" novalidate id="loginForm">
-
-                    <!-- Email -->
-                    <div class="mb-4">
-                        <label for="email" class="form-label">
-                            Adresse email <span class="text-error">*</span>
-                        </label>
-                        <div class="input-icon-wrapper">
-                            <span class="ms">mail</span>
-                            <input type="email" id="email" name="email" class="form-control" required autofocus
-                                placeholder="prenom.nom@entreprise.com" value="bob@sirh.com">
-                            <div class="invalid-feedback">
-                                Veuillez saisir une adresse email valide.
-                            </div>
-                        </div>
+                <!-- Mot de passe -->
+                <div>
+                    <label for="motDePasse" class="block text-sm font-semibold text-on-surface mb-2">
+                        Mot de passe <span class="text-error">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="ms absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px] pointer-events-none">lock</span>
+                        <input type="password" id="motDePasse" name="motDePasse" required
+                            class="w-full h-12 pl-12 pr-4 bg-surface-low border border-transparent rounded-xl text-sm text-on-surface placeholder-outline focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+                            placeholder="••••••••••••" value="123">
                     </div>
+                </div>
 
-                    <!-- Mot de passe -->
-                    <div class="mb-4">
-                        <label for="motDePasse" class="form-label">
-                            Mot de passe <span class="text-error">*</span>
-                        </label>
-                        <div class="input-icon-wrapper">
-                            <span class="ms">lock</span>
-                            <input type="password" id="motDePasse" name="motDePasse" class="form-control" required
-                                placeholder="••••••••••••" value="123">
-                            <div class="invalid-feedback">
-                                Le mot de passe est obligatoire.
-                            </div>
-                        </div>
-                    </div>
+                <!-- Bouton -->
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full h-12 bg-primary-container hover:bg-primary text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 transition-colors duration-200 shadow-sm">
+                        Se connecter
+                        <span class="ms" style="font-size: 20px;">arrow_forward</span>
+                    </button>
+                </div>
+            </form>
 
-                    <!-- Bouton -->
-                    <div class="pt-3">
-                        <button type="submit"
-                            class="btn-brand w-100 d-flex align-items-center justify-content-center gap-2">
-                            Se connecter
-                            <span class="ms" style="font-size: 20px;">arrow_forward</span>
-                        </button>
-                    </div>
-                </form>
-
-            </div>
         </div>
-
     </div>
 
-    <!-- SCRIPT 1 : Disparition des alertes -->
+    <!-- SCRIPT : Disparition des alertes -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const alerts = document.querySelectorAll('.auto-dismiss-alert');
@@ -102,20 +116,5 @@
         });
     </script>
 
-    <!-- SCRIPT 2 : Validation Bootstrap -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.getElementById('loginForm');
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    </script>
-
 </body>
-
 </html>

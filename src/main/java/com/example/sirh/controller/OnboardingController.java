@@ -80,6 +80,6 @@ public class OnboardingController {
         model.addAttribute("taches", onboardingService.taches(onboarding.getId()));
         model.addAttribute("progression", onboardingService.progression(onboarding.getId()));
         model.addAttribute("typesDocument", typeDocumentRepository.findAll());
-        return "bloc4/onboarding/checklist";
+        return "onboarding/checklist";
     }
 }
