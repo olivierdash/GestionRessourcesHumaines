@@ -1,72 +1,64 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="fr"
-      th:replace="~{dashboard :: layout(content=~{::mainContent})}">
-
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
-<main th:fragment="mainContent" class="app-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="page-title">Grilles salariales</h2>
-            <p class="text-outline">
-                Gérez les fourchettes salariales par poste.
-            </p>
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Grilles salariales</h2>
+                <p class="text-sm text-on-surface-variant mt-1">Gérez les fourchettes salariales par poste.</p>
+            </div>
+            <a th:href="@{/grilles/create}" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Nouvelle grille
+            </a>
         </div>
 
-        <a th:href="@{/grilles/create}" class="btn-brand">
-            Nouvelle grille
-        </a>
-    </div>
-
-    <div th:if="${#lists.isEmpty(grilles)}"
-         class="alert alert-info">
-        Aucune grille salariale n'est enregistrée.
-    </div>
-
-    <div th:if="${!#lists.isEmpty(grilles)}" class="card-x">
-        <div class="table-responsive">
-            <table class="table table-x">
-                <thead>
-                <tr>
-                    <th>Poste</th>
-                    <th>Département</th>
-                    <th>Salaire minimum</th>
-                    <th>Salaire moyen</th>
-                    <th>Salaire maximum</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr th:each="grille : ${grilles}">
-                    <td th:text="${grille.poste.intitule}"></td>
-
-                    <td th:text="${grille.departement.titre}"></td>
-
-                    <td th:text="${grille.salaireMin}"></td>
-
-                    <td th:text="${grille.salaireMoyen}"></td>
-
-                    <td th:text="${grille.salaireMax}"></td>
-
-                    <td class="text-end text-nowrap">
-                        <a th:href="@{/grilles/{id}(id=${grille.idGrille})}"
-                           class="btn-soft btn-sm-x">
-                            Consulter
-                        </a>
-
-                        <a th:href="@{/grilles/{id}/edit(id=${grille.idGrille})}"
-                           class="btn-brand btn-sm-x">
-                            Modifier
-                        </a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <!-- Message vide -->
+        <div th:if="${#lists.isEmpty(grilles)}" class="p-4 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-sm font-medium">
+            Aucune grille salariale n'est enregistrée.
         </div>
-    </div>
 
-</main>
+        <!-- Tableau -->
+        <div th:if="${!#lists.isEmpty(grilles)}" class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Département</th>
+                            <th scope="col">Salaire minimum</th>
+                            <th scope="col">Salaire moyen</th>
+                            <th scope="col">Salaire maximum</th>
+                            <th scope="col" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="grille : ${grilles}">
+                            <td class="font-medium text-on-surface" th:text="${grille.poste.intitule}"></td>
+                            <td th:text="${grille.departement.titre}"></td>
+                            <td class="font-mono" th:text="${grille.salaireMin}"></td>
+                            <td class="font-mono" th:text="${grille.salaireMoyen}"></td>
+                            <td class="font-mono" th:text="${grille.salaireMax}"></td>
+                            <td class="text-right whitespace-nowrap">
+                                <a th:href="@{/grilles/{id}(id=${grille.idGrille})}" 
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-xs transition-colors border border-surface-container-high">
+                                    Consulter
+                                </a>
+                                <a th:href="@{/grilles/{id}/edit(id=${grille.idGrille})}" 
+                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-xs transition-colors shadow-sm ml-2">
+                                    Modifier
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
 </body>
 </html>
