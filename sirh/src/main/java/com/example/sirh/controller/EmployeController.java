@@ -1,7 +1,9 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.model.Employe;
+import com.example.sirh.service.AffectationService;
 import com.example.sirh.service.CandidatureService;
+import com.example.sirh.service.ContratService;
 import com.example.sirh.service.EmployeService;
 import com.example.sirh.service.EmbaucheService;
 
@@ -24,7 +26,8 @@ public class EmployeController {
 
     private final EmployeService employeService;
     private final CandidatureService candidatureService;
-    private final EmbaucheService embaucheService;
+    private final ContratService contratService;
+    private final AffectationService affectationService;
 
     @GetMapping
     public String index(
@@ -52,22 +55,6 @@ public class EmployeController {
         // Appel au service de candidature
         model.addAttribute("candidatures", candidatureService.getCandidaturesSansEmploye());
         return "employe/form";
-    }
-
-    // -----------------------------------------------------------------
-    // CREATE (POST) : Enregistrer le nouvel employé
-    // -----------------------------------------------------------------
-    @PostMapping
-    public String store(
-            @RequestParam Integer idCandidature,
-            @RequestParam String matricule,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hiringDate,
-            @RequestParam String statusEmployer) {
-
-        // Le service s'occupe de la validation et de la création
-        employeService.createEmploye(idCandidature, matricule, hiringDate, statusEmployer);
-
-        return "redirect:/employes";
     }
 
         /** Fiche salarié avec matricule, contrat et affectation. */

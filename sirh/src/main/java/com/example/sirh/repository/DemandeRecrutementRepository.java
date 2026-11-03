@@ -1,9 +1,9 @@
 package com.example.sirh.repository;
 
+import com.example.sirh.dto.DemandeRecrutementFilter;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.model.DemandeRecrutement;
 import com.example.sirh.model.MotifDemande;
-import com.example.sirh.wrapper.DemandeRecrutementFilter;
 
 import java.util.List;
 
@@ -70,4 +70,20 @@ public interface DemandeRecrutementRepository
     List<DemandeRecrutement> findDemandesSansOffre();
 
     List<DemandeRecrutement> findByEtatDemandeIntituleIgnoreCaseOrderByDateCreationDesc(String intitule);
+
+    @Query("""
+                SELECT d FROM DemandeRecrutement d
+                JOIN FETCH d.poste p
+                JOIN FETCH p.departement dep
+                JOIN FETCH d.manager m
+                JOIN FETCH d.motif mo
+                WHERE d.etatDemande.intitule = 'Valide'
+                  AND p.idPoste = COALESCE(:#{#filter.idPoste}, p.idPoste)
+                  AND dep.idDepartement = COALESCE(:#{#filter.idDepartement}, dep.idDepartement)
+                  AND d.idDemandeRecrutement NOT IN (
+                      SELECT o.demandeRecrutement.idDemandeRecrutement FROM OffreEmploi o
+                  )
+                ORDER BY d.dateCreation DESC
+            """)
+    List<DemandeRecrutement> getAllDemandeValide(@Param("filter") DemandeRecrutementFilter filter);
 }

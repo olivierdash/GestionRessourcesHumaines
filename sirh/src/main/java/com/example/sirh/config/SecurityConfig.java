@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,8 +29,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
                         .requestMatchers("/login", "/utilisateur/login").permitAll()
+
+                        // Mêmes rôles que les liens de la sidebar
                         .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
                         .requestMatchers("/propositions/**").hasAnyRole("RH", "FINANCE", "DG")
+                        .requestMatchers("/offres/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/candidatures/**").hasAnyRole("RH", "MANAGER")
+                        .requestMatchers("/employes/**").hasAnyRole("MANAGER", "RH", "DG")
+                        .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
+
                         .anyRequest().authenticated())
 
                 .formLogin(form -> form
