@@ -47,7 +47,7 @@
         <div class="relative flex items-center justify-center mb-6">
             <!-- Le code d'erreur en très grand (404, 500...) -->
             <span class="text-[120px] leading-none font-bold tracking-tighter text-surface-mid select-none" 
-                  th:text="${status != null ? status : '500'}">404</span>
+                  th:text="${status != null ? status : '500'}"></span>
             
             <!-- L'illustration SVG superposée -->
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -69,8 +69,7 @@
         </h1>
         
         <p class="text-base text-outline mb-8 max-w-lg leading-relaxed" 
-           th:text="${message != null ? message : 'La fiche collaborateur, le document contractuel ou la demande de recrutement demandée n''existe plus ou a été archivée.'}">
-            La fiche collaborateur, le document contractuel ou la demande de recrutement demandée n'existe plus ou a été archivée.
+           th:text="${message != null ? message : ''}">
         </p>
 
         <!-- Bouton -->

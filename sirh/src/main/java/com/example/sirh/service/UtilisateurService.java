@@ -42,11 +42,6 @@ public class UtilisateurService {
                         "Utilisateur introuvable avec l'email : " + email));
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Utilisateur> findByEmail(String email) {
-        return utilisateurRepository.findByEmail(email);
-    }
-
     /**
      * Utilisé par OnboardingService.creerTache pour trouver le responsable
      * d'une tâche à partir du libellé de son rôle.
@@ -56,15 +51,5 @@ public class UtilisateurService {
         return utilisateurRepository.findFirstByRoleLibelle(libelle)
                 .orElseThrow(() -> new IllegalStateException(
                         "Aucun utilisateur avec le rôle " + libelle));
-    }
-
-    /**
-     * Conservé pour EvaluationController (factice) — à supprimer dès que
-     * l'évaluateur viendra de @AuthenticationPrincipal.
-     */
-    @Transactional(readOnly = true)
-    public Utilisateur getFirstUtilisateur() {
-        return utilisateurRepository.findAll().stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("Aucun utilisateur en base pour évaluer."));
     }
 }

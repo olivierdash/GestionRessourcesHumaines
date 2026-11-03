@@ -24,6 +24,7 @@ public class EmbaucheService {
     private final EmployeService employeService;
     private final ContratService contratService;
     private final TypeContratService typeContratService;
+    private final AffectationService affectationService;
 
     /**
      * Bouton « Créer dossier » : matricule + employé + contrat + affectation en UNE transaction.
@@ -79,7 +80,7 @@ public class EmbaucheService {
                 .salaireMensuel(salaire)
                 .build());
 
-        employeService.saveAffectation(Affectation.builder()
+        affectationService.save(Affectation.builder()
                 .employe(employe)
                 .poste(poste)
                 .dateDebut(dateDebut)
@@ -96,15 +97,5 @@ public class EmbaucheService {
     @Transactional(readOnly = true)
     public Employe getEmploye(Integer idEmployer) {
         return employeService.getById(idEmployer);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Contrat> contratsDe(Integer idEmployer) {
-        return contratService.historique(idEmployer);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Affectation> affectationsDe(Integer idEmployer) {
-        return employeService.affectationsDe(idEmployer);
     }
 }

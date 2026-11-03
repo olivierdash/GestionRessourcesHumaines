@@ -1,8 +1,6 @@
 package com.example.sirh.service;
 
-import com.example.sirh.model.Departement;
 import com.example.sirh.model.GrilleSalarial;
-import com.example.sirh.model.Poste;
 import com.example.sirh.repository.GrilleSalarialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +16,6 @@ import java.util.Optional;
 public class GrilleSalarialService {
 
     private final GrilleSalarialRepository grilleRepository;
-    private final PosteService posteService;
-    private final DepartementService departementService;
 
     @Transactional(readOnly = true)
     public List<GrilleSalarial> lister() {
@@ -33,14 +29,20 @@ public class GrilleSalarialService {
                         "Grille salariale introuvable : " + id));
     }
 
-    public GrilleSalarial creer(
-            Integer idPoste,
-            Integer idDepartement,
-            BigDecimal salaireMin,
-            BigDecimal salaireMax,
-            BigDecimal salaireMoyen) {
+    /**
+     * Crée une nouvelle grille. L'entité doit déjà porter un Poste et un
+     * Departement managés (chargés par le controller via leurs services).
+     * L'idGrille doit être null (autogénéré).
+     */
+    public GrilleSalarial creer(GrilleSalarial grille) {
+        if (grille == null) {
+            throw new IllegalArgumentException("Grille salariale requise.");
+        }
 
-        verifierMontants(salaireMin, salaireMax, salaireMoyen);
+        verifierMontants(grille);
+
+        Integer idPoste = grille.getPoste().getIdPoste();
+        Integer idDepartement = grille.getDepartement().getIdDepartement();
 
         if (grilleRepository.existsByPosteIdPosteAndDepartementIdDepartement(
                 idPoste, idDepartement)) {
@@ -48,53 +50,44 @@ public class GrilleSalarialService {
                     "Une grille existe déjà pour ce poste et ce département.");
         }
 
-        Poste poste = posteService.getById(idPoste);
-        Departement departement = departementService.getById(idDepartement);
-
-        GrilleSalarial grille = GrilleSalarial.builder()
-                .poste(poste)
-                .departement(departement)
-                .salaireMin(salaireMin)
-                .salaireMax(salaireMax)
-                .salaireMoyen(salaireMoyen)
-                .build();
-
         return grilleRepository.save(grille);
     }
 
-    public GrilleSalarial modifier(
-            Integer id,
-            Integer idPoste,
-            Integer idDepartement,
-            BigDecimal salaireMin,
-            BigDecimal salaireMax,
-            BigDecimal salaireMoyen) {
+    /**
+     * Modifie une grille existante. L'entité passée porte l'idGrille à
+     * modifier ainsi que les nouvelles valeurs (poste, departement, salaires).
+     * Les entités Poste/Departement doivent être managées.
+     */
+    public GrilleSalarial modifier(GrilleSalarial grille) {
+        if (grille == null) {
+            throw new IllegalArgumentException("Grille salariale requise.");
+        }
 
-        verifierMontants(salaireMin, salaireMax, salaireMoyen);
+        verifierMontants(grille);
 
         if (grilleRepository.existsByPosteIdPosteAndDepartementIdDepartementAndIdGrilleNot(
-                idPoste, idDepartement, id)) {
+                grille.getPoste().getIdPoste(),
+                grille.getDepartement().getIdDepartement(),
+                grille.getIdGrille())) {
             throw new IllegalArgumentException(
                     "Une autre grille existe déjà pour ce poste et ce département.");
         }
 
-        GrilleSalarial grille = trouver(id);
-        Poste poste = posteService.getById(idPoste);
-        Departement departement = departementService.getById(idDepartement);
+        GrilleSalarial existing = trouver(grille.getIdGrille());
 
-        grille.setPoste(poste);
-        grille.setDepartement(departement);
-        grille.setSalaireMin(salaireMin);
-        grille.setSalaireMax(salaireMax);
-        grille.setSalaireMoyen(salaireMoyen);
+        existing.setPoste(grille.getPoste());
+        existing.setDepartement(grille.getDepartement());
+        existing.setSalaireMin(grille.getSalaireMin());
+        existing.setSalaireMax(grille.getSalaireMax());
+        existing.setSalaireMoyen(grille.getSalaireMoyen());
 
-        return grilleRepository.save(grille);
+        return grilleRepository.save(existing);
     }
 
-    private void verifierMontants(
-            BigDecimal salaireMin,
-            BigDecimal salaireMax,
-            BigDecimal salaireMoyen) {
+    private void verifierMontants(GrilleSalarial grille) {
+        BigDecimal salaireMin = grille.getSalaireMin();
+        BigDecimal salaireMax = grille.getSalaireMax();
+        BigDecimal salaireMoyen = grille.getSalaireMoyen();
 
         if (salaireMin == null || salaireMax == null || salaireMoyen == null) {
             throw new IllegalArgumentException("Tous les montants sont obligatoires.");
@@ -106,10 +99,10 @@ public class GrilleSalarialService {
             throw new IllegalArgumentException(
                     "Le salaire maximum doit être supérieur au minimum.");
         }
-        if (salaireMoyen.compareTo(salaireMin) < 0 || salaireMoyen.compareTo(salaireMax) > 0) {
-            throw new IllegalArgumentException(
-                    "Le salaire moyen doit être compris dans la fourchette.");
-        }
+        // if (salaireMoyen.compareTo(salaireMin) < 0 || salaireMoyen.compareTo(salaireMax) > 0) {
+        //     throw new IllegalArgumentException(
+        //             "Le salaire moyen doit être compris dans la fourchette.");
+        // }
     }
 
     @Transactional(readOnly = true)
@@ -119,10 +112,6 @@ public class GrilleSalarialService {
                 idPoste, idDepartement);
     }
 
-    /**
-     * Utilisé par ContratService.verifierSalaire — la grille par poste seul
-     * (sans département) reste la référence légale historique.
-     */
     @Transactional(readOnly = true)
     public Optional<GrilleSalarial> getGrillePourPoste(Integer idPoste) {
         return grilleRepository.findFirstByPosteIdPoste(idPoste);

@@ -8,7 +8,7 @@ import com.example.sirh.model.StatutProposition;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.model.ValidationProposition;
 import com.example.sirh.repository.PropositionEmbaucheRepository;
-import com.example.sirh.repository.ValidationPropositionRepository;
+import com.example.sirh.service.ValidationPropositionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ public class PropositionService {
 
     private final PropositionEmbaucheRepository propositionRepo;
     // ValidationProposition est une entité enfant de PropositionEmbauche -> garde son repo
-    private final ValidationPropositionRepository validationRepo;
+    private final ValidationPropositionService validationPropositionService;
 
     private final StatutPropositionService statutPropositionService;
     private final CandidatureService candidatureService;
@@ -55,11 +55,6 @@ public class PropositionService {
         PropositionEmbauche p = charger(id);
         appliquerExpiration(p);
         return p;
-    }
-
-    @Transactional(readOnly = true)
-    public List<ValidationProposition> historiqueValidations(Integer idProposition) {
-        return validationRepo.findByPropositionIdPropositionOrderByIdDesc(idProposition);
     }
 
     /** Retourne un message d'alerte si le salaire est hors grille (ou sans grille), sinon null. */
@@ -146,7 +141,7 @@ public class PropositionService {
                     "Un commentaire est obligatoire pour refuser.");
         }
 
-        validationRepo.save(ValidationProposition.builder()
+        validationPropositionService.save(ValidationProposition.builder()
                 .proposition(p)
                 .validateur(validateur)
                 .departement(p.getCandidature().getDemandeRecrutement().getPoste().getDepartement())

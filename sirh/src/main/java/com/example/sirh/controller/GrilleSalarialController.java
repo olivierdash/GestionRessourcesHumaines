@@ -1,6 +1,8 @@
 package com.example.sirh.controller;
 
+import com.example.sirh.model.Departement;
 import com.example.sirh.model.GrilleSalarial;
+import com.example.sirh.model.Poste;
 import com.example.sirh.service.DepartementService;
 import com.example.sirh.service.GrilleSalarialService;
 import com.example.sirh.service.PosteService;
@@ -18,8 +20,8 @@ import java.math.BigDecimal;
 public class GrilleSalarialController {
 
     private final GrilleSalarialService grilleService;
-    private final PosteService posteService;             // Injection du Service au lieu du Repository
-    private final DepartementService departementService; // Injection du Service au lieu du Repository
+    private final PosteService posteService;
+    private final DepartementService departementService;
 
     @GetMapping
     public String index(Model model) {
@@ -29,33 +31,32 @@ public class GrilleSalarialController {
 
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("grille", new GrilleSalarial());
+        if (!model.containsAttribute("grille")) {
+            GrilleSalarial grille = new GrilleSalarial();
+            grille.setPoste(new Poste());
+            grille.setDepartement(new Departement());
+            model.addAttribute("grille", grille);
+        }
         model.addAttribute("postes", posteService.getAllPostes());
         model.addAttribute("departements", departementService.getAllDepartements());
         return "grille/form";
     }
 
     @PostMapping
-    public String store(
-            @RequestParam Integer idPoste,
-            @RequestParam Integer idDepartement,
-            @RequestParam BigDecimal salaireMin,
-            @RequestParam BigDecimal salaireMax,
-            @RequestParam BigDecimal salaireMoyen,
-            RedirectAttributes redirect) {
-
+    public String store(GrilleSalarial grille, RedirectAttributes redirect) {
         try {
-            GrilleSalarial grille = grilleService.creer(
-                    idPoste,
-                    idDepartement,
-                    salaireMin,
-                    salaireMax,
-                    salaireMoyen);
+            Poste poste = posteService.getById(grille.getPoste().getIdPoste());
+            Departement departement = departementService.getById(grille.getDepartement().getIdDepartement());
 
-            return "redirect:/grilles/" + grille.getIdGrille();
+            grille.setPoste(poste);
+            grille.setDepartement(departement);
 
-        } catch (IllegalArgumentException e) {
+            GrilleSalarial saved = grilleService.creer(grille);
+            return "redirect:/grilles/" + saved.getIdGrille();
+
+        } catch (Exception e) {
             redirect.addFlashAttribute("error", e.getMessage());
+            redirect.addFlashAttribute("grille", grille);
             return "redirect:/grilles/create";
         }
     }
@@ -77,22 +78,14 @@ public class GrilleSalarialController {
     @PostMapping("/{id}")
     public String update(
             @PathVariable Integer id,
-            @RequestParam Integer idPoste,
-            @RequestParam Integer idDepartement,
-            @RequestParam BigDecimal salaireMin,
-            @RequestParam BigDecimal salaireMax,
-            @RequestParam BigDecimal salaireMoyen,
+            GrilleSalarial grille,
             RedirectAttributes redirect) {
 
         try {
-            grilleService.modifier(
-                    id,
-                    idPoste,
-                    idDepartement,
-                    salaireMin,
-                    salaireMax,
-                    salaireMoyen);
+            Poste poste = posteService.getById(grille.getPoste().getIdPoste());
+            Departement departement = departementService.getById(grille.getDepartement().getIdDepartement());
 
+            grilleService.modifier(grille);
             return "redirect:/grilles/" + id;
 
         } catch (IllegalArgumentException e) {

@@ -85,6 +85,11 @@
                     <span class="material-symbols-outlined text-[20px]">group</span>
                     <span class="text-sm">Candidats</span>
                 </a>
+                <a sec:authorize="hasAnyRole('FINANCE')" th:href="@{/grilles}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <span class="material-symbols-outlined text-[20px]">group</span>
+                    <span class="text-sm">Grilles</span>
+                </a>
+
                 <a sec:authorize="hasAnyRole('FINANCE', 'DG', 'RH')" th:href="@{/demandes/validations}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-[20px]">fact_check</span>

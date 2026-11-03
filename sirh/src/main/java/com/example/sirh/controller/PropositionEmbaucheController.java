@@ -4,6 +4,7 @@ import com.example.sirh.model.PropositionEmbauche;
 import com.example.sirh.service.CandidatureService;
 import com.example.sirh.service.EmbaucheService;
 import com.example.sirh.service.PropositionService;
+import com.example.sirh.service.ValidationPropositionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,7 @@ public class PropositionEmbaucheController {
     private final PropositionService propositionService;
     private final EmbaucheService embaucheService;
     private final CandidatureService candidatureService;
+    private final ValidationPropositionService validationPropositionService;
 
     /** Liste et suivi de toutes les propositions. */
     @GetMapping("/propositions")
@@ -62,7 +64,7 @@ public class PropositionEmbaucheController {
         PropositionEmbauche p = propositionService.getProposition(id);
         model.addAttribute("proposition", p);
         model.addAttribute("alerteGrille", propositionService.verifierGrille(p));
-        model.addAttribute("validations", propositionService.historiqueValidations(id));
+        model.addAttribute("validations", validationPropositionService.findByProposition(id));
         model.addAttribute("employe",
                 embaucheService.trouverEmploye(p.getCandidature().getIdCandidature()).orElse(null));
         return "propositions/show";
@@ -140,14 +142,5 @@ public class PropositionEmbaucheController {
             ra.addFlashAttribute("erreur", ex.getMessage());
             return "redirect:/propositions/" + id;
         }
-    }
-
-    /** Fiche salarié avec matricule, contrat et affectation. */
-    @GetMapping("/employes/{id}")
-    public String fiche(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("employe", embaucheService.getEmploye(id));
-        model.addAttribute("contrats", embaucheService.contratsDe(id));
-        model.addAttribute("affectations", embaucheService.affectationsDe(id));
-        return "employes/fiche";
     }
 }
