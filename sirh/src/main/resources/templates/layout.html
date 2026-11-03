@@ -73,7 +73,12 @@
                     <span class="material-symbols-outlined text-[20px]">dashboard</span>
                     <span class="text-sm">Tableau de bord</span>
                 </a>
-                <a th:href="@{/demandes}"
+                <a sec:authorize="hasAnyRole('ADMIN')" th:href="@{/admin/utilisateurs}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
+                    <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+                    <span class="text-sm">Utilisateurs</span>
+                </a>
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH')" th:href="@{/demandes}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
                     <span class="material-symbols-outlined text-[20px]">post_add</span>
                     <span class="text-sm">Demandes</span>
