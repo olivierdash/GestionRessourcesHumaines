@@ -86,4 +86,11 @@ public interface DemandeRecrutementRepository
                 ORDER BY d.dateCreation DESC
             """)
     List<DemandeRecrutement> getAllDemandeValide(@Param("filter") DemandeRecrutementFilter filter);
+
+    long countByEtatDemandeIntituleIn(List<String> intitules);
+    long countByEtatDemandeIntituleInAndManagerIdUtilisateur(List<String> intitules, Integer idManager);
+
+    // NOUVEAU : Limite dynamique pour la table
+    List<DemandeRecrutement> findAllByOrderByDateCreationDesc(Pageable pageable);
+    List<DemandeRecrutement> findByManagerIdUtilisateurOrderByDateCreationDesc(Integer idManager, Pageable pageable);
 }
