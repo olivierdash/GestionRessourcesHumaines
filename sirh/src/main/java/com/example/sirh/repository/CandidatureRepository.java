@@ -1,5 +1,6 @@
 package com.example.sirh.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,9 @@ public interface CandidatureRepository extends JpaRepository<Candidature, Intege
         WHERE e.idEmployer IS NULL
     """)
     List<Candidature> findCandidaturesSansEmploye();
+    long countByDateDepotCandidatureAfter(LocalDateTime date);
+    long countByDateDepotCandidatureAfterAndOffreDemandeRecrutementManagerIdUtilisateur(LocalDateTime date, Integer idManager);
+
+    List<Candidature> findByDateDepotCandidatureAfter(LocalDateTime date);
+    List<Candidature> findByDateDepotCandidatureAfterAndOffreDemandeRecrutementManagerIdUtilisateur(LocalDateTime date, Integer idManager);
 }

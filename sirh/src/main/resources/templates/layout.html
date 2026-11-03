@@ -68,7 +68,7 @@
             </div>
             <nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
                 <!-- Liens avec autorisations dynamiques (sec:authorize) -->
-                <a th:href="@{/}"
+                <a sec:authorize="!hasRole('ADMIN')" th:href="@{/utilisateur/dashboard}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-800 transition-colors text-blue-100 hover:text-white">
                     <span class="material-symbols-outlined text-[20px]">dashboard</span>
                     <span class="text-sm">Tableau de bord</span>

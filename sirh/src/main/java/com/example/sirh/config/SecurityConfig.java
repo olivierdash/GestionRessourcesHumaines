@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
                         .requestMatchers("/login", "/utilisateur/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/utilisateur/dashboard").hasAnyRole("RH", "FINANCE", "DG", "MANAGER")
                         .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
                         .requestMatchers("/propositions/**").hasAnyRole("RH", "FINANCE", "DG")
                         .requestMatchers("/offres/**").hasAnyRole("RH", "DG")

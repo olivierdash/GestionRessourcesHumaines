@@ -2,434 +2,168 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr" 
       th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
-
-    <!-- Le contenu spécifique au tableau de bord -->
-    <main th:fragment="mainContent">
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
         
-        <!-- Top Page Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
             <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="inline-block w-2 h-2 rounded-full bg-secondary"></span>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Vue d'ensemble • Q2 2024</span>
-                </div>
                 <h1 class="text-3xl font-bold text-on-surface tracking-tight">Tableau de bord</h1>
                 <p class="text-sm text-gray-500 mt-1">Bienvenue, voici l'état de vos recrutements aujourd'hui.</p>
             </div>
-            <div class="flex items-center gap-3">
-                <button class="h-10 px-4 rounded-lg bg-surface-low text-gray-700 hover:text-gray-900 hover:bg-surface-mid transition-colors text-sm font-medium flex items-center gap-2 shadow-sm">
-                    <span class="material-symbols-outlined text-[18px]">calendar_today</span>
-                    Mai 2024
-                </button>
-                <button class="h-10 px-4 rounded-lg bg-surface-low text-gray-700 hover:text-gray-900 hover:bg-surface-mid transition-colors text-sm font-medium flex items-center gap-2 shadow-sm">
-                    <span class="material-symbols-outlined text-[18px]">file_download</span>
-                    Exporter
-                </button>
-            </div>
         </div>
 
-        <!-- KPI Cards Grid (4 columns) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-            <!-- Card 1 -->
-            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+        <!-- KPI Cards Grid (3 columns maintenant) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4">
+            <!-- Card 1 : Demandes en cours -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group">
                 <div class="flex items-start justify-between">
                     <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Demandes en cours</span>
-                        <div class="text-3xl font-bold text-on-surface mt-2">24</div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Demandes à valider</span>
+                        <div class="text-3xl font-bold text-on-surface mt-2" th:text="${dashboard.demandesEnCours}">0</div>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-[24px]">folder_open</span>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 text-xs text-primary-container bg-blue-50 px-2 py-0.5 rounded-full font-semibold">
-                        <span class="material-symbols-outlined text-[14px]">trending_up</span> +12%
-                    </span>
-                    <span class="text-xs text-gray-400">vs mois précédent</span>
-                </div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 to-primary"></div>
             </div>
             
-            <!-- Card 2 -->
-            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">En attente RH/Finance</span>
-                        <div class="text-3xl font-bold text-on-surface mt-2">8</div>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined text-[24px]">hourglass_top</span>
-                    </div>
-                </div>
-                <div class="mt-4 flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full font-semibold">
-                        <span class="material-symbols-outlined text-[14px]">priority_high</span> 3 urgentes
-                    </span>
-                    <span class="text-xs text-gray-400">délai > 48h</span>
-                </div>
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-200 to-orange-500"></div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+            <!-- Card 2 : Postes ouverts -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group">
                 <div class="flex items-start justify-between">
                     <div>
                         <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Postes ouverts</span>
-                        <div class="text-3xl font-bold text-on-surface mt-2">15</div>
+                        <div class="text-3xl font-bold text-on-surface mt-2" th:text="${dashboard.postesOuverts}">0</div>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-[24px]">work</span>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 text-xs text-secondary bg-purple-50 px-2 py-0.5 rounded-full font-semibold">
-                        <span class="material-symbols-outlined text-[14px]">swap_horiz</span> 5 départs
-                    </span>
-                    <span class="text-xs text-gray-400">à pourvoir d'ici 30j</span>
-                </div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-200 to-secondary"></div>
             </div>
 
-            <!-- Card 4 -->
-            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+            <!-- Card 3 : Candidatures de la semaine -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden group">
                 <div class="flex items-start justify-between">
                     <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Candidatures reçues</span>
-                        <div class="text-3xl font-bold text-on-surface mt-2">142</div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Candidatures (7j)</span>
+                        <div class="text-3xl font-bold text-on-surface mt-2" th:text="${dashboard.candidaturesSemaine}">0</div>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-600 group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-[24px]">group</span>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 text-xs text-primary-container bg-gray-100 px-2 py-0.5 rounded-full font-semibold">
-                        <span class="material-symbols-outlined text-[14px]">north_east</span> +28
-                    </span>
-                    <span class="text-xs text-gray-400">cette semaine</span>
-                </div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-gray-200 to-gray-400"></div>
             </div>
         </div>
 
-        <!-- Analytics Row (12 columns) -->
-        <div class="grid grid-cols-12 gap-6 mb-8">
-            <!-- Left Column: Area Chart (Evolution) -->
-            <div class="col-span-12 lg:col-span-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-                    <div>
-                        <h2 class="text-lg font-semibold text-on-surface">Évolution des recrutements</h2>
-                        <p class="text-sm text-gray-500">Suivi des demandes créées et clôturées avec succès</p>
-                    </div>
-                    <div class="inline-flex p-1 rounded-lg bg-gray-50 self-start sm:self-auto">
-                        <button class="px-3 py-1 rounded-md text-gray-500 hover:text-gray-900 text-xs font-medium transition-colors">7j</button>
-                        <button class="px-3 py-1 rounded-md bg-white text-primary-container text-xs font-semibold shadow-sm">30j</button>
-                        <button class="px-3 py-1 rounded-md text-gray-500 hover:text-gray-900 text-xs font-medium transition-colors">Année</button>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-3 gap-4 mb-4 pt-2">
-                    <div class="p-3 rounded-lg bg-gray-50">
-                        <span class="text-xs text-gray-500 block">Moyenne journalière</span>
-                        <span class="text-sm font-bold text-on-surface">4.8 candidatures</span>
-                    </div>
-                    <div class="p-3 rounded-lg bg-gray-50">
-                        <span class="text-xs text-gray-500 block">Temps moyen de clôture</span>
-                        <span class="text-sm font-bold text-primary-container">18.5 jours</span>
-                    </div>
-                    <div class="p-3 rounded-lg bg-gray-50">
-                        <span class="text-xs text-gray-500 block">Taux de conversion</span>
-                        <span class="text-sm font-bold text-secondary">31.2%</span>
-                    </div>
-                </div>
-
-                <!-- Vector Area Chart -->
-                <div class="relative w-full h-64 mt-2">
-                    <svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 680 200">
-                        <defs>
-                            <lineargradient id="areaGradientPrimary" x1="0" x2="0" y1="0" y2="1">
-                                <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.32"></stop>
-                                <stop offset="80%" stop-color="#1e3a8a" stop-opacity="0.02"></stop>
-                                <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0"></stop>
-                            </lineargradient>
-                            <lineargradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
-                                <stop offset="0%" stop-color="#4059aa"></stop>
-                                <stop offset="50%" stop-color="#1e3a8a"></stop>
-                                <stop offset="100%" stop-color="#4b41e1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <line stroke="#f2f3ff" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="680" y1="20" y2="20"></line>
-                        <line stroke="#f2f3ff" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="680" y1="70" y2="70"></line>
-                        <line stroke="#f2f3ff" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="680" y1="120" y2="120"></line>
-                        <line stroke="#eaedff" stroke-width="1" x1="0" x2="680" y1="170" y2="170"></line>
-                        
-                        <path d="M 0,160 Q 60,140 120,110 T 240,85 T 360,115 T 480,45 T 600,60 T 680,30 L 680,170 L 0,170 Z" fill="url(#areaGradientPrimary)"></path>
-                        <path d="M 0,160 Q 60,140 120,110 T 240,85 T 360,115 T 480,45 T 600,60 T 680,30" fill="none" stroke="url(#lineGrad)" stroke-linecap="round" stroke-width="3"></path>
-                        <path d="M 0,150 Q 80,130 160,120 T 320,100 T 480,80 T 680,60" fill="none" opacity="0.4" stroke="#757682" stroke-dasharray="4 3" stroke-width="1.5"></path>
-                        
-                        <g class="cursor-pointer group">
-                            <circle class="transition-transform transform group-hover:scale-125" cx="240" cy="85" fill="#ffffff" r="4" stroke="#1e3a8a" stroke-width="2.5"></circle>
-                            <circle cx="240" cy="85" fill="#1e3a8a" opacity="0.15" r="8"></circle>
-                        </g>
-                        <g class="cursor-pointer group">
-                            <circle class="transition-transform transform group-hover:scale-125" cx="480" cy="45" fill="#ffffff" r="5" stroke="#4b41e1" stroke-width="2.5"></circle>
-                            <circle cx="480" cy="45" fill="#4b41e1" opacity="0.2" r="10"></circle>
-                        </g>
-                        <g class="cursor-pointer group">
-                            <circle cx="680" cy="30" fill="#ffffff" r="4.5" stroke="#1e3a8a" stroke-width="2.5"></circle>
-                        </g>
-                    </svg>
-                </div>
-                
-                <div class="flex justify-between items-center text-gray-400 text-xs pt-3 border-t border-gray-100 mt-2">
-                    <span>01 Mai</span><span>06 Mai</span><span>11 Mai</span><span>16 Mai</span><span>21 Mai</span><span>26 Mai</span><span>31 Mai</span>
-                </div>
+        <!-- Graphique (Chart.js) -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4">
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold text-on-surface">Évolution des candidatures</h2>
+                <p class="text-sm text-gray-500">Candidatures reçues sur les 30 derniers jours</p>
             </div>
-
-            <!-- Right Column: Donut Chart (Department distribution) -->
-            <div class="col-span-12 lg:col-span-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-semibold text-on-surface">Répartition par département</h2>
-                        <p class="text-sm text-gray-500">Postes en cours d'attribution</p>
-                    </div>
-                    <button class="p-1 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">more_vert</span>
-                    </button>
-                </div>
-                
-                <div class="relative flex items-center justify-center my-3">
-                    <svg class="w-44 h-44 -rotate-90 transform" viewbox="0 0 100 100">
-                        <circle cx="50" cy="50" fill="none" r="38" stroke="#f2f3ff" stroke-width="12"></circle>
-                        <circle cx="50" cy="50" fill="none" r="38" stroke="#1e3a8a" stroke-dasharray="107.4 238.7" stroke-dashoffset="0" stroke-linecap="round" stroke-width="12"></circle>
-                        <circle cx="50" cy="50" fill="none" r="38" stroke="#4b41e1" stroke-dasharray="59.7 238.7" stroke-dashoffset="-111.4" stroke-linecap="round" stroke-width="12"></circle>
-                        <circle cx="50" cy="50" fill="none" r="38" stroke="#ef9900" stroke-dasharray="35.8 238.7" stroke-dashoffset="-175.1" stroke-linecap="round" stroke-width="12"></circle>
-                        <circle cx="50" cy="50" fill="none" r="38" stroke="#4059aa" stroke-dasharray="35.8 238.7" stroke-dashoffset="-214.9" stroke-linecap="round" stroke-width="12"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                        <span class="text-2xl font-bold text-on-surface leading-tight">47</span>
-                        <span class="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Total Postes</span>
-                    </div>
-                </div>
-                
-                <div class="space-y-2.5 mt-2">
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-[#1e3a8a]"></span>
-                            <span class="text-sm font-medium text-gray-700">IT & Ingénierie</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs text-gray-400">21 postes</span>
-                            <span class="text-xs font-semibold text-primary-container">45%</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-[#4b41e1]"></span>
-                            <span class="text-sm font-medium text-gray-700">Finance & Audit</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs text-gray-400">12 postes</span>
-                            <span class="text-xs font-semibold text-secondary">25%</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-[#ef9900]"></span>
-                            <span class="text-sm font-medium text-gray-700">Ressources Humaines</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs text-gray-400">7 postes</span>
-                            <span class="text-xs font-semibold text-orange-500">15%</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-[#4059aa]"></span>
-                            <span class="text-sm font-medium text-gray-700">Marketing & Ventes</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs text-gray-400">7 postes</span>
-                            <span class="text-xs font-semibold text-blue-400">15%</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="relative w-full h-64">
+                <canvas id="evolutionChart"></canvas>
             </div>
         </div>
 
-        <!-- Full-Width Requests Data Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
-            <div class="p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div>
-                    <div class="flex items-center gap-3">
-                        <h2 class="text-lg font-semibold text-on-surface">Dernières demandes de recrutement</h2>
-                        <span class="px-2.5 py-0.5 rounded-full bg-gray-100 text-xs text-primary-container font-semibold">24 actives</span>
-                    </div>
-                    <p class="text-sm text-gray-500 mt-0.5">Cycle d'approbation et statut opérationnel en temps réel</p>
-                </div>
-                <div class="flex items-center flex-wrap gap-2.5">
-                    <div class="relative flex items-center">
-                        <span class="material-symbols-outlined absolute left-3 text-gray-400 text-[18px]">filter_list</span>
-                        <input class="h-9 pl-9 pr-3 rounded-lg bg-gray-50 text-sm focus:outline-none focus:ring-1 focus:ring-secondary w-44 md:w-56" placeholder="Filtrer un profil..." type="text"/>
-                    </div>
-                    <select class="h-9 px-3 rounded-lg bg-gray-50 text-sm focus:outline-none cursor-pointer">
-                        <option>Tous départements</option>
-                        <option>IT & Ingénierie</option>
-                        <option>Finance</option>
-                    </select>
-                    <button class="h-9 px-3 rounded-lg bg-gray-100 text-gray-700 hover:text-gray-900 text-sm font-medium flex items-center gap-1.5 transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">tune</span> Filtres
-                    </button>
-                </div>
+        <!-- Tableau des dernières demandes -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-on-surface">Dernières demandes</h2>
+                <p class="text-sm text-gray-500 mt-0.5">Les <span th:text="${#lists.size(dashboard.dernieresDemandes)}"></span> dernières demandes enregistrées.</p>
             </div>
-            
-            <div class="w-full overflow-x-auto">
+            <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                             <th class="py-3 px-6 font-semibold">Identifiant</th>
-                            <th class="py-3 px-6 font-semibold">Poste recherché</th>
+                            <th class="py-3 px-6 font-semibold">Poste</th>
                             <th class="py-3 px-6 font-semibold">Département</th>
-                            <th class="py-3 px-6 font-semibold">Date de soumission</th>
-                            <th class="py-3 px-6 font-semibold">Statut d'approbation</th>
+                            <th class="py-3 px-6 font-semibold">Date</th>
+                            <th class="py-3 px-6 font-semibold">Statut</th>
                             <th class="py-3 px-6 font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="py-4 px-6 text-sm font-semibold text-primary-container">#REC-2024-001</td>
-                            <td class="py-4 px-6">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-primary font-semibold text-sm">DEV</div>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Développeur Fullstack React / Node</div>
-                                        <span class="text-xs text-gray-500">CDI • Temps plein • Paris HQ</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
-                                    <span class="w-2 h-2 rounded-full bg-primary-container"></span> IT & Ingénierie
-                                </span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="text-sm text-gray-700">24 Mai 2024</span>
-                                <span class="block text-xs text-gray-400">il y a 2 heures</span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-primary-container text-xs font-semibold tracking-wide">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> VALIDE_RH
-                                </span>
-                            </td>
-                            <td class="py-4 px-6 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <button class="px-2.5 py-1.5 rounded-lg text-primary hover:bg-gray-100 transition-colors text-sm font-medium flex items-center gap-1">
-                                        Détails <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-                                    </button>
-                                </div>
-                            </td>
+                        <tr th:if="${#lists.isEmpty(dashboard.dernieresDemandes)}">
+                            <td colspan="6" class="py-6 text-center text-gray-500 italic">Aucune demande enregistrée.</td>
                         </tr>
-                        <tr class="hover:bg-gray-50 transition-colors group">
-                            <td class="py-4 px-6 text-sm font-semibold text-primary-container">#REC-2024-002</td>
+                        <tr th:each="dem : ${dashboard.dernieresDemandes}" class="hover:bg-gray-50 transition-colors group">
+                            <td class="py-4 px-6 text-sm font-semibold text-primary-container" th:text="${dem.reference}"></td>
+                            <td class="py-4 px-6 text-sm text-gray-900" th:text="${dem.poste}"></td>
+                            <td class="py-4 px-6 text-sm text-gray-700" th:text="${dem.departement}"></td>
+                            <td class="py-4 px-6 text-sm text-gray-700" th:text="${#temporals.format(dem.dateCreation, 'dd/MM/yyyy HH:mm')}"></td>
                             <td class="py-4 px-6">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-secondary font-semibold text-sm">FIN</div>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Responsable Contrôle de Gestion</div>
-                                        <span class="text-xs text-gray-500">CDI • Cadre • Lyon (Hybride)</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
-                                    <span class="w-2 h-2 rounded-full bg-secondary"></span> Finance
-                                </span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="text-sm text-gray-700">22 Mai 2024</span>
-                                <span class="block text-xs text-gray-400">il y a 2 jours</span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container text-white text-xs font-semibold tracking-wide shadow-sm">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-purple-200"></span> VALIDE_FINANCE
-                                </span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-50 text-primary-container text-xs font-semibold tracking-wide"
+                                      th:text="${dem.statut}"></span>
                             </td>
                             <td class="py-4 px-6 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <button class="px-2.5 py-1.5 rounded-lg text-primary hover:bg-gray-100 transition-colors text-sm font-medium flex items-center gap-1">
-                                        Détails <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-                                    </button>
-                                </div>
+                                <a th:href="@{/demandes/{id}(id=${dem.id})}" class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-primary hover:bg-gray-100 transition-colors text-sm font-medium">
+                                    Détails <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                                </a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            
-            <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                <span class="text-sm text-gray-500">Affichage de 1 à 4 sur 24 demandes</span>
-                <div class="flex items-center gap-1">
-                    <button class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 transition-colors disabled:opacity-40" disabled="">
-                        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
-                    </button>
-                    <button class="w-8 h-8 rounded-lg bg-primary-container text-white text-sm font-semibold">1</button>
-                    <button class="w-8 h-8 rounded-lg hover:bg-gray-200 text-gray-600 text-sm">2</button>
-                    <button class="p-1.5 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">chevron_right</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Complementary Section: Empty State & Skeleton Loader -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
-                <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-primary-container mb-4 shadow-inner">
-                    <span class="material-symbols-outlined text-[32px]">folder_off</span>
-                </div>
-                <h3 class="text-sm font-semibold text-gray-900 mb-1">Aucune alerte critique en cours</h3>
-                <p class="text-sm text-gray-500 max-w-sm mb-5">
-                    Tous les recrutements prioritaires suivent les accords de niveau de service (SLA) définis.
-                </p>
-                <button class="h-9 px-4 rounded-lg bg-gray-100 text-primary-container hover:bg-gray-200 transition-colors text-sm font-medium flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[18px]">history</span> Consulter l'historique
-                </button>
-            </div>
-            
-            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
-                            <span class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Synchronisation SIRH en temps réel</span>
-                        </div>
-                        <span class="text-xs text-gray-400">Chargement...</span>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-gray-100 animate-pulse"></div>
-                            <div class="flex-1 space-y-1.5">
-                                <div class="h-3.5 bg-gray-100 rounded w-3/4 animate-pulse"></div>
-                                <div class="h-2.5 bg-gray-50 rounded w-1/2 animate-pulse"></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-gray-100 animate-pulse"></div>
-                            <div class="flex-1 space-y-1.5">
-                                <div class="h-3.5 bg-gray-100 rounded w-5/6 animate-pulse"></div>
-                                <div class="h-2.5 bg-gray-50 rounded w-2/5 animate-pulse"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pt-4 flex items-center justify-between text-gray-500 text-xs">
-                    <span>Flux API RH connecté (Workday • SAP)</span>
-                    <span class="inline-flex items-center gap-1 text-primary-container font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> Statut: Optimal
-                    </span>
-                </div>
-            </div>
         </div>
 
     </main>
+
+    <!-- Script Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            // Récupération des données Thymeleaf injectées en JSON
+            const chartData = /*[[${dashboard.chartData}]]*/ [];
+            
+            const labels = chartData.map(d => {
+                const parts = d.date.split('-');
+                return `${parts[2]}/${parts[1]}`; // Format JJ/MM
+            });
+            const dataPoints = chartData.map(d => d.count);
+
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Candidatures reçues',
+                        data: dataPoints,
+                        borderColor: '#1e3a8a',
+                        backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#1e3a8a',
+                        pointBorderWidth: 2,
+                        pointRadius: 3,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, color: '#757682' },
+                            grid: { borderDash: [4, 4], color: '#f2f3ff' }
+                        },
+                        x: {
+                            ticks: { color: '#757682' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
