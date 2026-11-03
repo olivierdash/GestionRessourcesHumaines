@@ -93,7 +93,7 @@ Ce fichier est **ignoré par git** (contient des identifiants locaux).
 ### 2. Backend (Spring Boot)
 
 ```bash
-cd sirh-backend
+cd sirh
 ./mvnw spring-boot:run
 ```
 
@@ -105,7 +105,7 @@ Démarre sur **http://localhost:8080**
 ### 3. Frontend (Vue.js)
 
 ```bash
-cd sirh-careers
+cd site-public
 npm install
 npm run dev
 ```
@@ -205,21 +205,6 @@ server: {
 },
 ```
 
----
-
-## Notes de développement
-
-- **Mot de passe candidat** : hashé BCrypt, 8 caractères minimum
-- **Mot de passe SIRH interne** : `NoOpPasswordEncoder` (projet de cours uniquement — **à remplacer par BCrypt en production**)
-- **Upload CV** : stocké dans `uploads/` à la racine du backend (chemin configurable via `app.upload.dir`)
-- **Sécurité API publique** : l'API fait confiance à `idCandidat` fourni par le client — voir limite dans la section suivante
-
-### Limites connues (projet de cours)
-
-- L'API publique ne vérifie pas que l'`idCandidat` provient bien de la personne authentifiée. Un client malveillant peut postuler sous une autre identité avec `curl`. En production, remplacer par un JWT signé.
-- Pas de récupération de mot de passe (endpoint `forgot-password` non implémenté).
-- Pas de pagination serveur sur `/api/public/jobs` — la pagination est côté client.
-- Pas de tests automatisés.
 
 ---
 
