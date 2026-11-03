@@ -65,7 +65,6 @@ public class EmbaucheService {
 
         Employe employe = employeService.save(Employe.builder()
                 .candidature(candidature)
-                .matricule(employeService.prochainMatricule())
                 .hiringDate(dateDebut)
                 .statusEmployer("ACTIF")
                 .build());

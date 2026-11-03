@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 
 /**
  * @author vox
- * OffreEmploieService
+ *         OffreEmploieService
  */
 @Service
 @AllArgsConstructor
@@ -39,22 +39,17 @@ public class OffreEmploieService {
      * task 9 : créer une offre d'emploi
      */
     @Transactional
-    public OffreEmploi createNewOffer(Integer id_demande_recrutement,
-            String title,
-            String description,
-            Integer id_statut_offre_emploie) {
+    public OffreEmploi createNewOffer(OffreEmploi offre, Integer idStatutOffreEmploi) {
+        if (offre.getDemandeRecrutement() == null || offre.getDemandeRecrutement().getIdDemandeRecrutement() == null) {
+            throw new IllegalArgumentException("La demande de recrutement est obligatoire");
+        }
 
-        DemandeRecrutement demandeRecrutement = demandeRecrutementService.getById(id_demande_recrutement);
-        StatutOffreEmploi statutOffreEmploi = statutOffreService.getById(id_statut_offre_emploie);
+        offre.setIdOffre(null); 
+        offre.setDemandeRecrutement(
+                demandeRecrutementService.getById(offre.getDemandeRecrutement().getIdDemandeRecrutement()));
+        offre.setStatut(statutOffreService.getById(idStatutOffreEmploi));
 
-        OffreEmploi newoffer = OffreEmploi.builder()
-                .demandeRecrutement(demandeRecrutement)
-                .titre(title)
-                .description(description)
-                .statut(statutOffreEmploi)
-                .build();
-
-        return offreEmploieRepo.save(newoffer);
+        return offreEmploieRepo.save(offre);
     }
 
     /**

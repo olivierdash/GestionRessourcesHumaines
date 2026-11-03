@@ -18,11 +18,11 @@
 
                     <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium mb-6" th:text="${error}"></div>
 
-                    <form th:action="@{/offres/creer}" method="post">
+                    <form th:action="@{/offres/creer}" th:object="${offre}" method="post">
 
                         <div class="mb-6">
                             <label for="idDemande" class="block text-sm font-semibold text-on-surface mb-2">Demande de recrutement liée <span class="text-red-500">*</span></label>
-                            <select name="idDemande" id="idDemande" required
+                            <select th:field="*{demandeRecrutement.idDemandeRecrutement}" id="idDemande" required
                                     class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                                 <option value="">-- Sélectionnez une demande --</option>
                                 <option th:each="dem : ${demandes}" 
@@ -34,13 +34,19 @@
 
                         <div class="mb-6">
                             <label for="titre" class="block text-sm font-semibold text-on-surface mb-2">Titre de l'offre <span class="text-red-500">*</span></label>
-                            <input type="text" name="titre" id="titre" required placeholder="Ex: Développeur Java Senior"
+                            <input type="text" th:field="*{titre}" id="titre" required placeholder="Ex: Développeur Java Senior"
+                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="datePublication" class="block text-sm font-semibold text-on-surface mb-2">Date de publication</label>
+                            <input type="datetime-local" th:field="*{datePublication}" id="datePublication"
                                    class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                         </div>
 
                         <div class="mb-8">
                             <label for="description" class="block text-sm font-semibold text-on-surface mb-2">Description <span class="text-red-500">*</span></label>
-                            <textarea name="description" id="description" rows="5" required placeholder="Missions, profil recherché..."
+                            <textarea th:field="*{description}" id="description" rows="5" required placeholder="Missions, profil recherché..."
                                       class="w-full p-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"></textarea>
                         </div>
 

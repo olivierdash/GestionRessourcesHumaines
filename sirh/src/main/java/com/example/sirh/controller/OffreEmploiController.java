@@ -1,5 +1,7 @@
 package com.example.sirh.controller;
 
+import com.example.sirh.dto.DemandeRecrutementFilter;
+import com.example.sirh.model.OffreEmploi;
 import com.example.sirh.service.DemandeRecrutementService;
 import com.example.sirh.service.OffreEmploieService;
 
@@ -11,7 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/offres")
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class OffreEmploiController {
 
     private final OffreEmploieService offreService;
@@ -26,19 +28,18 @@ public class OffreEmploiController {
     // TÂCHE 9 : Formulaire de création
     @GetMapping("/creer")
     public String formCreerOffre(Model model) {
+        model.addAttribute("offre", new OffreEmploi());
         // APPEL AU SERVICE au lieu du Repository
-        model.addAttribute("demandes", demandeService.getAllDemandes());
+        model.addAttribute("demandes", demandeService.getAllDemandeValide(new DemandeRecrutementFilter()));
         return "offres/form";
     }
 
     // TÂCHE 9 : Enregistrement de l'offre
     @PostMapping("/creer")
-    public String creerOffre(@RequestParam Integer idDemande, 
-                             @RequestParam String titre, 
-                             @RequestParam String description,
-                             RedirectAttributes redirectAttributes) {
+    public String creerOffre(@ModelAttribute OffreEmploi offre,
+            RedirectAttributes redirectAttributes) {
         try {
-            offreService.createNewOffer(idDemande, titre, description, 2); 
+            offreService.createNewOffer(offre, 2);
             redirectAttributes.addFlashAttribute("success", "Offre créée avec succès");
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             redirectAttributes.addFlashAttribute("error", "Erreur : Une offre existe déjà pour cette demande.");

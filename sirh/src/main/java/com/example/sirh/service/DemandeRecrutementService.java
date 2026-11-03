@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.sirh.dto.DemandeRecrutementDTO;
+import com.example.sirh.dto.DemandeRecrutementFilter;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.dto.ValidationPageData;
 import com.example.sirh.model.DemandeRecrutement;
@@ -21,7 +22,6 @@ import com.example.sirh.model.MotifDemande;
 import com.example.sirh.model.Poste;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.DemandeRecrutementRepository;
-import com.example.sirh.wrapper.DemandeRecrutementFilter;
 
 import lombok.AllArgsConstructor;
 
@@ -57,15 +57,13 @@ public class DemandeRecrutementService {
         return demandeRepository.save(demande);
     }
 
-    @Transactional(readOnly = true)
     public DemandeRecrutement getById(Integer id) {
         return demandeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
     }
 
-    @Transactional(readOnly = true)
-    public List<DemandeRecrutement> getAllDemandes() {
-        return demandeRepository.findAll();
+    public List<DemandeRecrutement> getAllDemandeValide(DemandeRecrutementFilter filter){
+        return  demandeRepository.getAllDemandeValide(filter);
     }
 
     @Transactional
@@ -150,7 +148,6 @@ public class DemandeRecrutementService {
         return demandeRepository.findAllLib(filter, pageable);
     }
 
-    @Transactional(readOnly = true)
     public DemandeRecrutementDTO getDtoForEdit(Integer id) {
         DemandeRecrutement demande = getById(id);
         if (!"Brouillon".equalsIgnoreCase(demande.getEtatDemande().getIntitule())) {
@@ -187,12 +184,10 @@ public class DemandeRecrutementService {
         return dto;
     }
 
-    @Transactional(readOnly = true)
     public boolean canValidate(String etat, String role) {
-        return ("cree".equals(etat) && "rh".equals(role)) ||
+        return  ("cree".equals(etat) && "rh".equals(role)) ||
                ("validerh".equals(etat) && "finance".equals(role)) ||
-               ("validefinance".equals(etat) && "dg".equals(role)) ||
-               "refuse".equals(etat);
+               ("validefinance".equals(etat) && "dg".equals(role)) ;
     }
 
     @Transactional(readOnly = true)

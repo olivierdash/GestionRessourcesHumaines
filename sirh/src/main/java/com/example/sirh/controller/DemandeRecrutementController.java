@@ -2,10 +2,10 @@ package com.example.sirh.controller;
 
 import com.example.sirh.config.CustomUserDetails;
 import com.example.sirh.dto.DemandeRecrutementDTO;
+import com.example.sirh.dto.DemandeRecrutementFilter;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.dto.ValidationPageData;
 import com.example.sirh.model.*;
-import com.example.sirh.wrapper.DemandeRecrutementFilter;
 import com.example.sirh.service.*;
 
 import lombok.AllArgsConstructor;

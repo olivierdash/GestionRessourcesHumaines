@@ -31,14 +31,12 @@ public class EmployeService {
     }
 
     @Transactional
-    public Employe createEmploye(Integer idCandidature, String matricule,
-            LocalDate hiringDate, String statusEmployer) {
+    public Employe createEmploye(Integer idCandidature, LocalDate hiringDate) {
         Candidature candidature = candidatureService.getCandidatureById(idCandidature);
         Employe employe = Employe.builder()
                 .candidature(candidature)
-                .matricule(matricule)
                 .hiringDate(hiringDate)
-                .statusEmployer(statusEmployer)
+                .statusEmployer("ACTIF") // Valeur par défaut (Q5)
                 .build();
         return employeRepository.save(employe);
     }
@@ -70,15 +68,5 @@ public class EmployeService {
     public long countByDepartement(Integer idDepartement) {
         return employeRepository
                 .countByCandidature_DemandeRecrutement_Poste_Departement_IdDepartement(idDepartement);
-    }
-
-    /**
-     * Génère le prochain matricule (EMP-AAAA-NNNN) à partir de la séquence PostgreSQL.
-     * Écriture (nextval) -> @Transactional sans readOnly.
-     */
-    @Transactional
-    public String prochainMatricule() {
-        Long numero = employeRepository.prochainNumeroMatricule();
-        return String.format("EMP-%d-%04d", LocalDate.now().getYear(), numero);
     }
 }
