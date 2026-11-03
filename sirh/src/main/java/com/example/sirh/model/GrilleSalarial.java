@@ -16,10 +16,10 @@ public class GrilleSalarial {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_grille")
     private Integer idGrille;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne( optional = false)
     @JoinColumn(name = "id_poste", nullable = false)
     private Poste poste;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne( optional = false)
     @JoinColumn(name = "id_departement", nullable = false)
     private Departement departement;
     @Column(name = "salaire_min", nullable = false)

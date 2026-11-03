@@ -21,7 +21,6 @@ import java.util.Optional;
 public class EmployeService {
 
     private final EmployeRepository employeRepository;
-    private final AffectationRepository affectationRepository;
     private final CandidatureService candidatureService;
 
     // ---------- Existant ----------
@@ -81,17 +80,5 @@ public class EmployeService {
     public String prochainMatricule() {
         Long numero = employeRepository.prochainNumeroMatricule();
         return String.format("EMP-%d-%04d", LocalDate.now().getYear(), numero);
-    }
-
-    // ---------- Affectations (enfant de Employe) ----------
-
-    @Transactional
-    public Affectation saveAffectation(Affectation affectation) {
-        return affectationRepository.save(affectation);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Affectation> affectationsDe(Integer idEmploye) {
-        return affectationRepository.findByEmployeIdEmployer(idEmploye);
     }
 }

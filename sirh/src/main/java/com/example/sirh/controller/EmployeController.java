@@ -3,6 +3,7 @@ package com.example.sirh.controller;
 import com.example.sirh.model.Employe;
 import com.example.sirh.service.CandidatureService;
 import com.example.sirh.service.EmployeService;
+import com.example.sirh.service.EmbaucheService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ public class EmployeController {
 
     private final EmployeService employeService;
     private final CandidatureService candidatureService;
+    private final EmbaucheService embaucheService;
 
     @GetMapping
     public String index(
@@ -66,5 +68,14 @@ public class EmployeController {
         employeService.createEmploye(idCandidature, matricule, hiringDate, statusEmployer);
 
         return "redirect:/employes";
+    }
+
+        /** Fiche salarié avec matricule, contrat et affectation. */
+    @GetMapping("/{id}")
+    public String show(@PathVariable("id") Integer id, Model model) {
+        model.addAttribute("employe", employeService.getById(id));
+        // model.addAttribute("contrats", embaucheService.contratsDe(id));
+        // model.addAttribute("affectations", embaucheService.affectationsDe(id));
+        return "employe/fiche";
     }
 }

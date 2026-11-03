@@ -90,7 +90,7 @@
                                 <div class="flex justify-end items-center gap-2">
                                     <!-- Bouton Refuser -->
                                     <button type="button"
-                                        th:onclick="|openDecisionModal(${demande.idDemandeRecrutement}, 'refuse')|"
+                                        th:onclick="|openDecisionModal(${demande.idDemandeRecrutement}, 'refuser')|"
                                         class="h-8 px-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-medium text-xs transition-colors flex items-center gap-1 border border-red-200">
                                         <span class="material-symbols-outlined text-[16px]">close</span> Refuser
                                     </button>
@@ -128,7 +128,8 @@
                     </button>
                 </div>
 
-                <form id="decisionForm" method="post" action="" class="p-6 flex flex-col gap-4">
+                <!-- th:action => Thymeleaf ajoute automatiquement le champ _csrf -->
+                <form id="decisionForm" method="post" th:action="@{/demandes/update}" class="p-6 flex flex-col gap-4">
                     <p id="modalMessage" class="font-bold text-sm text-on-surface"></p>
 
                     <div>
@@ -155,63 +156,62 @@
             </div>
         </div>
 
-    </main>
+        <!-- SCRIPT JS POUR LE MODAL -->
+        <script>
+            const modal = document.getElementById('decisionModal');
+            const modalContent = document.getElementById('modalContent');
+            const form = document.getElementById('decisionForm');
+            const title = document.getElementById('decisionModalLabel');
+            const message = document.getElementById('modalMessage');
+            const actionInput = document.getElementById('modalAction');
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            const remarqueInput = document.getElementById('modalRemarque');
 
-    <!-- SCRIPT JS POUR LE MODAL -->
-    <script>
-        const modal = document.getElementById('decisionModal');
-        const modalContent = document.getElementById('modalContent');
-        const form = document.getElementById('decisionForm');
-        const title = document.getElementById('decisionModalLabel');
-        const message = document.getElementById('modalMessage');
-        const actionInput = document.getElementById('modalAction');
-        const submitBtn = document.getElementById('modalSubmitBtn');
-        const remarqueInput = document.getElementById('modalRemarque');
+            function openDecisionModal(idDemande, action) {
+                // Reset
+                form.action = '/demandes/update/' + idDemande;
+                actionInput.value = action;
+                remarqueInput.value = '';
 
-        function openDecisionModal(idDemande, action) {
-            // Reset
-            form.action = '/demandes/update/' + idDemande;
-            actionInput.value = action;
-            remarqueInput.value = '';
+                // Style
+                if (action === 'valider') {
+                    title.textContent = 'Valider la demande';
+                    message.className = 'font-bold text-sm text-green-600';
+                    submitBtn.className = 'h-10 px-5 rounded-lg bg-primary text-white hover:bg-primary-container font-medium text-sm transition-colors shadow-sm';
+                    submitBtn.textContent = 'Confirmer la validation';
+                } else if (action === 'refuser') {
+                    title.textContent = 'Refuser la demande #' + idDemande;
+                    message.textContent = 'Vous êtes sur le point de refuser cette demande.';
+                    message.className = 'font-bold text-sm text-red-600';
+                    submitBtn.className = 'h-10 px-5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium text-sm transition-colors shadow-sm';
+                    submitBtn.textContent = 'Confirmer le refus';
+                }
 
-            // Style
-            if (action === 'valider') {
-                title.textContent = 'Valider la demande #' + idDemande;
-                message.textContent = 'Vous êtes sur le point de valider cette demande.';
-                message.className = 'font-bold text-sm text-green-600';
-                submitBtn.className = 'h-10 px-5 rounded-lg bg-primary text-white hover:bg-primary-container font-medium text-sm transition-colors shadow-sm';
-                submitBtn.textContent = 'Confirmer la validation';
-            } else if (action === 'refuse') {
-                title.textContent = 'Refuser la demande #' + idDemande;
-                message.textContent = 'Vous êtes sur le point de refuser cette demande.';
-                message.className = 'font-bold text-sm text-red-600';
-                submitBtn.className = 'h-10 px-5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium text-sm transition-colors shadow-sm';
-                submitBtn.textContent = 'Confirmer le refus';
+                // Afficher
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95');
+                    modalContent.classList.add('scale-100');
+                }, 10);
             }
 
-            // Afficher
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
-        }
+            function closeDecisionModal() {
+                modalContent.classList.remove('scale-100');
+                modalContent.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 150);
+            }
 
-        function closeDecisionModal() {
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 150);
-        }
+            // Fermer en cliquant à l'extérieur
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeDecisionModal();
+            });
+        </script>
 
-        // Fermer en cliquant à l'extérieur
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeDecisionModal();
-        });
-    </script>
+    </main>
 </body>
 
 </html>
