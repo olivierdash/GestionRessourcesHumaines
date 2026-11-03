@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Découvrez nos offres d'emploi et postulez en ligne." />
+    <meta name="theme-color" content="#2563eb" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: '#2563eb',
+                hover: '#1d4ed8',
+              },
+            },
+            maxWidth: {
+              container: '1100px',
+            },
+          },
+        },
+      }
+    </script>
+
+    <style type="text/tailwindcss">
+      @layer components {
+        .container-app {
+          @apply max-w-container mx-auto px-4;
+        }
+        .btn {
+          @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg
+                 text-sm font-medium transition-colors cursor-pointer
+                 disabled:opacity-60 disabled:cursor-not-allowed;
+        }
+        .btn-primary {
+          @apply bg-primary text-white hover:bg-primary-hover;
+        }
+        .btn-secondary {
+          @apply bg-white text-gray-900 border border-gray-200 hover:bg-gray-50;
+        }
+        .state {
+          @apply text-center text-gray-500 py-8;
+        }
+      }
+
+      @layer base {
+        html, body, #app { @apply h-full; }
+        body {
+          @apply bg-white text-gray-900 antialiased;
+          font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        h1, h2, h3 { @apply leading-tight; }
+      }
+    </style>
+
+    <title>Carrières — Offres d'emploi</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

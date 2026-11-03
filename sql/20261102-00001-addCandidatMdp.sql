@@ -1,0 +1,1 @@
+ALTER TABLE candidat ADD COLUMN mot_de_passe VARCHAR(255);
