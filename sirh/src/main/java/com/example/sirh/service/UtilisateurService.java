@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.sirh.model.Role;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.UtilisateurRepository;
 
@@ -14,9 +16,11 @@ import com.example.sirh.repository.UtilisateurRepository;
 public class UtilisateurService {
 
     private final UtilisateurRepository utilisateurRepository;
+    private final RoleService roleService;
 
-    public UtilisateurService(UtilisateurRepository utilisateurRepository) {
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, RoleService roleService) {
         this.utilisateurRepository = utilisateurRepository;
+        this.roleService = roleService;
     }
 
     @Transactional(readOnly = true)
@@ -40,6 +44,32 @@ public class UtilisateurService {
         return utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException(
                         "Utilisateur introuvable avec l'email : " + email));
+    }
+
+    @Transactional
+    public Utilisateur createUtilisateur(Utilisateur utilisateur) {
+        // 1. Vérification de l'unicité de l'email
+        try {
+            getByEmail(utilisateur.getEmail());
+            throw new IllegalArgumentException("Erreur : cet email est déjà utilisé.");
+        } catch (NoSuchElementException e) {
+            // L'email n'existe pas, on peut continuer
+        }
+
+        // 2. Vérification de la longueur du mot de passe
+        if (utilisateur.getMotDePasse() == null || utilisateur.getMotDePasse().length() < 6) {
+            throw new IllegalArgumentException("Le mot de passe doit contenir au moins 6 caractères.");
+        }
+
+        // 3. Récupération du rôle managé depuis la base
+        Role role = roleService.getRoleById(utilisateur.getRole().getIdRole());
+
+        // 4. Hashage du mot de passe
+        utilisateur.setMotDePasse(new BCryptPasswordEncoder().encode(utilisateur.getMotDePasse()));
+
+        // 5. Assignation du rôle et sauvegarde
+        utilisateur.setRole(role);
+        return utilisateurRepository.save(utilisateur);
     }
 
     /**

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+
+        <!-- En-tête -->
+        <div class="flex items-center justify-between">
+            <h2 class="text-3xl font-bold text-on-surface">Utilisateurs</h2>
+            <button type="button" onclick="openUserModal()"
+                    class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">person_add</span> Ajouter un utilisateur
+            </button>
+        </div>
+
+        <div th:if="${success}" class="p-4 rounded-lg bg-green-50 text-green-700 border border-green-200 text-sm font-medium" th:text="${success}"></div>
+        <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${error}"></div>
+
+        <!-- Liste -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Rôle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${utilisateurs.isEmpty()}">
+                            <td colspan="4" class="td-empty">Aucun utilisateur.</td>
+                        </tr>
+                        <tr th:each="u : ${utilisateurs}">
+                            <td class="text-on-surface-variant" th:text="${u.idUtilisateur}"></td>
+                            <td class="font-medium text-on-surface" th:text="${u.nom}"></td>
+                            <td class="text-on-surface-variant" th:text="${u.email}"></td>
+                            <td>
+                                <span class="px-2.5 py-1 bg-surface-container text-on-surface text-xs font-semibold rounded-full"
+                                      th:text="${u.role.libelle}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODAL D'AJOUT -->
+        <div id="userModal"
+             class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-all">
+            <div id="userModalContent"
+                 class="bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-transform scale-95">
+
+                <div class="px-6 py-4 border-b border-surface-container-high flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-on-surface">Ajouter un utilisateur</h3>
+                    <button type="button" onclick="closeUserModal()"
+                            class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-surface-container transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <form th:action="@{/admin/utilisateurs}" th:object="${utilisateur}" method="post"
+                      class="p-6 flex flex-col gap-4">
+
+                    <div>
+                        <label for="nom" class="block text-sm font-semibold text-on-surface mb-2">Nom <span class="text-red-500">*</span></label>
+                        <input type="text" th:field="*{nom}" id="nom" required
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-on-surface mb-2">Email <span class="text-red-500">*</span></label>
+                        <input type="email" th:field="*{email}" id="email" required
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+
+                    <div>
+                        <label for="motDePasse" class="block text-sm font-semibold text-on-surface mb-2">Mot de passe <span class="text-red-500">*</span></label>
+                        <input type="password" th:field="*{motDePasse}" id="motDePasse" required
+                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+
+                    <div>
+                        <label for="role" class="block text-sm font-semibold text-on-surface mb-2">Rôle <span class="text-red-500">*</span></label>
+                        <select th:field="*{role.idRole}" id="role" required
+                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <option value="">-- Sélectionnez un rôle --</option>
+                            <option th:each="r : ${roles}" th:value="${r.idRole}" th:text="${r.libelle}"></option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeUserModal()"
+                                class="h-10 px-4 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high">
+                            Annuler
+                        </button>
+                        <button type="submit"
+                                class="h-10 px-5 rounded-lg bg-primary text-white hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SCRIPT (à l'intérieur du fragment mainContent) -->
+        <script>
+            (function () {
+                const modal = document.getElementById('userModal');
+                const content = document.getElementById('userModalContent');
+
+                window.openUserModal = function () {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => {
+                        content.classList.remove('scale-95');
+                        content.classList.add('scale-100');
+                    }, 10);
+                };
+
+                window.closeUserModal = function () {
+                    content.classList.remove('scale-100');
+                    content.classList.add('scale-95');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 150);
+                };
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) window.closeUserModal();
+                });
+            })();
+        </script>
+
+    </main>
+</body>
+</html>
