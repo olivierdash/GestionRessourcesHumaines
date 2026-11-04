@@ -5,25 +5,26 @@
 
     <main th:fragment="mainContent" class="p-6 md:p-8 max-w-3xl mx-auto flex flex-col gap-6 w-full">
 
+        <!-- En-tête -->
         <div>
-            <a th:href="@{/offres}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                &larr; Retour à la liste
-            </a>
-            <h2 class="text-3xl font-bold text-on-surface">Créer une nouvelle offre</h2>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Créer une nouvelle offre</h2>
         </div>
 
+        <!-- Carte du formulaire -->
         <div class="w-full">
-            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
                 <div class="p-6 md:p-8">
 
-                    <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium mb-6" th:text="${error}"></div>
+                    <!-- Message d'erreur -->
+                    <div th:if="${error}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold mb-6" th:text="${error}"></div>
 
                     <form th:action="@{/offres/creer}" th:object="${offre}" method="post">
 
+                        <!-- Demande liée -->
                         <div class="mb-6">
-                            <label for="idDemande" class="block text-sm font-semibold text-on-surface mb-2">Demande de recrutement liée <span class="text-red-500">*</span></label>
+                            <label for="idDemande" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Demande de recrutement liée <span class="text-red-500">*</span></label>
                             <select th:field="*{demandeRecrutement.idDemandeRecrutement}" id="idDemande" required
-                                    class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                                    class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer">
                                 <option value="">-- Sélectionnez une demande --</option>
                                 <option th:each="dem : ${demandes}" 
                                         th:value="${dem.idDemandeRecrutement}" 
@@ -32,29 +33,33 @@
                             </select>
                         </div>
 
+                        <!-- Titre -->
                         <div class="mb-6">
-                            <label for="titre" class="block text-sm font-semibold text-on-surface mb-2">Titre de l'offre <span class="text-red-500">*</span></label>
+                            <label for="titre" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Titre de l'offre <span class="text-red-500">*</span></label>
                             <input type="text" th:field="*{titre}" id="titre" required placeholder="Ex: Développeur Java Senior"
-                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
                         </div>
 
+                        <!-- Date de publication -->
                         <div class="mb-6">
-                            <label for="datePublication" class="block text-sm font-semibold text-on-surface mb-2">Date de publication</label>
+                            <label for="datePublication" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Date de publication</label>
                             <input type="datetime-local" th:field="*{datePublication}" id="datePublication"
-                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
                         </div>
 
+                        <!-- Description -->
                         <div class="mb-8">
-                            <label for="description" class="block text-sm font-semibold text-on-surface mb-2">Description <span class="text-red-500">*</span></label>
+                            <label for="description" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Description <span class="text-red-500">*</span></label>
                             <textarea th:field="*{description}" id="description" rows="5" required placeholder="Missions, profil recherché..."
-                                      class="w-full p-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"></textarea>
+                                      class="w-full p-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors"></textarea>
                         </div>
 
-                        <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high">
-                            <a th:href="@{/offres}" class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high flex items-center">
+                        <!-- Actions -->
+                        <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border">
+                            <a th:href="@{/offres}" class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
                                 Annuler
                             </a>
-                            <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            <button type="submit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
                                 Enregistrer en brouillon
                             </button>
                         </div>

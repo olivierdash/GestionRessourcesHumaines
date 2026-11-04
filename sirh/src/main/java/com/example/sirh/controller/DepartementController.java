@@ -26,10 +26,8 @@ public class DepartementController {
     }
 
     @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("managers", utilisateurService.getManagers());
-        model.addAttribute("departement", new Departement());
-        return "departement/form";
+    public String create() {
+        return "redirect:/departements";
     }
 
     @PostMapping

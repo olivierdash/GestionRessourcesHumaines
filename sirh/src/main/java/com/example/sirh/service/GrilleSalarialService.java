@@ -1,8 +1,12 @@
 package com.example.sirh.service;
 
+import com.example.sirh.dto.GrilleSalarialFilter;
 import com.example.sirh.model.GrilleSalarial;
 import com.example.sirh.repository.GrilleSalarialRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,5 +119,10 @@ public class GrilleSalarialService {
     @Transactional(readOnly = true)
     public Optional<GrilleSalarial> getGrillePourPoste(Integer idPoste) {
         return grilleRepository.findFirstByPosteIdPoste(idPoste);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<GrilleSalarial> getGrillesFiltrees(GrilleSalarialFilter filter, Pageable pageable) {
+        return grilleRepository.findWithFilters(filter, pageable);
     }
 }

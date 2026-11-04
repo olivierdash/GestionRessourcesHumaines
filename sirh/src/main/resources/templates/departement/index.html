@@ -3,23 +3,27 @@
       th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full relative">
 
         <!-- En-tête -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Départements</h2>
-                <p class="text-sm text-on-surface-variant mt-1">Gérez la structure de l'entreprise.</p>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Départements</h2>
+                <p class="text-sm text-slate-600 mt-1">Gérez la structure de l'entreprise.</p>
             </div>
-            <a th:href="@{/departements/create}" 
-               class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
-                <span class="material-symbols-outlined text-[18px]">add</span>
+            <!-- Bouton qui ouvre le modal en mode Création -->
+            <button type="button" onclick="openModal('create')"
+               class="inline-flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+                <span class="material-symbols-outlined text-[16px]">add</span>
                 Nouveau Département
-            </a>
+            </button>
         </div>
 
+        <!-- Message flash (succès) -->
+        <div th:if="${success}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold" th:text="${success}"></div>
+
         <!-- Tableau -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="sirh-table">
                     <thead>
@@ -32,42 +36,215 @@
                     <tbody>
                         <!-- Ligne vide -->
                         <tr th:if="${#lists.isEmpty(departements)}">
-                            <td colspan="3" class="td-empty">
+                            <td colspan="3" class="td-empty py-8 text-center text-slate-500 italic">
                                 Aucun département n'a été créé pour le moment.
                             </td>
                         </tr>
 
                         <!-- Boucle -->
                         <tr th:each="dept : ${departements}">
-                            <td class="font-semibold text-on-surface text-base" th:text="${dept.titre}"></td>
+                            <td class="font-bold text-cobalt-900 text-sm" th:text="${dept.titre}"></td>
                             
                             <td>
                                 <div th:if="${dept.manager != null}" class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                                    <div class="w-7 h-7 rounded bg-cobalt-900 text-white flex items-center justify-center font-bold text-xs">
                                         <span th:text="${#strings.substring(dept.manager.nom, 0, 1)}">J</span>
                                     </div>
-                                    <span class="font-medium text-on-surface" th:text="${dept.manager.nom}"></span>
+                                    <span class="font-medium text-slate-700 text-sm" th:text="${dept.manager.nom}"></span>
                                 </div>
-                                <span th:if="${dept.manager == null}" class="inline-flex px-2.5 py-1 rounded-full bg-surface-container text-outline text-xs font-semibold">
+                                <span th:if="${dept.manager == null}" class="inline-flex px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                                     Non assigné
                                 </span>
                             </td>
                             
                             <td class="text-right whitespace-nowrap">
                                 <a th:href="@{/departements/{id}(id=${dept.idDepartement})}" 
-                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-xs transition-colors border border-surface-container-high">
+                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
                                     Voir
                                 </a>
-                                <a th:href="@{/departements/{id}/edit(id=${dept.idDepartement})}" 
-                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-xs transition-colors shadow-sm ml-2">
+                                <!-- Bouton Modifier avec les data-attributes -->
+                                <button type="button" 
+                                        th:attr="data-id=${dept.idDepartement}, data-titre=${dept.titre}, data-manager=${dept.manager != null ? dept.manager.idUtilisateur : ''}"
+                                        onclick="openModal('edit', this)"
+                                        class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors shadow-sm ml-2">
                                     Modifier
-                                </a>
+                                </button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- ========================================================= -->
+        <!-- MODAL (Création / Édition) -->
+        <!-- ========================================================= -->
+        <div id="departementModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all duration-200">
+            <div class="bg-surface-card w-full max-w-lg rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col transform transition-transform scale-95" id="modalContent">
+                
+                <div class="px-6 py-4 border-b border-neutral-border flex justify-between items-center bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider" id="modalTitle">Nouveau Département</h3>
+                    <button type="button" class="text-slate-400 hover:text-slate-700" onclick="closeModal()">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+
+                <!-- Message d'erreur serveur (si on renvoie sur l'index avec une erreur) -->
+                <div th:if="${error}" class="m-6 mb-0 p-3 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold" th:text="${error}"></div>
+
+                <form id="departementForm" method="post" novalidate class="p-6 flex flex-col gap-5">
+                    
+                    <!-- Champ caché pour simuler le PUT -->
+                    <input type="hidden" name="_method" id="formMethod" value="post">
+
+                    <!-- Titre -->
+                    <div>
+                        <label for="titre" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Titre du département <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="titre" name="titre" required
+                               class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                        <p class="mt-2 text-xs text-red-500 font-semibold hidden" id="titreError">Veuillez saisir un titre unique.</p>
+                    </div>
+
+                    <!-- Manager -->
+                    <div>
+                        <label for="idManager" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Manager assigné</label>
+                        <select id="idManager" name="idManager"
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer">
+                            <option value="">— Aucun —</option>
+                            <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}" th:text="${manager.nom}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-neutral-border">
+                        <button type="button" onclick="closeModal()" class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm">
+                            Annuler
+                        </button>
+                        <button type="submit" id="btnSubmit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SCRIPT DE GESTION DU MODAL ET VALIDATION AJAX -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const modal = document.getElementById('departementModal');
+                const modalContent = document.getElementById('modalContent');
+                const modalTitle = document.getElementById('modalTitle');
+                const form = document.getElementById('departementForm');
+                const formMethod = document.getElementById('formMethod');
+                const titreInput = document.getElementById('titre');
+                const managerSelect = document.getElementById('idManager');
+                const titreError = document.getElementById('titreError');
+                const btnSubmit = document.getElementById('btnSubmit');
+                
+                let currentId = null;
+
+                // Fonction pour ouvrir le modal
+                window.openModal = function(action, button) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => {
+                        modalContent.classList.remove('scale-95');
+                        modalContent.classList.add('scale-100');
+                    }, 10);
+
+                    if (action === 'create') {
+                        currentId = null;
+                        modalTitle.textContent = 'Nouveau Département';
+                        form.action = '/departements';
+                        formMethod.disabled = true; // Pas de _method pour le POST
+                        titreInput.value = '';
+                        managerSelect.value = '';
+                    } else if (action === 'edit') {
+                        currentId = button.getAttribute('data-id');
+                        const titre = button.getAttribute('data-titre');
+                        const managerId = button.getAttribute('data-manager');
+
+                        modalTitle.textContent = 'Modifier le Département';
+                        form.action = '/departements/' + currentId;
+                        formMethod.disabled = false; // Active le _method=put
+                        formMethod.value = 'put';
+                        titreInput.value = titre;
+                        managerSelect.value = managerId;
+                    }
+
+                    // Reset erreurs
+                    titreInput.classList.remove('border-red-500');
+                    titreError.classList.add('hidden');
+                }
+
+                // Fonction pour fermer le modal
+                window.closeModal = function() {
+                    modalContent.classList.remove('scale-100');
+                    modalContent.classList.add('scale-95');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 150);
+                }
+
+                // Fermer en cliquant sur le fond noir
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+
+                // Validation AJAX du titre
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const titreValue = titreInput.value.trim();
+
+                    if (titreValue === "") {
+                        titreInput.classList.add('border-red-500');
+                        titreError.classList.remove('hidden');
+                        titreError.textContent = "Le titre est obligatoire.";
+                        return;
+                    }
+
+                    btnSubmit.disabled = true;
+                    btnSubmit.textContent = "Vérification...";
+
+                    let url = '/departements/check-titre?titre=' + encodeURIComponent(titreValue);
+                    if (currentId) {
+                        url += '&idDepartement=' + currentId;
+                    }
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(isUnique => {
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = "Enregistrer";
+
+                            if (isUnique) {
+                                titreInput.classList.remove('border-red-500');
+                                form.submit(); 
+                            } else {
+                                titreInput.classList.add('border-red-500');
+                                titreError.classList.remove('hidden');
+                                titreError.textContent = "Ce titre de département est déjà utilisé.";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la vérification:", error);
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = "Enregistrer";
+                            form.submit();
+                        });
+                });
+
+                titreInput.addEventListener('input', function() {
+                    titreInput.classList.remove('border-red-500');
+                    titreError.classList.add('hidden');
+                });
+            });
+        </script>
 
     </main>
 </body>

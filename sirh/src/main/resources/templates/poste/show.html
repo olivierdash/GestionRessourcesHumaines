@@ -8,54 +8,51 @@
         <!-- En-tête -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <a th:href="@{/postes}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                    &larr; Retour aux postes
-                </a>
-                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" th:text="${poste.intitule}"></h2>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight" th:text="${poste.intitule}"></h2>
             </div>
             <a th:href="@{/postes/{id}/edit(id=${poste.idPoste})}" 
-               class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
-                <span class="material-symbols-outlined text-[18px]">edit</span>
+               class="inline-flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
                 Modifier
             </a>
         </div>
 
         <!-- Message d'erreur -->
-        <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${error}"></div>
+        <div th:if="${error}" class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm" th:text="${error}"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- Colonne Gauche : Infos -->
-            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
-                <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
-                    <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Informations du poste</h3>
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Informations du poste</h3>
                 </div>
-                <div class="p-6 flex flex-col gap-3">
-                    <p class="m-0"><strong class="text-on-surface">Intitulé :</strong> <span class="text-on-surface-variant" th:text="${poste.intitule}"></span></p>
-                    <p class="m-0"><strong class="text-on-surface">Département :</strong> <span class="text-on-surface-variant" th:text="${poste.departement.titre}"></span></p>
-                    <p class="m-0"><strong class="text-on-surface">Lieu :</strong> <span class="text-on-surface-variant" th:text="${poste.lieu != null ? poste.lieu : 'Non précisé'}"></span></p>
-                    <p class="m-0"><strong class="text-on-surface">Date d'effet :</strong> <span class="text-on-surface-variant" th:text="${poste.dateEffet != null ? poste.dateEffet : 'Non précisée'}"></span></p>
-                    <p class="m-0">
-                        <strong class="text-on-surface">Durée hebdomadaire :</strong> 
-                        <span class="text-on-surface-variant" th:if="${poste.dureeHebdo != null}" th:text="${poste.dureeHebdo + ' heures'}"></span>
-                        <span class="text-on-surface-variant" th:if="${poste.dureeHebdo == null}">Non précisée</span>
+                <div class="p-6 flex flex-col gap-4">
+                    <p class="m-0 text-sm"><strong class="text-slate-700 uppercase tracking-wider text-[11px] mr-2">Intitulé :</strong> <span class="text-cobalt-900 font-bold" th:text="${poste.intitule}"></span></p>
+                    <p class="m-0 text-sm"><strong class="text-slate-700 uppercase tracking-wider text-[11px] mr-2">Département :</strong> <span class="text-slate-800 font-semibold" th:text="${poste.departement.titre}"></span></p>
+                    <p class="m-0 text-sm"><strong class="text-slate-700 uppercase tracking-wider text-[11px] mr-2">Lieu :</strong> <span class="text-slate-800" th:text="${poste.lieu != null ? poste.lieu : 'Non précisé'}"></span></p>
+                    <p class="m-0 text-sm"><strong class="text-slate-700 uppercase tracking-wider text-[11px] mr-2">Date d'effet :</strong> <span class="text-slate-800 font-mono" th:text="${poste.dateEffet != null ? poste.dateEffet : 'Non précisée'}"></span></p>
+                    <p class="m-0 text-sm">
+                        <strong class="text-slate-700 uppercase tracking-wider text-[11px] mr-2">Durée hebdomadaire :</strong> 
+                        <span class="text-slate-800" th:if="${poste.dureeHebdo != null}" th:text="${poste.dureeHebdo + ' heures'}"></span>
+                        <span class="text-slate-500 italic" th:if="${poste.dureeHebdo == null}">Non précisée</span>
                     </p>
                 </div>
             </div>
 
             <!-- Colonne Droite : Ajouter mission -->
-            <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
-                <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
-                    <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Ajouter une mission</h3>
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Ajouter une mission</h3>
                 </div>
                 <div class="p-6">
                     <form method="post" th:action="@{/postes/{id}/missions(id=${poste.idPoste})}" class="flex flex-col gap-4">
                         <div>
-                            <label for="titre" class="block text-sm font-semibold text-on-surface mb-2">Titre de la mission</label>
-                            <input type="text" id="titre" name="titre" maxlength="255" required
-                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                            <label for="titre" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Titre de la mission</label>
+                            <input type="text" id="titre" name="titre" maxlength="255" required placeholder="Ex: Gérer l'infrastructure cloud..."
+                                   class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
                         </div>
-                        <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm self-start">
+                        <button type="submit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm self-start">
                             Ajouter la mission
                         </button>
                     </form>
@@ -63,21 +60,21 @@
             </div>
 
             <!-- Ligne du bas : Missions -->
-            <div class="lg:col-span-2 bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
-                <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
-                    <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Missions du poste</h3>
+            <div class="lg:col-span-2 bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Missions du poste</h3>
                 </div>
                 <div class="p-6">
-                    <div th:if="${#lists.isEmpty(missions)}" class="text-sm text-outline py-2">
+                    <div th:if="${#lists.isEmpty(missions)}" class="text-sm text-slate-500 italic py-2">
                         Aucune mission n'est définie pour ce poste.
                     </div>
 
                     <div th:if="${!#lists.isEmpty(missions)}" class="flex flex-col">
-                        <div th:each="mission : ${missions}" class="flex justify-between items-center border-b border-surface-container-high py-3 last:border-0">
-                            <span class="text-sm font-medium text-on-surface" th:text="${mission.titre}"></span>
+                        <div th:each="mission : ${missions}" class="flex justify-between items-center border-b border-neutral-border py-3 last:border-0">
+                            <span class="text-sm font-semibold text-slate-800" th:text="${mission.titre}"></span>
 
                             <form method="post" th:action="@{/postes/{id}/missions/{missionId}/delete(id=${poste.idPoste}, missionId=${mission.idMission})}" class="m-0">
-                                <button type="submit" class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors border border-red-200 font-medium text-xs"
+                                <button type="submit" class="inline-flex items-center justify-center h-7 px-3 rounded bg-red-50 text-red-700 hover:bg-red-100 transition-colors border border-red-200 font-semibold text-xs"
                                         onclick="return confirm('Supprimer cette mission ?');">
                                     Supprimer
                                 </button>
