@@ -8,93 +8,103 @@
         <!-- En-tête -->
         <div class="flex justify-between items-center">
             <div>
-                <a th:href="@{/offres}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                    &larr; Retour aux offres
-                </a>
-                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Fiche Candidat</h2>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Fiche Candidat</h2>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Conteneur Vertical -->
+        <div class="flex flex-col gap-6 w-full">
             
-            <!-- Colonne de gauche : Informations personnelles -->
-            <div class="lg:col-span-5">
-                <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high h-full flex flex-col overflow-hidden">
-                    <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
-                        <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Informations Personnelles</h3>
-                    </div>
-                    <div class="p-6 flex-grow">
+            <!-- 1. Informations personnelles (Pleine largeur) -->
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Informations Personnelles</h3>
+                </div>
+                <div class="p-6">
+                    
+                    <!-- Layout horizontal pour la carte -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
                         
-                        <div class="text-center mb-6">
-                            <div class="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center font-bold text-3xl mx-auto mb-4">
+                        <!-- Avatar & Nom -->
+                        <div class="flex items-center gap-4 shrink-0">
+                            <div class="w-16 h-16 rounded-full bg-cobalt-800 text-white flex items-center justify-center font-bold text-2xl shadow-sm">
                                 <span th:text="${#strings.substring(candidat.nom, 0, 1)}">D</span>
                             </div>
-                            <h4 class="text-xl font-bold text-on-surface m-0" th:text="${candidat.nom + ' ' + candidat.prenom}">Dupont Jean</h4>
+                            <div>
+                                <h4 class="text-xl font-bold text-cobalt-900 m-0" th:text="${candidat.nom + ' ' + candidat.prenom}">Dupont Jean</h4>
+                                <span class="text-sm text-slate-500 font-medium">Candidat</span>
+                            </div>
                         </div>
 
-                        <div class="flex flex-col gap-4">
+                        <!-- Séparateur vertical -->
+                        <div class="hidden md:block w-px h-16 bg-neutral-border"></div>
+
+                        <!-- Détails (Email, Tel, CV) -->
+                        <div class="flex flex-col sm:flex-row flex-wrap gap-6 md:gap-10 flex-1">
+                            
                             <!-- Email -->
-                            <div class="flex justify-between items-center pb-4 border-b border-surface-container-high">
-                                <span class="text-xs font-semibold text-outline uppercase tracking-wider">Email</span>
-                                <span class="text-sm font-medium text-on-surface" th:text="${candidat.email}">jean.dupont@email.com</span>
+                            <div>
+                                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Email</span>
+                                <span class="text-sm font-semibold text-slate-800" th:text="${candidat.email}"></span>
                             </div>
                             
                             <!-- Téléphone -->
-                            <div class="flex justify-between items-center pb-4 border-b border-surface-container-high">
-                                <span class="text-xs font-semibold text-outline uppercase tracking-wider">Téléphone</span>
-                                <span class="text-sm font-medium text-on-surface" th:text="${candidat.telephone != null ? candidat.telephone : 'Non renseigné'}">06 12 34 56 78</span>
+                            <div>
+                                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Téléphone</span>
+                                <span class="text-sm font-semibold text-slate-800" th:text="${candidat.telephone != null ? candidat.telephone : 'Non renseigné'}"></span>
                             </div>
                             
                             <!-- CV -->
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-semibold text-outline uppercase tracking-wider">CV</span>
+                            <div>
+                                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">CV</span>
                                 <a th:if="${candidat.cvUrl != null}" th:href="${candidat.cvUrl}" target="_blank" 
-                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-primary hover:bg-surface-container-high text-xs font-medium transition-colors border border-surface-container-high">
-                                    Télécharger le CV
+                                   class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors shadow-sm mt-0.5">
+                                    <span class="material-symbols-outlined text-[14px] mr-1">download</span>
+                                    Télécharger
                                 </a>
-                                <span th:if="${candidat.cvUrl == null}" class="text-xs text-outline">Aucun CV fourni</span>
+                                <span th:if="${candidat.cvUrl == null}" class="text-xs text-slate-400 italic block mt-1">Aucun CV</span>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
+
                 </div>
             </div>
 
-            <!-- Colonne de droite : Historique des candidatures -->
-            <div class="lg:col-span-7">
-                <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high h-full flex flex-col overflow-hidden">
-                    <div class="p-6 border-b border-surface-container-high bg-surface-container-low/30">
-                        <h3 class="font-title-sm text-title-sm text-on-surface font-semibold">Historique de ses candidatures</h3>
-                    </div>
-                    
-                    <div class="overflow-x-auto flex-grow">
-                        <table class="sirh-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Offre d'emploi</th>
-                                    <th scope="col">Date de dépôt</th>
-                                    <th scope="col">Statut actuel</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="cand : ${candidatures}">
-                                    <td class="font-medium text-on-surface" th:text="${cand.offre.titre}">Développeur Java</td>
-                                    <td class="text-on-surface-variant" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy')}">12/10/2024</td>
-                                    <td>
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant text-xs font-semibold" 
-                                              th:text="${cand.statutCandidature.libelle}">
-                                            RECU
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr th:if="${candidatures.isEmpty()}">
-                                    <td colspan="3" class="td-empty">
-                                        Aucune candidature enregistrée pour ce candidat.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <!-- 2. Historique des candidatures (En bas) -->
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Historique des candidatures</h3>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="sirh-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Offre d'emploi</th>
+                                <th scope="col">Date de dépôt</th>
+                                <th scope="col">Statut actuel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${candidatures.isEmpty()}">
+                                <td colspan="3" class="td-empty py-8 text-center text-slate-500 italic">
+                                    Aucune candidature enregistrée pour ce candidat.
+                                </td>
+                            </tr>
+                            <tr th:each="cand : ${candidatures}">
+                                <td class="font-bold text-cobalt-900" th:text="${cand.offre.titre}"></td>
+                                <td class="text-slate-600 font-mono" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy')}"></td>
+                                <td>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                          th:classappend="${cand.statutCandidature.libelle == 'RETENU' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (cand.statutCandidature.libelle == 'REFUSE' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
+                                          th:text="${cand.statutCandidature.libelle}">
+                                        RECU
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

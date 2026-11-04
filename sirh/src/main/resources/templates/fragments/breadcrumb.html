@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <nav th:fragment="breadcrumb" th:if="${breadcrumb != null and !breadcrumb.isEmpty()}" aria-label="Breadcrumb" class="mb-6">
+        <ol class="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+            
+            <li th:each="item, iterStat : ${breadcrumb}" class="flex items-center gap-2">
+                
+                <!-- Dernier élément (Page courante) -->
+                <span th:if="${iterStat.last}" 
+                      class="text-cobalt-900 uppercase tracking-wider" 
+                      th:text="${item.label}"></span>
+                
+                <!-- Éléments précédents (Liens) -->
+                <a th:if="${!iterStat.last}" 
+                   th:href="${item.url != null and !item.url.isEmpty() ? item.url : '#'}" 
+                   class="hover:text-cobalt-700 transition-colors uppercase tracking-wider"
+                   th:text="${item.label}">
+                </a>
+
+                <!-- Séparateur (sauf dernier) -->
+                <span th:if="${!iterStat.last}" class="text-slate-400">
+                    <span class="material-symbols-outlined text-[14px] block">chevron_right</span>
+                </span>
+
+            </li>
+        </ol>
+    </nav>
+
+</body>
+</html>

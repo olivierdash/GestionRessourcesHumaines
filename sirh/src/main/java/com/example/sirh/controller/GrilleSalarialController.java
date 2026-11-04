@@ -1,5 +1,6 @@
 package com.example.sirh.controller;
 
+import com.example.sirh.dto.GrilleSalarialFilter;
 import com.example.sirh.model.Departement;
 import com.example.sirh.model.GrilleSalarial;
 import com.example.sirh.model.Poste;
@@ -7,12 +8,16 @@ import com.example.sirh.service.DepartementService;
 import com.example.sirh.service.GrilleSalarialService;
 import com.example.sirh.service.PosteService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/grilles")
@@ -24,8 +29,18 @@ public class GrilleSalarialController {
     private final DepartementService departementService;
 
     @GetMapping
-    public String index(Model model) {
-        model.addAttribute("grilles", grilleService.lister());
+    public String index(
+            @ModelAttribute("filter") GrilleSalarialFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size, // 5 par défaut
+            Model model) {
+
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 20), Sort.by("idGrille").descending());
+        Page<GrilleSalarial> grillesPage = grilleService.getGrillesFiltrees(filter, pageable);
+
+        model.addAttribute("grilles", grillesPage);
+        model.addAttribute("departements", departementService.getAllDepartements());
+
         return "grille/index";
     }
 

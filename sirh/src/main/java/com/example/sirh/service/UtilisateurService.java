@@ -39,6 +39,10 @@ public class UtilisateurService {
         return utilisateurRepository.findAll();
     }
 
+    public List<Utilisateur> getManagersEtRH() {
+        return utilisateurRepository.findByRole_LibelleIn(List.of("MANAGER", "RH"));
+    }
+
     @Transactional(readOnly = true)
     public Utilisateur getByEmail(String email) {
         return utilisateurRepository.findByEmail(email)

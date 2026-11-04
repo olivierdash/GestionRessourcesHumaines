@@ -7,22 +7,17 @@
 
         <!-- En-tête -->
         <div>
-            <a th:href="@{/grilles}"
-                class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                &larr; Retour aux grilles
-            </a>
-            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold"
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight"
                 th:text="${grille.idGrille == null ? 'Nouvelle grille salariale' : 'Modifier la grille salariale'}">
             </h2>
         </div>
 
         <!-- Message d'erreur -->
-        <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium"
+        <div th:if="${error}" class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm"
             th:text="${error}"></div>
 
         <!-- Formulaire -->
-        <div
-            class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="p-6 md:p-8">
                 <form method="post"
                     th:action="${grille.idGrille == null} ? @{/grilles} : @{/grilles/{id}(id=${grille.idGrille})}"
@@ -30,60 +25,61 @@
 
                     <!-- Poste -->
                     <div>
-                        <label for="poste" class="block text-sm font-semibold text-on-surface mb-2">Poste <span
-                                class="text-red-500">*</span></label>
-                        <select th:field="*{poste.idPoste}" required
-                            class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
-                            <option value="">Sélectionner un poste</option>
-                            <option th:each="poste : ${postes}" th:value="${poste.idPoste}" th:text="${poste.intitule}">
-                            </option>
-                        </select>
+                        <label for="poste" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Poste <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select th:field="*{poste.idPoste}" id="poste" required
+                                class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option value="">Sélectionner un poste</option>
+                                <option th:each="poste : ${postes}" th:value="${poste.idPoste}" th:text="${poste.intitule}">
+                                </option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
                     </div>
 
                     <!-- Département -->
                     <div>
-                        <label for="departement" class="block text-sm font-semibold text-on-surface mb-2">Département
-                            <span class="text-red-500">*</span></label>
-                        <select th:field="*{departement.idDepartement}" required
-                            class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
-                            <option value="">Sélectionner un département</option>
-                            <option th:each="departement : ${departements}" th:value="${departement.idDepartement}"
-                                th:text="${departement.titre}"></option>
-                        </select>
+                        <label for="departement" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Département <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select th:field="*{departement.idDepartement}" id="departement" required
+                                class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option value="">Sélectionner un département</option>
+                                <option th:each="departement : ${departements}" th:value="${departement.idDepartement}"
+                                    th:text="${departement.titre}"></option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
                     </div>
 
                     <!-- Salaire Min -->
                     <div>
-                        <label for="salaireMin" class="block text-sm font-semibold text-on-surface mb-2">Salaire minimum
-                            <span class="text-red-500">*</span></label>
-                        <input type="number" th:field="*{salaireMin}" step="0.01" min="0" required
-                            class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label for="salaireMin" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire minimum (€) <span class="text-red-500">*</span></label>
+                        <input type="number" th:field="*{salaireMin}" id="salaireMin" step="0.01" min="0" required
+                            class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
                     </div>
 
                     <!-- Salaire Moyen -->
                     <div>
-                        <label for="salaireMoyen" class="block text-sm font-semibold text-on-surface mb-2">Salaire moyen
-                            <span class="text-red-500">*</span></label>
-                        <input type="number" th:field="*{salaireMoyen}" step="0.01" min="0" required
-                            class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label for="salaireMoyen" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire moyen (€) <span class="text-red-500">*</span></label>
+                        <input type="number" th:field="*{salaireMoyen}" id="salaireMoyen" step="0.01" min="0" required
+                            class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
                     </div>
 
                     <!-- Salaire Max -->
                     <div>
-                        <label for="salaireMax" class="block text-sm font-semibold text-on-surface mb-2">Salaire maximum
-                            <span class="text-red-500">*</span></label>
-                        <input type="number" th:field="*{salaireMax}" step="0.01" min="0" required
-                            class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label for="salaireMax" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire maximum (€) <span class="text-red-500">*</span></label>
+                        <input type="number" th:field="*{salaireMax}" id="salaireMax" step="0.01" min="0" required
+                            class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high mt-2">
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border mt-2">
                         <a th:href="@{/grilles}"
-                            class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high flex items-center">
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
                             Annuler
                         </a>
                         <button type="submit"
-                            class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
                             Enregistrer
                         </button>
                     </div>

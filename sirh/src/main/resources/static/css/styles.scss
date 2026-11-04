@@ -1,23 +1,24 @@
 // =========================================================
-// 1. VARIABLES (Design Tokens)
+// 1. VARIABLES (Design Tokens - High Contrast Cobalt)
 // =========================================================
-$primary: #00236f;
-$primary-hover: #1e3a8a;
-$secondary: #4b41e1;
-$accent: #ef9900;
+$primary: #1e3a8a;       // Cobalt 900
+$primary-hover: #1e40af; // Cobalt 800
 
-$canvas: #faf8ff;
-$surface: #ffffff;
-$surface-low: #f2f3ff;
-$surface-mid: #eaedff;
+$surface-bg: #f8fafc;    // Fond global (Slate 50)
+$surface-card: #ffffff;  // Fond des cartes (Blanc)
+$surface-low: #f1f5f9;   // Fond au survol (Slate 100)
 
-$text-main: #131b2e;
-$text-muted: #757682;
-$border-color: #E2E8F0;
+$text-main: #1e293b;     // Texte principal (Slate 800)
+$text-muted: #64748b;    // Texte secondaire (Slate 500)
+$text-sub: #334155;      // Texte des liens inactifs (Slate 700)
 
-$radius-sm: 6px;
-$radius-md: 8px;
-$radius-lg: 12px;
+$border-color: #e2e8f0;  // Bordures (Slate 200)
+
+// Arrondis (Stitch utilise des arrondis très légers)
+$radius-sm: 0.125rem; // 2px
+$radius-md: 0.25rem;  // 4px
+$radius-lg: 0.375rem; // 6px
+$radius-full: 0.5rem; // 8px
 
 $font-family: 'Inter', sans-serif;
 
@@ -64,20 +65,14 @@ $font-family: 'Inter', sans-serif;
 // 3. STYLES DE BASE & ICÔNES
 // =========================================================
 body {
-    background-color: $canvas;
+    background-color: $surface-bg;
     color: $text-main;
     font-family: $font-family;
     -webkit-font-smoothing: antialiased;
     margin: 0;
     padding: 0;
-    overscroll-behavior: none;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
 }
 
-// Icônes Material
 .ms, .material-symbols-outlined {
     font-family: 'Material Symbols Outlined' !important;
     font-weight: normal;
@@ -96,7 +91,60 @@ body {
 }
 
 // =========================================================
-// 4. CUSTOM SELECT (Liste Flottante)
+// 4. TABLEAUX (Design System Strict)
+// =========================================================
+.sirh-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    min-width: 900px;
+
+    thead {
+        background-color: $surface-low; 
+        border-bottom: 1px solid $border-color;
+        
+        th {
+            padding: 0.75rem 1rem; 
+            color: $text-sub;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+    }
+
+    tbody {
+        tr {
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid $border-color;
+
+            &:hover {
+                background-color: rgba($surface-low, 0.6);
+            }
+
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            font-size: 13px;
+            color: $text-main;
+            vertical-align: middle;
+
+            &.td-empty {
+                text-align: center;
+                padding: 2rem 0;
+                color: $text-muted;
+            }
+        }
+    }
+}
+
+// =========================================================
+// 5. COMPOSANTS (Custom Select / Autocomplete)
 // =========================================================
 .custom-select-wrapper {
     position: relative;
@@ -107,7 +155,7 @@ body {
     top: calc(100% + 4px);
     left: 0;
     right: 0;
-    background: $surface;
+    background: $surface-card;
     border-radius: $radius-sm;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     border: 1px solid $border-color;
@@ -126,7 +174,7 @@ body {
     font-size: 14px;
     color: $text-main;
     cursor: pointer;
-    border-bottom: 1px solid $surface-low;
+    border-bottom: 1px solid $border-color;
     transition: all 0.2s;
 
     &:last-child {
@@ -141,7 +189,7 @@ body {
 }
 
 // =========================================================
-// 5. ANIMATIONS & CORRECTIFS
+// 6. ANIMATIONS & CORRECTIFS
 // =========================================================
 .effectif-wrapper {
     position: relative;
@@ -175,7 +223,7 @@ body {
     transform-origin: center;
     opacity: 0;
     background-color: $primary;
-    color: #FFFFFF;
+    color: $surface-card;
     padding: 0.25rem 0.75rem;
     border-radius: 50rem;
     font-size: 11px;
@@ -187,7 +235,6 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-// Alertes
 .alert-floating {
     border: none;
     font-size: 13px;
@@ -220,66 +267,11 @@ body {
     border: 0 !important;
 }
 
-// Autofill Chrome
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px $surface-low inset !important;
+    -webkit-box-shadow: 0 0 0 30px $surface-card inset !important;
     -webkit-text-fill-color: $text-main !important;
     transition: background-color 5000s ease-in-out 0s;
-}
-// =========================================================
-// 5. TABLEAUX (Design System)
-// =========================================================
-.sirh-table {
-    width: 100%;
-    text-align: left;
-    border-collapse: collapse;
-    min-width: 900px;
-
-    // En-tête du tableau
-    thead {
-        background-color: $surface-mid; 
-        
-        th {
-            padding: 0.875rem 1rem; // ~ py-3.5 px-4
-            color: $text-muted;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            white-space: nowrap;
-        }
-    }
-
-    // Corps du tableau
-    tbody {
-        tr {
-            transition: background-color 0.2s ease;
-            border-bottom: 1px solid $surface-mid;
-
-            &:hover {
-                background-color: rgba($surface-low, 0.6);
-            }
-
-            &:last-child {
-                border-bottom: none;
-            }
-        }
-
-        td {
-            padding: 1rem;
-            font-size: 14px;
-            color: $text-main;
-            vertical-align: middle;
-
-            // Classe spécifique pour la ligne vide
-            &.td-empty {
-                text-align: center;
-                padding: 2rem 0;
-                color: $text-muted;
-            }
-        }
-    }
 }

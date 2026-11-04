@@ -3,6 +3,9 @@ package com.example.sirh.service;
 import com.example.sirh.model.StatutOffreEmploi;
 import com.example.sirh.repository.StatutOffreEmploieRepository;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,6 +13,10 @@ import org.springframework.stereotype.Service;
 public class StatutOffreEmploieService {
 
     private final StatutOffreEmploieRepository statutOffreRepo;
+
+    public List<StatutOffreEmploi> getAllStatuts() {
+        return statutOffreRepo.findAll();
+    }
 
     public StatutOffreEmploi getByLibelle(String libelle) {
         return statutOffreRepo.findByLibelle(libelle)

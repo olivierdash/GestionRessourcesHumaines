@@ -1,5 +1,6 @@
 package com.example.sirh.service;
 
+import com.example.sirh.dto.EmployeFilter;
 import com.example.sirh.model.Affectation;
 import com.example.sirh.model.Candidature;
 import com.example.sirh.model.Employe;
@@ -68,5 +69,10 @@ public class EmployeService {
     public long countByDepartement(Integer idDepartement) {
         return employeRepository
                 .countByCandidature_DemandeRecrutement_Poste_Departement_IdDepartement(idDepartement);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Employe> getEmployesFiltres(EmployeFilter filter, Pageable pageable) {
+        return employeRepository.findWithFilters(filter, pageable);
     }
 }

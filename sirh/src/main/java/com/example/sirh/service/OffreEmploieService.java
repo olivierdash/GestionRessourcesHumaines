@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.sirh.dto.OffreFilter;
 import com.example.sirh.dto.OffrePublicDto;
-import com.example.sirh.model.DemandeRecrutement;
 import com.example.sirh.model.OffreEmploi;
 import com.example.sirh.model.StatutOffreEmploi;
 import com.example.sirh.repository.OffreEmploieRepository;
@@ -44,7 +46,7 @@ public class OffreEmploieService {
             throw new IllegalArgumentException("La demande de recrutement est obligatoire");
         }
 
-        offre.setIdOffre(null); 
+        offre.setIdOffre(null);
         offre.setDemandeRecrutement(
                 demandeRecrutementService.getById(offre.getDemandeRecrutement().getIdDemandeRecrutement()));
         offre.setStatut(statutOffreService.getById(idStatutOffreEmploi));
@@ -124,6 +126,10 @@ public class OffreEmploieService {
             throw new RuntimeException("Cette offre n'est pas publiée.");
         }
         return toPublicDto(offre);
+    }
+
+    public Page<OffreEmploi> getOffresFiltrees(OffreFilter filter, Pageable pageable) {
+        return offreEmploieRepo.findWithFilters(filter, pageable);
     }
 
     /**

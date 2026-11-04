@@ -7,20 +7,17 @@
 
         <!-- En-tête -->
         <div>
-            <a th:href="@{/departements}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                &larr; Retour à la liste
-            </a>
-            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" 
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight" 
                 th:text="${departement.idDepartement == null ? 'Nouveau Département' : 'Modifier le Département'}">
             </h2>
         </div>
 
         <!-- Carte du formulaire -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="p-6 md:p-8">
                 
                 <!-- Message d'erreur serveur -->
-                <div th:if="${error}" class="mb-6 p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${error}"></div>
+                <div th:if="${error}" class="mb-6 p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold" th:text="${error}"></div>
 
                 <form th:action="${departement.idDepartement == null} ? @{/departements} : @{/departements/{id}(id=${departement.idDepartement})}" 
                       method="post" id="departementForm" novalidate>
@@ -30,20 +27,20 @@
 
                     <!-- Titre -->
                     <div class="mb-6">
-                        <label for="titre" class="block text-sm font-semibold text-on-surface mb-2">
+                        <label for="titre" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
                             Titre du département <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="titre" name="titre" th:value="${departement.titre}" required
-                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                               class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
                         <!-- Message d'erreur JS -->
-                        <p class="mt-2 text-xs text-red-500 hidden" id="titreError">Veuillez saisir un titre unique.</p>
+                        <p class="mt-2 text-xs text-red-500 font-semibold hidden" id="titreError">Veuillez saisir un titre unique.</p>
                     </div>
 
                     <!-- Manager -->
                     <div class="mb-8">
-                        <label for="idManager" class="block text-sm font-semibold text-on-surface mb-2">Manager assigné</label>
+                        <label for="idManager" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Manager assigné</label>
                         <select id="idManager" name="idManager"
-                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer">
                             <option value="">— Aucun —</option>
                             <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}" th:text="${manager.nom}"
                                     th:selected="${departement.manager != null and departement.manager.idUtilisateur == manager.idUtilisateur}">
@@ -52,11 +49,11 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high">
-                        <a th:href="@{/departements}" class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high flex items-center">
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border">
+                        <a th:href="@{/departements}" class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
                             Annuler
                         </a>
-                        <button type="submit" id="btnSubmit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                        <button type="submit" id="btnSubmit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
                             Enregistrer
                         </button>
                     </div>
@@ -64,7 +61,7 @@
             </div>
         </div>
 
-        <!-- SCRIPT DE VALIDATION JAVASCRIPT (Adapté pour Tailwind) -->
+        <!-- SCRIPT DE VALIDATION JAVASCRIPT -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const form = document.getElementById('departementForm');

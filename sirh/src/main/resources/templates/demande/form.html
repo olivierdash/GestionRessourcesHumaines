@@ -7,16 +7,13 @@
 
         <!-- En-tête -->
         <div>
-            <a th:href="@{/demandes}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                &larr; Retour à la liste
-            </a>
-            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" 
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight" 
                 th:text="${isBrouillon != null} ? 'Modifier la demande' : 'Nouvelle demande'">
             </h2>
         </div>
 
         <!-- Carte du formulaire -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="p-6 md:p-8">
                 <form th:action="${isBrouillon != null} ? @{/demandes/update} : @{/demandes/create}"
                       method="post" th:object="${demandeRecrutementForm}" id="demandeForm" novalidate>
@@ -25,75 +22,75 @@
 
                     <!-- État actuel -->
                     <div class="mb-6">
-                        <label class="block text-sm font-semibold text-on-surface-variant mb-2">État actuel</label>
+                        <label class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">État actuel</label>
                         <input type="text" readonly
                                th:value="${demandeRecrutementForm.etat != null ? demandeRecrutementForm.etat : 'Brouillon'}"
-                               class="w-full h-11 px-3 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-semibold cursor-not-allowed outline-none">
+                               class="w-full h-11 px-3 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold text-sm cursor-not-allowed outline-none">
                     </div>
 
                     <!-- Manager -->
                     <div class="mb-6">
-                        <label for="idManager" class="block text-sm font-semibold text-on-surface mb-2">Manager demandeur <span class="text-red-500">*</span></label>
-                        <select class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all cursor-pointer" 
+                        <label for="idManager" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Manager demandeur <span class="text-red-500">*</span></label>
+                        <select class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer" 
                                 id="idManager" th:field="*{idManager}" required>
                             <option value="" disabled>Sélectionnez un manager...</option>
                             <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
                                 th:text="${manager.nom + ' (' + manager.role.libelle + ')'}"></option>
                         </select>
-                        <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('idManager')}" th:errors="*{idManager}"></p>
+                        <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('idManager')}" th:errors="*{idManager}"></p>
                     </div>
 
                     <!-- Poste (Custom Select) -->
                     <div class="mb-6">
-                        <label for="posteSearch" class="block text-sm font-semibold text-on-surface mb-2">Poste concerné <span class="text-red-500">*</span></label>
-                        <div class="custom-select-wrapper">
+                        <label for="posteSearch" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Poste concerné <span class="text-red-500">*</span></label>
+                        <div class="custom-select-wrapper relative">
                             <input type="text" id="posteSearch" placeholder="Rechercher..." autocomplete="off" required
-                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all">
-                            <div class="custom-dropdown" id="posteDropdown"></div>
+                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                            <div class="custom-dropdown absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-border rounded shadow-lg z-50 max-h-60 overflow-y-auto hidden" id="posteDropdown"></div>
                             <select class="hidden" id="posteSelect" th:field="*{idPoste}" required>
                                 <option value=""></option>
                                 <option th:each="poste : ${postes}" th:value="${poste.idPoste}" th:text="${poste.intitule}"></option>
                             </select>
                         </div>
-                        <p class="mt-1 text-xs text-red-500" id="posteError" th:if="${#fields.hasErrors('idPoste')}" th:errors="*{idPoste}"></p>
+                        <p class="mt-1 text-xs text-red-500 font-semibold" id="posteError" th:if="${#fields.hasErrors('idPoste')}" th:errors="*{idPoste}"></p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <!-- Date -->
                         <div>
-                            <label for="dateSouhaitee" class="block text-sm font-semibold text-on-surface mb-2">Date d'entrée <span class="text-red-500">*</span></label>
+                            <label for="dateSouhaitee" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Date d'entrée <span class="text-red-500">*</span></label>
                             <input type="date" id="dateSouhaitee" th:field="*{dateSouhaitee}" required
-                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all">
-                            <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('dateSouhaitee')}" th:errors="*{dateSouhaitee}"></p>
+                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                            <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('dateSouhaitee')}" th:errors="*{dateSouhaitee}"></p>
                         </div>
                         <!-- Effectif -->
                         <div>
-                            <label for="effectif" class="block text-sm font-semibold text-on-surface mb-2">Effectif requis <span class="text-red-500">*</span></label>
+                            <label for="effectif" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Effectif requis <span class="text-red-500">*</span></label>
                             <input type="number" id="effectif" th:field="*{effectif}" min="1" required
-                                   class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all">
-                            <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('effectif')}" th:errors="*{effectif}"></p>
+                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                            <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('effectif')}" th:errors="*{effectif}"></p>
                         </div>
                     </div>
 
                     <!-- Motif -->
                     <div class="mb-8">
-                        <label for="idMotif" class="block text-sm font-semibold text-on-surface mb-2">Motif de la demande <span class="text-red-500">*</span></label>
+                        <label for="idMotif" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Motif de la demande <span class="text-red-500">*</span></label>
                         <select id="idMotif" th:field="*{motif.idMotifDemande}" required
-                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all cursor-pointer">
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer">
                             <option value="" disabled>Sélectionnez un motif...</option>
                             <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}" th:text="${motif.libelle}"></option>
                         </select>
-                        <p class="mt-1 text-xs text-red-500" th:if="${#fields.hasErrors('motif.idMotifDemande')}" th:errors="*{motif.idMotifDemande}"></p>
+                        <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('motif.idMotifDemande')}" th:errors="*{motif.idMotifDemande}"></p>
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high">
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border">
                         <button type="submit" name="action" value="save" 
-                                class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high">
+                                class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm">
                             Enregistrer le brouillon
                         </button>
                         <button type="submit" name="action" value="submit" 
-                                class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm"
+                                class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm"
                                 th:text="${isBrouillon != null} ? 'Mettre à jour et Soumettre' : 'Soumettre la demande'">
                         </button>
                     </div>
@@ -101,7 +98,7 @@
             </div>
         </div>
 
-        <!-- SCRIPT (Inchangé, gère la liste flottante) -->
+        <!-- SCRIPT (Inchangé) -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const form = document.getElementById('demandeForm');
@@ -114,11 +111,11 @@
                     const options = Array.from(hiddenSelect.options).filter(opt => opt.value !== "");
                     options.forEach(opt => {
                         const div = document.createElement('div');
-                        div.className = 'custom-option';
+                        div.className = 'px-3 py-2 text-sm text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-100 last:border-0 custom-option';
                         div.textContent = opt.text;
                         div.dataset.value = opt.value;
                         if (opt.selected) {
-                            div.classList.add('active');
+                            div.classList.add('bg-slate-100', 'font-bold', 'text-cobalt-800');
                             searchInput.value = opt.text;
                         }
                         div.addEventListener('click', () => selectOption(opt, div));
@@ -130,8 +127,8 @@
                     searchInput.value = opt.text;
                     hiddenSelect.value = opt.value;
                     searchInput.classList.remove('border-red-500');
-                    dropdown.querySelectorAll('.custom-option').forEach(el => el.classList.remove('active'));
-                    divElement.classList.add('active');
+                    dropdown.querySelectorAll('.custom-option').forEach(el => el.classList.remove('bg-slate-100', 'font-bold', 'text-cobalt-800'));
+                    divElement.classList.add('bg-slate-100', 'font-bold', 'text-cobalt-800');
                     closeDropdown();
                 }
 
@@ -155,7 +152,7 @@
                     if (show) {
                         if (!noResultDiv) {
                             noResultDiv = document.createElement('div');
-                            noResultDiv.className = 'custom-option no-result';
+                            noResultDiv.className = 'px-3 py-2 text-sm text-slate-500 italic custom-option no-result';
                             noResultDiv.textContent = 'Aucun poste trouvé';
                             dropdown.appendChild(noResultDiv);
                         }
@@ -165,13 +162,13 @@
                     }
                 }
 
-                function openDropdown() { dropdown.classList.add('show'); filterList(); }
-                function closeDropdown() { dropdown.classList.remove('show'); }
+                function openDropdown() { dropdown.classList.remove('hidden'); filterList(); }
+                function closeDropdown() { dropdown.classList.add('hidden'); }
 
                 function isFormValid() {
                     let isValid = true;
                     if (hiddenSelect.value === "") {
-                        searchInput.classList.add('border-red-500'); // Classe Tailwind pour l'erreur
+                        searchInput.classList.add('border-red-500');
                         isValid = false;
                     } else {
                         searchInput.classList.remove('border-red-500');

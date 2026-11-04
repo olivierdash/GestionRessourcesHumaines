@@ -7,71 +7,71 @@
 
         <!-- En-tête -->
         <div>
-            <a th:href="@{/postes}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                &larr; Retour aux postes
-            </a>
-            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold" 
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight" 
                 th:text="${poste.idPoste == null ? 'Nouveau poste' : 'Modifier le poste'}">
             </h2>
         </div>
 
         <!-- Message d'erreur -->
-        <div th:if="${error}" class="p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm font-medium" th:text="${error}"></div>
+        <div th:if="${error}" class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm" th:text="${error}"></div>
 
         <!-- Formulaire -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="p-6 md:p-8">
                 <form method="post" th:action="${poste.idPoste == null} ? @{/postes} : @{/postes/{id}(id=${poste.idPoste})}" class="flex flex-col gap-5">
 
                     <!-- Intitulé -->
                     <div>
-                        <label for="intitule" class="block text-sm font-semibold text-on-surface mb-2">Intitulé du poste <span class="text-red-500">*</span></label>
+                        <label for="intitule" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Intitulé du poste <span class="text-red-500">*</span></label>
                         <input type="text" id="intitule" name="intitule" th:value="${poste.intitule}" required maxlength="255"
-                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
                     </div>
 
                     <!-- Département -->
                     <div>
-                        <label for="idDepartement" class="block text-sm font-semibold text-on-surface mb-2">Département <span class="text-red-500">*</span></label>
-                        <select id="idDepartement" name="idDepartement" required
-                                class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
-                            <option value="">Sélectionner un département</option>
-                            <option th:each="departement : ${departements}"
-                                    th:value="${departement.idDepartement}"
-                                    th:text="${departement.titre}"
-                                    th:selected="${poste.departement != null and poste.departement.idDepartement == departement.idDepartement}">
-                            </option>
-                        </select>
+                        <label for="idDepartement" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Département <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select id="idDepartement" name="idDepartement" required
+                                    class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option value="">Sélectionner un département</option>
+                                <option th:each="departement : ${departements}"
+                                        th:value="${departement.idDepartement}"
+                                        th:text="${departement.titre}"
+                                        th:selected="${poste.departement != null and poste.departement.idDepartement == departement.idDepartement}">
+                                </option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
                     </div>
 
                     <!-- Date d'effet -->
                     <div>
-                        <label for="dateEffet" class="block text-sm font-semibold text-on-surface mb-2">Date d'effet</label>
+                        <label for="dateEffet" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Date d'effet</label>
                         <input type="date" id="dateEffet" name="dateEffet" th:value="${poste.dateEffet}"
-                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
                     </div>
 
                     <!-- Lieu -->
                     <div>
-                        <label for="lieu" class="block text-sm font-semibold text-on-surface mb-2">Lieu</label>
+                        <label for="lieu" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Lieu</label>
                         <input type="text" id="lieu" name="lieu" th:value="${poste.lieu}" maxlength="255"
-                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
                     </div>
 
                     <!-- Durée hebdo -->
                     <div>
-                        <label for="dureeHebdo" class="block text-sm font-semibold text-on-surface mb-2">Durée hebdomadaire</label>
+                        <label for="dureeHebdo" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Durée hebdomadaire</label>
                         <input type="number" id="dureeHebdo" name="dureeHebdo" th:value="${poste.dureeHebdo}" min="1" max="168"
-                               class="w-full h-11 px-3 bg-surface-container-low border border-transparent rounded-lg text-sm text-on-surface focus:outline-none focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
-                        <div class="mt-1 text-xs text-outline">Durée en heures par semaine.</div>
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                        <div class="mt-1 text-xs text-slate-500 font-medium">Durée en heures par semaine.</div>
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-surface-container-high mt-2">
-                        <a th:href="@{/postes}" class="h-11 px-6 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-sm transition-colors border border-surface-container-high flex items-center">
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border mt-2">
+                        <a th:href="@{/postes}" class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
                             Annuler
                         </a>
-                        <button type="submit" class="h-11 px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-sm transition-colors shadow-sm">
+                        <button type="submit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
                             Enregistrer
                         </button>
                     </div>
