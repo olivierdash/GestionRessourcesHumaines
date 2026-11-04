@@ -27,6 +27,9 @@ public class UtilisateurController {
 
         Utilisateur utilisateur = userDetails.getUtilisateur();
 
+        // --- LOGS DE DEBUGGING ---
+
+
         // Redirection si ADMIN
         if ("ADMIN".equalsIgnoreCase(utilisateur.getRole().getLibelle())) {
             return "redirect:/admin/utilisateurs";

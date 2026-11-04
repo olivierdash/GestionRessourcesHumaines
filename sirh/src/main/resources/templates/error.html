@@ -6,20 +6,28 @@
     <title>Erreur - SIRH Pro</title>
     
     <!-- 1. Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script th:src="@{/js/tailwind.js}"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: "#00236f",
-                        "primary-container": "#1e3a8a",
-                        background: "#faf8ff",
-                        "surface-mid": "#eaedff",
-                        "on-surface": "#131b2e",
-                        outline: "#757682",
-                        secondary: "#4b41e1"
+                        cobalt: {
+                            950: "#0f172a", 900: "#1e3a8a", 800: "#1e40af", 
+                            700: "#1d4ed8", 600: "#2563eb", 500: "#3b82f6", 50: "#eff6ff"
+                        },
+                        "neutral-border": "#e2e8f0",
+                        "surface-bg": "#f8fafc",
+                        "surface-card": "#ffffff",
+                        "body-text": "#1e293b",
+                        "muted-text": "#64748b"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.125rem",
+                        lg: "0.25rem",
+                        xl: "0.375rem",
+                        full: "0.5rem"
                     }
                 }
             }
@@ -34,49 +42,49 @@
     </style>
 </head>
 
-<body class="bg-background h-screen font-sans antialiased text-on-surface overflow-hidden flex items-center justify-center relative">
+<body class="bg-surface-bg h-screen font-sans antialiased text-body-text overflow-hidden flex items-center justify-center relative">
 
-    <!-- Fond décoratif (Blobs) -->
-    <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-blue-200/40 blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-orange-200/30 blur-3xl pointer-events-none"></div>
+    <!-- Fond décoratif (Blobs) - Couleurs adaptées au design Cobalt -->
+    <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-cobalt-100/50 blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-slate-200/50 blur-3xl pointer-events-none"></div>
 
     <!-- Contenu principal -->
     <div class="relative z-10 w-full max-w-3xl px-6 py-12 flex flex-col items-center text-center">
         
         <!-- Code HTTP + Illustration -->
         <div class="relative flex items-center justify-center mb-6">
-            <!-- Le code d'erreur en très grand (404, 500...) -->
-            <span class="text-[120px] leading-none font-bold tracking-tighter text-surface-mid select-none" 
+            <!-- Le code d'erreur en très grand -->
+            <span class="text-[120px] leading-none font-bold tracking-tighter text-slate-200 select-none" 
                   th:text="${status != null ? status : '500'}"></span>
             
             <!-- L'illustration SVG superposée -->
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <svg class="w-28 h-28 text-primary-container/80 drop-shadow-lg" fill="none" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-28 h-28 text-cobalt-800 drop-shadow-md" fill="none" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
                     <rect fill="currentColor" fill-opacity="0.08" height="72" rx="10" width="76" x="22" y="24"></rect>
                     <path d="M38 42H82M38 56H68M38 70H54" stroke="currentColor" stroke-linecap="round" stroke-width="3"></path>
                     <circle cx="74" cy="74" fill="#FFFFFF" r="18"></circle>
-                    <circle cx="74" cy="74" r="18" stroke="#ef9900" stroke-width="3.5"></circle>
-                    <line stroke="#ef9900" stroke-linecap="round" stroke-width="4" x1="87" x2="102" y1="87" y2="102"></line>
-                    <path d="M70 74H78M74 70V78" stroke="#00236f" stroke-linecap="round" stroke-width="2"></path>
+                    <!-- Cercle d'alerte en rouge (pour le contraste et l'erreur) -->
+                    <circle cx="74" cy="74" r="18" stroke="#ef4444" stroke-width="3.5"></circle>
+                    <line stroke="#ef4444" stroke-linecap="round" stroke-width="4" x1="87" x2="102" y1="87" y2="102"></line>
+                    <path d="M70 74H78M74 70V78" stroke="#1e3a8a" stroke-linecap="round" stroke-width="2"></path>
                 </svg>
             </div>
         </div>
 
         <!-- Texte dynamique -->
-        <h1 class="text-2xl md:text-3xl font-bold text-on-surface mb-3 max-w-2xl" 
+        <h1 class="text-2xl md:text-3xl font-bold text-cobalt-900 mb-3 max-w-2xl" 
             th:text="${error != null ? error : 'Ressource RH introuvable'}">
-            Ressource RH introuvable
         </h1>
         
-        <p class="text-base text-outline mb-8 max-w-lg leading-relaxed" 
+        <p class="text-base text-slate-600 mb-8 max-w-lg leading-relaxed" 
            th:text="${message != null ? message : ''}">
         </p>
 
         <!-- Bouton -->
         <div class="flex items-center justify-center w-full">
             <button type="button" onclick="window.history.back()" 
-                class="inline-flex items-center justify-center gap-2 h-12 px-8 bg-primary-container hover:bg-primary text-white font-semibold text-sm rounded-xl transition-colors shadow-sm">
-                <span class="ms text-[20px]">arrow_back</span>
+                class="inline-flex items-center justify-center gap-2 h-11 px-6 bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs rounded transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
                 <span>Page précédente</span>
             </button>
         </div>
