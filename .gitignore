@@ -61,7 +61,6 @@ pnpm-debug.log*
 .env
 
 ### Configuration Spring — connexion base de données locale
-*.properties
 
 # ===========================================
 # Environnement de développement personnel
