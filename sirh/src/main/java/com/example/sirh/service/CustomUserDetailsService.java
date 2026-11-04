@@ -8,8 +8,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j; // <-- Ajout de l'import Lombok
+
 
 @Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UtilisateurRepository utilisateurRepository;
@@ -22,7 +25,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + email));
-
+        log.info("=== DEBUG ACCÈS DASHBOARD ===");
+        log.info("Utilisateur connecté (Email) : {}", utilisateur.getEmail());
+        log.info("Rôle en base de données : {}", utilisateur.getRole().getLibelle());
+        log.info("=============================");
         // On retourne notre propre objet qui contient toutes les infos
         return new CustomUserDetails(utilisateur);
     }
