@@ -70,3 +70,7 @@ docker-compose.yml
 .devcontainer/**/*
 Dockerfile
 *.sh
+
+
+site-public/vite.config.js
+config/*

@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/public/applications")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:3010")
 public class PublicApplicationController {
 
     private final CandidatureService candidatureService;

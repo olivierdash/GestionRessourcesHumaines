@@ -110,7 +110,7 @@ npm install
 npm run dev
 ```
 
-Démarre sur **http://localhost:5173**
+Démarre sur **http://localhost:3010**
 
 Le proxy Vite redirige automatiquement `/api/**` vers `http://localhost:8080`.
 
@@ -198,7 +198,7 @@ server: {
   port: 5173,
   proxy: {
     '/api': {
-      target: 'http://localhost:8080',
+      target: 'http://app:8080',
       changeOrigin: true,
     },
   },
