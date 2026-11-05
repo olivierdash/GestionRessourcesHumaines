@@ -14,7 +14,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://app:8081',
-        changeOrigin: true,                // ← recommandé (voir note ci-dessous)
+        changeOrigin: true,                
       },
     },
   },
