@@ -35,7 +35,6 @@ public class DashboardService {
         String role = utilisateur.getRole().getLibelle().toUpperCase();
         Integer idManager = "MANAGER".equals(role) ? utilisateur.getIdUtilisateur() : null;
 
-        // 1. Détermination des états à surveiller pour le KPI 1
         List<String> etatsAValider = switch (role) {
             case "RH" -> List.of("Cree");
             case "FINANCE" -> List.of("ValideRH");
@@ -44,27 +43,19 @@ public class DashboardService {
             default -> List.of();
         };
 
-        // 2. KPI 1 : Demandes en cours
         long demandesEnCours = (idManager == null)
                 ? demandeRepo.countByEtatDemandeIntituleIn(etatsAValider)
                 : demandeRepo.countByEtatDemandeIntituleInAndManagerIdUtilisateur(etatsAValider, idManager);
 
-        // 3. KPI 3 : Postes ouverts
         long postesOuverts = (idManager == null)
                 ? offreRepo.countByStatutLibelle("PUBLIEE")
                 : offreRepo.countByStatutLibelleAndDemandeRecrutementManagerIdUtilisateur("PUBLIEE", idManager);
 
-        // 4. KPI 4 : Candidatures (7 derniers jours)
         LocalDateTime ilYa7Jours = LocalDateTime.now().minusDays(7);
-        long candidaturesSemaine = (idManager == null)
-                ? candidatureRepo.countByDateDepotCandidatureAfter(ilYa7Jours)
-                : candidatureRepo.countByDateDepotCandidatureAfterAndOffreDemandeRecrutementManagerIdUtilisateur(ilYa7Jours, idManager);
+        long candidaturesSemaine = candidatureRepo.countByPeriodWithFilters(ilYa7Jours, null, idManager, null);
 
-        // 5. Données du graphique (30 derniers jours)
         LocalDateTime ilYa30Jours = LocalDateTime.now().minusDays(30);
-        List<Candidature> candidatures30Jours = (idManager == null)
-                ? candidatureRepo.findByDateDepotCandidatureAfter(ilYa30Jours)
-                : candidatureRepo.findByDateDepotCandidatureAfterAndOffreDemandeRecrutementManagerIdUtilisateur(ilYa30Jours, idManager);
+        List<Candidature> candidatures30Jours = candidatureRepo.findByPeriodWithFilters(ilYa30Jours, null, idManager);
 
         List<ChartPointDto> chartData = new ArrayList<>();
         Map<String, Long> groupByDate = candidatures30Jours.stream()
@@ -75,7 +66,6 @@ public class DashboardService {
                 ));
         groupByDate.forEach((date, count) -> chartData.add(new ChartPointDto(date, count)));
 
-        // 6. Table : Dernières demandes (avec limite dynamique)
         Pageable limite = PageRequest.of(0, limit);
         List<DemandeRecrutement> dernieres = (idManager == null)
                 ? demandeRepo.findAllByOrderByDateCreationDesc(limite)

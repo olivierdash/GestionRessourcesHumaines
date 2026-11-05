@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
-                        .requestMatchers("/login", "/utilisateur/login").permitAll()
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
                         .requestMatchers("/propositions/**").hasAnyRole("RH", "FINANCE", "DG")
@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("motDePasse")
-                        .defaultSuccessUrl("/utilisateur/dashboard", true)
+                        .defaultSuccessUrl("/utilisateur", true)
                         .permitAll())
 
                 .logout(logout -> logout

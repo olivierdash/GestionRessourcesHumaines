@@ -4,6 +4,7 @@ import com.example.sirh.model.PropositionEmbauche;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface PropositionEmbaucheRepository extends JpaRepository<Proposition
     List<PropositionEmbauche> findAllByOrderByIdPropositionDesc();
 
     boolean existsByCandidatureIdCandidatureAndStatutLibelleIn(Integer idCandidature, Collection<String> libelles);
+    long countByDatePropositionBetween(LocalDateTime start, LocalDateTime end);
 }

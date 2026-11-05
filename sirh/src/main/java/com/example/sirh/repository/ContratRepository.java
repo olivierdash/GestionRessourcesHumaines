@@ -26,4 +26,8 @@ public interface ContratRepository extends JpaRepository<Contrat, Integer> {
             @Param("fin") LocalDate fin);
 
     List<Contrat> findByEmployeIdEmployer(Integer idEmployer);
+    long countByStatutLibelleAndDateFinBetween(
+        String libelle,
+        LocalDate start,
+        LocalDate end);
 }

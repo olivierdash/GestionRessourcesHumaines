@@ -105,8 +105,8 @@
             <nav class="px-2 pt-4 flex flex-col gap-1 overflow-y-auto flex-1">
 
                 <!-- Tableau de bord -->
-                <a sec:authorize="!hasRole('ADMIN')" th:href="@{/utilisateur/dashboard}"
-                    data-path="/utilisateur/dashboard"
+                <a sec:authorize="!hasRole('ADMIN')" th:href="@{/utilisateur}"
+                    data-path="/utilisateur"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                     title="Tableau de bord">
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">grid_view</span>
@@ -274,7 +274,7 @@
                 let isActive = false;
 
                 // Cas 1 : Racine
-                if (currentPath === '/' && path === '/utilisateur/dashboard') {
+                if (currentPath === '/' && path === '/utilisateur') {
                     isActive = true;
                 }
                 // Cas 2 : Exception Demandes vs Validations
