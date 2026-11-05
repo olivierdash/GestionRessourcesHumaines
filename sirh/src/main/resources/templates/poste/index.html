@@ -3,27 +3,27 @@
       th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6 select-none">
 
         <!-- En-tête -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
             <div>
-                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Référentiel des postes</h2>
-                <p class="text-sm text-on-surface-variant mt-1">Consultez les postes disponibles dans l'entreprise.</p>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Référentiel des postes</h2>
+                <p class="text-sm text-slate-600 mt-1">Consultez les postes disponibles dans l'entreprise.</p>
             </div>
-            <a th:href="@{/postes/create}" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
-                <span class="material-symbols-outlined text-[18px]">add</span>
+            <a th:href="@{/postes/create}" class="inline-flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+                <span class="material-symbols-outlined text-[16px]">add</span>
                 Nouveau poste
             </a>
         </div>
 
         <!-- Message vide -->
-        <div th:if="${#lists.isEmpty(postes)}" class="p-4 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-sm font-medium">
+        <div th:if="${#lists.isEmpty(postes)}" class="p-4 rounded bg-cobalt-50 text-cobalt-800 border border-cobalt-200 text-sm font-semibold shadow-sm">
             Aucun poste n'a encore été créé.
         </div>
 
         <!-- Tableau -->
-        <div th:if="${!#lists.isEmpty(postes)}" class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+        <div th:if="${!#lists.isEmpty(postes)}" class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="sirh-table">
                     <thead>
@@ -37,20 +37,20 @@
                     </thead>
                     <tbody>
                         <tr th:each="poste : ${postes}">
-                            <td class="font-medium text-on-surface" th:text="${poste.intitule}"></td>
-                            <td th:text="${poste.departement.titre}"></td>
-                            <td th:text="${poste.lieu != null ? poste.lieu : '-'}"></td>
+                            <td class="font-bold text-cobalt-900" th:text="${poste.intitule}"></td>
+                            <td class="text-slate-700" th:text="${poste.departement.titre}"></td>
+                            <td class="text-slate-700" th:text="${poste.lieu != null ? poste.lieu : '-'}"></td>
                             <td>
-                                <span th:if="${poste.dureeHebdo != null}" th:text="${poste.dureeHebdo + ' h/semaine'}"></span>
-                                <span th:if="${poste.dureeHebdo == null}">-</span>
+                                <span th:if="${poste.dureeHebdo != null}" class="text-slate-700" th:text="${poste.dureeHebdo + ' h/semaine'}"></span>
+                                <span th:if="${poste.dureeHebdo == null}" class="text-slate-400 italic">-</span>
                             </td>
                             <td class="text-right whitespace-nowrap">
                                 <a th:href="@{/postes/{id}(id=${poste.idPoste})}" 
-                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-medium text-xs transition-colors border border-surface-container-high">
+                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
                                     Consulter
                                 </a>
                                 <a th:href="@{/postes/{id}/edit(id=${poste.idPoste})}" 
-                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-medium text-xs transition-colors shadow-sm ml-2">
+                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors shadow-sm ml-2">
                                     Modifier
                                 </a>
                             </td>

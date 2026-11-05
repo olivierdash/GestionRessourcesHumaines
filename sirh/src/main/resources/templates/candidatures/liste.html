@@ -3,76 +3,74 @@
       th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
 
         <!-- En-tête -->
         <div>
-            <a th:href="@{/offres}" class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-2">
-                &larr; Retour aux offres
-            </a>
-            <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">
-                Candidatures pour l'offre : <span class="text-primary" th:text="${offre.titre}"></span>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">
+                Candidatures pour l'offre : <span class="text-cobalt-700" th:text="${offre.titre}"></span>
             </h2>
         </div>
 
         <!-- Tableau -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="sirh-table">
                     <thead>
                         <tr>
                             <th scope="col">Candidat</th>
-                            <th scope="col">Email</th>
                             <th scope="col">Date de dépôt</th>
                             <th scope="col">Statut</th>
                             <th scope="col" class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr th:if="${candidatures.isEmpty()}">
+                            <td colspan="5" class="td-empty py-8 text-center text-slate-500 italic">
+                                Aucune candidature pour cette offre.
+                            </td>
+                        </tr>
                         <tr th:each="cand : ${candidatures}">
-                            <td class="font-medium text-on-surface" th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
-                            <td class="text-on-surface-variant" th:text="${cand.candidat.email}"></td>
-                            <td class="text-on-surface-variant whitespace-nowrap" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td class="font-bold text-cobalt-900" th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
+                            <td class="text-slate-700 font-mono text-xs whitespace-nowrap" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy HH:mm')}"></td>
                             <td>
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant text-xs font-semibold" 
+                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                      th:classappend="${cand.statutCandidature.libelle == 'RETENU' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : (cand.statutCandidature.libelle == 'REFUSE' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-slate-100 border-slate-300 text-slate-700')}"
                                       th:text="${cand.statutCandidature.libelle}">
                                 </span>
                             </td>
                             <td class="text-right whitespace-nowrap">
-                                <a th:href="@{/candidats/{id}(id=${cand.candidat.idCandidat})}" 
-                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high text-xs font-medium transition-colors border border-surface-container-high">
-                                    Fiche Candidat
-                                </a>
-                                <a th:href="@{/candidatures/{id}/evaluer(id=${cand.idCandidature})}" 
-                                   class="inline-flex items-center justify-center h-8 px-3 rounded-lg bg-primary text-on-white hover:bg-primary-container text-xs font-medium transition-colors shadow-sm ml-2">
-                                    Évaluer
-                                </a>
+                                <div class="inline-flex gap-2">
+                                    <a th:href="@{/candidats/{id}(id=${cand.candidat.idCandidat})}" 
+                                       class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                        Fiche
+                                    </a>
+                                    <a th:href="@{/candidatures/{id}/evaluer(id=${cand.idCandidature})}" 
+                                       class="inline-flex items-center justify-center h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 text-xs font-semibold transition-colors shadow-sm">
+                                        Évaluer
+                                    </a>
 
-                                <!-- 🔥 NOUVEAUX BOUTONS (Affichés seulement si le candidat n'est ni RETENU (3) ni REFUSE (4)) -->
-                                <div th:if="${cand.statutCandidature.id != 3 and cand.statutCandidature.id != 4}" style="display:inline-block;">
-                                    
-                                    <!-- Bouton RETENIR -->
-                                    <form th:action="@{/candidatures/{id}/retenir(id=${cand.idCandidature})}" method="post" style="display:inline;">
-                                        <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
-                                        <button type="submit" class="btn-soft btn-sm-x ms-1" style="color: #198754; border-color: #198754;" title="Retenir ce candidat">
-                                            Retenir
-                                        </button>
-                                    </form>
-                                    
-                                    <!-- Bouton REFUSER -->
-                                    <form th:action="@{/candidatures/{id}/refuser(id=${cand.idCandidature})}" method="post" style="display:inline;">
-                                        <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
-                                        <button type="submit" class="btn-soft btn-sm-x ms-1" style="color: #dc3545; border-color: #dc3545;" title="Refuser ce candidat">
-                                            Refuser
-                                        </button>
-                                    </form>
-                                    
+                                    <!-- Boutons RETENIR / REFUSER -->
+                                    <div th:if="${cand.statutCandidature.id != 3 and cand.statutCandidature.id != 4}" class="inline-flex gap-2 ml-2 pl-2 border-l border-slate-300">
+                                        
+                                        <!-- Bouton RETENIR -->
+                                        <form th:action="@{/candidatures/{id}/retenir(id=${cand.idCandidature})}" method="post" class="m-0">
+                                            <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
+                                            <button type="submit" class="inline-flex items-center justify-center h-7 px-3 rounded bg-emerald-50 border border-emerald-300 text-emerald-800 hover:bg-emerald-100 text-xs font-semibold transition-colors" title="Retenir ce candidat">
+                                                Retenir
+                                            </button>
+                                        </form>
+                                        
+                                        <!-- Bouton REFUSER -->
+                                        <form th:action="@{/candidatures/{id}/refuser(id=${cand.idCandidature})}" method="post" class="m-0">
+                                            <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
+                                            <button type="submit" class="inline-flex items-center justify-center h-7 px-3 rounded bg-red-50 border border-red-300 text-red-800 hover:bg-red-100 text-xs font-semibold transition-colors" title="Refuser ce candidat">
+                                                Refuser
+                                            </button>
+                                        </form>
+                                        
+                                    </div>
                                 </div>
-                            </td>
-                        </tr>
-                        <tr th:if="${candidatures.isEmpty()}">
-                            <td colspan="5" class="td-empty">
-                                Aucune candidature pour cette offre.
                             </td>
                         </tr>
                     </tbody>

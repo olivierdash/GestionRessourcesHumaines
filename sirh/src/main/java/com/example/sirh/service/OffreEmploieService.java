@@ -1,13 +1,18 @@
 package com.example.sirh.service;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.sirh.dto.OffreFilter;
 import com.example.sirh.dto.OffrePublicDto;
-import com.example.sirh.model.DemandeRecrutement;
+import com.example.sirh.exception.ValidationMetierException;
 import com.example.sirh.model.OffreEmploi;
 import com.example.sirh.model.StatutOffreEmploi;
 import com.example.sirh.repository.OffreEmploieRepository;
@@ -17,7 +22,7 @@ import lombok.AllArgsConstructor;
 
 /**
  * @author vox
- * OffreEmploieService
+ *         OffreEmploieService
  */
 @Service
 @AllArgsConstructor
@@ -39,22 +44,40 @@ public class OffreEmploieService {
      * task 9 : créer une offre d'emploi
      */
     @Transactional
-    public OffreEmploi createNewOffer(Integer id_demande_recrutement,
-            String title,
-            String description,
-            Integer id_statut_offre_emploie) {
+    public OffreEmploi createNewOffer(OffreEmploi offre, Integer idStatutOffreEmploi) {
 
-        DemandeRecrutement demandeRecrutement = demandeRecrutementService.getById(id_demande_recrutement);
-        StatutOffreEmploi statutOffreEmploi = statutOffreService.getById(id_statut_offre_emploie);
+        // --- RÈGLES DE GESTION (Accumulation des erreurs) ---
+        Map<String, String> errors = new LinkedHashMap<>();
 
-        OffreEmploi newoffer = OffreEmploi.builder()
-                .demandeRecrutement(demandeRecrutement)
-                .titre(title)
-                .description(description)
-                .statut(statutOffreEmploi)
-                .build();
+        // 1. Demande de recrutement
+        if (offre.getDemandeRecrutement() == null
+                || offre.getDemandeRecrutement().getIdDemandeRecrutement() == null) {
+            errors.put("demandeRecrutement.idDemandeRecrutement",
+                    "La demande de recrutement est obligatoire.");
+        }
 
-        return offreEmploieRepo.save(newoffer);
+        // 2. Titre
+        if (offre.getTitre() == null || offre.getTitre().isBlank()) {
+            errors.put("titre", "Le titre de l'offre est obligatoire.");
+        }
+
+        // 3. Description
+        if (offre.getDescription() == null || offre.getDescription().isBlank()) {
+            errors.put("description", "La description de l'offre est obligatoire.");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationMetierException(errors);
+        }
+        // ----------------------------------------------------
+
+        // Suite de la logique (si pas d'erreur)
+        offre.setIdOffre(null);
+        offre.setDemandeRecrutement(
+                demandeRecrutementService.getById(offre.getDemandeRecrutement().getIdDemandeRecrutement()));
+        offre.setStatut(statutOffreService.getById(idStatutOffreEmploi));
+
+        return offreEmploieRepo.save(offre);
     }
 
     /**
@@ -129,6 +152,10 @@ public class OffreEmploieService {
             throw new RuntimeException("Cette offre n'est pas publiée.");
         }
         return toPublicDto(offre);
+    }
+
+    public Page<OffreEmploi> getOffresFiltrees(OffreFilter filter, Pageable pageable) {
+        return offreEmploieRepo.findWithFilters(filter, pageable);
     }
 
     /**

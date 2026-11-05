@@ -3,22 +3,25 @@
       th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full">
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6 select-none">
 
         <!-- En-tête -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h2 class="font-headline-xl text-headline-xl text-on-surface font-bold">Liste des employés</h2>
-                <p class="text-sm text-on-surface-variant mt-1">Gérez les employés de l'entreprise.</p>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Liste des employés</h2>
+                <p class="text-sm text-slate-600 mt-1">Gérez les employés de l'entreprise.</p>
             </div>
-            <a th:href="@{/employes/create}" class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm font-medium text-sm">
-                <span class="material-symbols-outlined text-[18px]">add</span>
-                Ajouter un employé
-            </a>
+            <div class="flex items-center gap-3">
+                <button type="button" onclick="document.getElementById('filter-modal-backdrop').style.display='flex'"
+                        class="flex items-center gap-1.5 px-4 h-9 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">tune</span>
+                    <span>Filtrer</span>
+                </button>
+            </div>
         </div>
 
         <!-- Tableau -->
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container-high overflow-hidden flex flex-col">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden flex flex-col">
             <div class="overflow-x-auto">
                 <table class="sirh-table">
                     <thead>
@@ -26,53 +29,145 @@
                             <th scope="col">Réf.</th>
                             <th scope="col">Matricule</th>
                             <th scope="col">Date d'embauche</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${employes.content.isEmpty()}">
-                            <td colspan="3" class="td-empty">
-                                Aucun employé enregistré pour le moment.
+                            <td colspan="5" class="td-empty py-8 text-center text-slate-500 italic">
+                                Aucun employé ne correspond à ces critères.
                             </td>
                         </tr>
 
                         <tr th:each="employe : ${employes.content}">
-                            <td class="font-code-num text-outline whitespace-nowrap">
-                                <a th:href="@{/employes/{id}(id=${employe.idEmployer})}" class="hover:underline text-primary font-semibold" th:text="'#' + ${employe.idEmployer}"></a>
+                            <td class="font-mono text-cobalt-800 font-bold whitespace-nowrap">
+                                #<span th:text="${employe.idEmployer}"></span>
                             </td>
-                            <td class="font-medium text-on-surface" th:text="${employe.matricule}"></td>
-                            <td class="text-on-surface-variant" th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
+                            <td class="font-bold text-cobalt-900" th:text="${employe.matricule}"></td>
+                            <td class="text-slate-600 font-mono" th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
+                            <td>
+                                <span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                      th:classappend="${employe.statusEmployer == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmployer == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
+                                      th:text="${employe.statusEmployer}">
+                                </span>
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <a th:href="@{/employes/{id}(id=${employe.idEmployer})}" 
+                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                    <span>Consulter</span>
+                                    <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
-            <div class="p-4 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-4" th:if="${employes.totalPages > 1}">
-                <span class="text-sm text-on-surface-variant">
-                    Affichage de <span class="font-semibold text-on-surface" th:text="${employes.number * employes.size + 1}"></span> à 
-                    <span class="font-semibold text-on-surface" th:text="${employes.number * employes.size + employes.numberOfElements}"></span> sur 
-                    <span class="font-semibold text-on-surface" th:text="${employes.totalElements}"></span> employés
+            <div class="p-3 bg-slate-50 border-t border-neutral-border flex flex-col sm:flex-row items-center justify-between gap-4" th:if="${employes.totalPages > 1}">
+                <span class="text-xs text-slate-600 font-medium">
+                    Affichage de <span class="font-bold" th:text="${employes.number * employes.size + 1}"></span> à 
+                    <span class="font-bold" th:text="${employes.number * employes.size + employes.numberOfElements}"></span> sur 
+                    <span class="font-bold" th:text="${employes.totalElements}"></span> employés
                 </span>
 
                 <form th:action="@{/employes}" method="get" class="flex items-center gap-2 m-0">
                     <input type="hidden" name="size" th:value="${employes.size}">
-                    <input type="hidden" name="idDepartement" th:value="${idDepartement}">
+                    <!-- On conserve les filtres dans la pagination -->
+                    <input type="hidden" name="idDepartement" th:value="${filter.idDepartement}">
+                    <input type="hidden" name="dateMin" th:value="${filter.dateMin}">
+                    <input type="hidden" name="dateMax" th:value="${filter.dateMax}">
+                    <input type="hidden" name="statusEmployer" th:value="${filter.statusEmployer}">
+                    <input type="hidden" name="filterApplied" value="true">
 
                     <button type="submit" name="page" th:value="${employes.number - 1}"
-                            class="px-3 py-1.5 bg-surface-container-lowest rounded-lg text-sm font-medium hover:bg-surface-container-high transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
                             th:disabled="${employes.first}">
                         Précédent
                     </button>
                     
-                    <span class="px-3 py-1.5 bg-surface-container text-on-surface text-sm font-semibold rounded-lg">
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded">
                         Page <span th:text="${employes.number + 1}"></span> / <span th:text="${employes.totalPages}"></span>
                     </span>
 
                     <button type="submit" name="page" th:value="${employes.number + 1}"
-                            class="px-3 py-1.5 bg-surface-container-lowest rounded-lg text-sm font-medium hover:bg-surface-container-high transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
                             th:disabled="${employes.last}">
                         Suivant
                     </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DE FILTRE -->
+        <div id="filter-modal-backdrop" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all duration-200">
+            <div class="bg-surface-card w-full max-w-2xl rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transform max-h-[90vh]" role="dialog">
+                
+                <div class="px-6 py-4 border-b border-neutral-border flex justify-between items-center bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Filtres employés</h3>
+                    <button type="button" class="text-slate-400 hover:text-slate-700" onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+
+                <form th:action="@{/employes}" method="get" class="p-6 flex flex-col gap-5 overflow-y-auto">
+                    <!-- Champ caché pour signaler que le filtre a été appliqué -->
+                    <input type="hidden" name="filterApplied" value="true">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Département -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Département</label>
+                            <select name="idDepartement" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
+                                <option value="">Tous les départements</option>
+                                <option th:each="dept : ${departements}" th:value="${dept.idDepartement}" th:text="${dept.titre}" th:selected="${filter.idDepartement == dept.idDepartement}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Statut -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Statut</label>
+                            <select name="statusEmployer" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
+                                <option value="">Tous les statuts</option>
+                                <option value="ACTIF" th:selected="${filter.statusEmployer == 'ACTIF'}">Actif</option>
+                                <option value="EN_ONBOARDING" th:selected="${filter.statusEmployer == 'EN_ONBOARDING'}">En onboarding</option>
+                                <option value="SORTI" th:selected="${filter.statusEmployer == 'SORTI'}">Sorti</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Période d'arrivée -->
+                    <div class="bg-slate-50 border border-neutral-border p-4 rounded flex flex-col gap-3">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">calendar_month</span> Date d'embauche
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-slate-600">Du</span>
+                                <input name="dateMin" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white" type="date" th:value="${filter.dateMin}"/>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-slate-600">Au</span>
+                                <input name="dateMax" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white" type="date" th:value="${filter.dateMax}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Modal -->
+                    <div class="px-2 py-3 mt-2 border-t border-neutral-border flex items-center justify-between gap-4 shrink-0">
+                        <a th:href="@{/employes}" class="text-xs font-bold text-slate-500 hover:text-cobalt-900 hover:underline transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">restart_alt</span> Réinitialiser
+                        </a>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="px-4 h-9 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors" onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
+                                Annuler
+                            </button>
+                            <button type="submit" class="px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">check</span> Appliquer
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6 select-none">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+            <div>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Gestion des utilisateurs</h2>
+                <p class="text-sm text-slate-600 mt-1">Gérez les accès et les rôles du système.</p>
+            </div>
+            <button type="button" onclick="openUserModal()"
+                    class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">person_add</span> 
+                Ajouter un utilisateur
+            </button>
+        </div>
+
+        <!-- Messages Flash -->
+        <div th:if="${success}" class="p-4 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${success}"></div>
+        <div th:if="${error}" class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm" th:text="${error}"></div>
+
+        <!-- Liste -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="w-16">#</th>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Rôle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${utilisateurs.isEmpty()}">
+                            <td colspan="4" class="td-empty py-8 text-center text-slate-500 italic">
+                                Aucun utilisateur enregistré.
+                            </td>
+                        </tr>
+                        <tr th:each="u : ${utilisateurs}">
+                            <td class="text-slate-500 font-mono text-xs" th:text="${u.idUtilisateur}"></td>
+                            <td class="font-bold text-cobalt-900" th:text="${u.nom}"></td>
+                            <td class="text-slate-700" th:text="${u.email}"></td>
+                            <td>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider bg-slate-100 border-slate-300 text-slate-700"
+                                      th:text="${u.role.libelle}">
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODAL D'AJOUT -->
+        <div id="userModal"
+             class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all">
+            <div id="userModalContent"
+                 class="bg-surface-card w-full max-w-lg rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col transform transition-transform scale-95">
+
+                <div class="px-5 py-4 border-b border-neutral-border flex items-center justify-between bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Ajouter un utilisateur</h3>
+                    <button type="button" onclick="closeUserModal()"
+                            class="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+
+                <form th:action="@{/admin/utilisateurs}" th:object="${utilisateur}" method="post"
+                      class="p-6 flex flex-col gap-5">
+
+                    <!-- Nom -->
+                    <div>
+                        <label for="nom" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Nom complet <span class="text-red-500">*</span></label>
+                        <input type="text" th:field="*{nom}" id="nom" required placeholder="Ex: Jean Dupont"
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Adresse email <span class="text-red-500">*</span></label>
+                        <input type="email" th:field="*{email}" id="email" required placeholder="Ex: jean.dupont@entreprise.com"
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                    </div>
+
+                    <!-- Mot de passe -->
+                    <div>
+                        <label for="motDePasse" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Mot de passe <span class="text-red-500">*</span></label>
+                        <input type="password" th:field="*{motDePasse}" id="motDePasse" required placeholder="••••••••••••"
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                    </div>
+
+                    <!-- Rôle -->
+                    <div>
+                        <label for="role" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Rôle <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select th:field="*{role.idRole}" id="role" required
+                                    class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option value="" disabled selected>-- Sélectionnez un rôle --</option>
+                                <option th:each="r : ${roles}" th:value="${r.idRole}" th:text="${r.libelle}"></option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-neutral-border">
+                        <button type="button" onclick="closeUserModal()"
+                                class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm">
+                            Annuler
+                        </button>
+                        <button type="submit"
+                                class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SCRIPT -->
+        <script>
+            (function () {
+                const modal = document.getElementById('userModal');
+                const content = document.getElementById('userModalContent');
+
+                window.openUserModal = function () {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => {
+                        content.classList.remove('scale-95');
+                        content.classList.add('scale-100');
+                    }, 10);
+                };
+
+                window.closeUserModal = function () {
+                    content.classList.remove('scale-100');
+                    content.classList.add('scale-95');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 150);
+                };
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) window.closeUserModal();
+                });
+            })();
+        </script>
+
+    </main>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.example.sirh.wrapper;
+package com.example.sirh.dto;
 
 import java.time.LocalDate;
 

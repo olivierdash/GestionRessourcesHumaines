@@ -19,7 +19,7 @@ public class CandidatureController {
     private final CandidatService candidatService; // Injection du Service
 
     // TÂCHE 10 : Candidatures d'une offre
-    @GetMapping("/offres/{idOffre}/candidatures")
+    @GetMapping("/offres/{idOffre}")
     public String listeCandidatures(@PathVariable Integer idOffre, Model model) {
         model.addAttribute("offre", offreService.getOffreEmploiById(idOffre));
         model.addAttribute("candidatures", candidatureService.listeCandidatureByOffre(idOffre));

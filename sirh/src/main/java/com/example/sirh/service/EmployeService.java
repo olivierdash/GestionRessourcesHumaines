@@ -1,5 +1,6 @@
 package com.example.sirh.service;
 
+import com.example.sirh.dto.EmployeFilter;
 import com.example.sirh.model.Affectation;
 import com.example.sirh.model.Candidature;
 import com.example.sirh.model.Employe;
@@ -21,7 +22,6 @@ import java.util.Optional;
 public class EmployeService {
 
     private final EmployeRepository employeRepository;
-    private final AffectationRepository affectationRepository;
     private final CandidatureService candidatureService;
 
     // ---------- Existant ----------
@@ -32,14 +32,12 @@ public class EmployeService {
     }
 
     @Transactional
-    public Employe createEmploye(Integer idCandidature, String matricule,
-            LocalDate hiringDate, String statusEmployer) {
+    public Employe createEmploye(Integer idCandidature, LocalDate hiringDate) {
         Candidature candidature = candidatureService.getCandidatureById(idCandidature);
         Employe employe = Employe.builder()
                 .candidature(candidature)
-                .matricule(matricule)
                 .hiringDate(hiringDate)
-                .statusEmployer(statusEmployer)
+                .statusEmployer("ACTIF") // Valeur par défaut (Q5)
                 .build();
         return employeRepository.save(employe);
     }
@@ -73,25 +71,8 @@ public class EmployeService {
                 .countByCandidature_DemandeRecrutement_Poste_Departement_IdDepartement(idDepartement);
     }
 
-    /**
-     * Génère le prochain matricule (EMP-AAAA-NNNN) à partir de la séquence PostgreSQL.
-     * Écriture (nextval) -> @Transactional sans readOnly.
-     */
-    @Transactional
-    public String prochainMatricule() {
-        Long numero = employeRepository.prochainNumeroMatricule();
-        return String.format("EMP-%d-%04d", LocalDate.now().getYear(), numero);
-    }
-
-    // ---------- Affectations (enfant de Employe) ----------
-
-    @Transactional
-    public Affectation saveAffectation(Affectation affectation) {
-        return affectationRepository.save(affectation);
-    }
-
     @Transactional(readOnly = true)
-    public List<Affectation> affectationsDe(Integer idEmploye) {
-        return affectationRepository.findByEmployeIdEmployer(idEmploye);
+    public Page<Employe> getEmployesFiltres(EmployeFilter filter, Pageable pageable) {
+        return employeRepository.findWithFilters(filter, pageable);
     }
 }

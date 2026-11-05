@@ -1,6 +1,8 @@
 package com.example.sirh.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -11,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.sirh.dto.DemandeRecrutementDTO;
+import com.example.sirh.dto.DemandeRecrutementFilter;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.dto.ValidationPageData;
+import com.example.sirh.exception.ValidationMetierException;
 import com.example.sirh.model.DemandeRecrutement;
 import com.example.sirh.model.EtatDemande;
 import com.example.sirh.model.GrilleSalarial;
@@ -21,7 +25,6 @@ import com.example.sirh.model.MotifDemande;
 import com.example.sirh.model.Poste;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.DemandeRecrutementRepository;
-import com.example.sirh.wrapper.DemandeRecrutementFilter;
 
 import lombok.AllArgsConstructor;
 
@@ -37,12 +40,88 @@ public class DemandeRecrutementService {
     private final HistoriqueDemandeRecrutementService historiqueService;
     private final GrilleSalarialService grilleSalarialService;
 
+    // =========================================================
+    // MÉTHODES DE VALIDATION PRIVÉES
+    // =========================================================
+
+    private void validerChampsObligatoires(DemandeRecrutementDTO dto, Map<String, String> errors) {
+        if (dto.getIdManager() == null) {
+            errors.put("idManager", "Le manager demandeur est obligatoire.");
+        }
+        if (dto.getIdPoste() == null) {
+            errors.put("idPoste", "Le poste concerné est obligatoire.");
+        }
+        if (dto.getMotif() == null || dto.getMotif().getIdMotifDemande() == null) {
+            errors.put("motif", "Le motif de la demande est obligatoire.");
+        }
+    }
+
+    private void validerReglesMetier(DemandeRecrutementDTO dto, Map<String, String> errors, Poste poste) {
+        // Date
+         // Doublon actif (Poste OR Date+Département)
+        if (poste != null && dto.getDateSouhaitee() != null 
+                && !errors.containsKey("idPoste") && !errors.containsKey("dateSouhaitee")) {
+            
+            List<String> etatsFinaux = List.of("Valide", "Refuse");
+            boolean existeDeja = demandeRepository.existsDemandeActive(
+                    poste.getIdPoste(),
+                    etatsFinaux);
+
+            if (existeDeja) {
+                errors.put("idPoste", "Une demande active existe déjà pour ce poste, ou pour cette date dans ce département.");
+            }
+        }
+        
+        if (dto.getDateSouhaitee() == null) {
+            errors.put("dateSouhaitee", "La date d'entrée est obligatoire.");
+        } else if (dto.getDateSouhaitee().isBefore(LocalDate.now())) {
+            errors.put("dateSouhaitee", "La date doit être aujourd'hui ou dans le futur.");
+        }
+
+        // Effectif
+        if (dto.getEffectif() == null || dto.getEffectif() <= 0) {
+            errors.put("effectif", "L'effectif doit être un nombre positif.");
+        }
+
+       
+    }
+
+    // =========================================================
+    // CREATE
+    // =========================================================
+
     @Transactional
-    public DemandeRecrutement createDemande(DemandeRecrutementDTO dto) {
+    public DemandeRecrutement createDemande(DemandeRecrutementDTO dto, String action) {
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        // 1. Validations toujours exécutées (Champs obligatoires en BDD)
+        validerChampsObligatoires(dto, errors);
+
+        // 2. Validations métier (Uniquement si on soumet)
+        Poste poste = null;
+        if (dto.getIdPoste() != null && !errors.containsKey("idPoste")) {
+            poste = posteService.getById(dto.getIdPoste());
+        }
+
+        if ("submit".equals(action)) {
+            validerReglesMetier(dto, errors, poste);
+        }
+
+        // 3. Lancement de l'exception si erreurs
+        if (!errors.isEmpty()) {
+            throw new ValidationMetierException(errors);
+        }
+
+        // 4. Enregistrement
         Utilisateur manager = utilisateurService.getById(dto.getIdManager());
-        Poste poste = posteService.getById(dto.getIdPoste());
+        if (poste == null) {
+            poste = posteService.getById(dto.getIdPoste());
+        }
         MotifDemande motif = motifDemandeService.getById(dto.getMotif().getIdMotifDemande());
-        EtatDemande statutBrouillon = etatDemandeService.getByIntitule("Brouillon");
+        
+        // Détermination de l'état
+        String intituleEtat = "submit".equals(action) ? "Cree" : "Brouillon";
+        EtatDemande etatCible = etatDemandeService.getByIntitule(intituleEtat);
 
         DemandeRecrutement demande = DemandeRecrutement.builder()
                 .manager(manager)
@@ -50,40 +129,53 @@ public class DemandeRecrutementService {
                 .dateSouhaitee(dto.getDateSouhaitee())
                 .effectif(dto.getEffectif())
                 .motif(motif)
-                .etatDemande(statutBrouillon)
+                .etatDemande(etatCible)
                 .commentaires(dto.getRemarque())
                 .build();
 
         return demandeRepository.save(demande);
     }
 
-    @Transactional(readOnly = true)
-    public DemandeRecrutement getById(Integer id) {
-        return demandeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
-    }
-
-    @Transactional(readOnly = true)
-    public List<DemandeRecrutement> getAllDemandes() {
-        return demandeRepository.findAll();
-    }
+    // =========================================================
+    // UPDATE
+    // =========================================================
 
     @Transactional
-    public DemandeRecrutement updateDemande(DemandeRecrutementDTO dto, Utilisateur validateur,
-            String action) {
-
+    public DemandeRecrutement updateDemande(DemandeRecrutementDTO dto, Utilisateur validateur, String action) {
         DemandeRecrutement demande = getById(dto.getIdDemandeRecrutement());
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        // 1. Vérification de sécurité (convertie en ValidationMetierException)
         EtatDemande etatActuel = demande.getEtatDemande();
         String etatIntitule = etatActuel.getIntitule().toLowerCase().trim();
         String role = validateur.getRole().getLibelle().toLowerCase().trim();
 
         if (!"brouillon".equals(etatIntitule) || !"manager".equals(role)) {
-            throw new RuntimeException(
-                    "Modification Impossible : seul le manager peut modifier un brouillon.");
+            errors.put("global", "Modification Impossible : seul le manager peut modifier un brouillon.");
+            throw new ValidationMetierException(errors);
         }
 
+        // 2. Validations
+        validerChampsObligatoires(dto, errors);
+
+        Poste poste = null;
+        if (dto.getIdPoste() != null && !errors.containsKey("idPoste")) {
+            poste = posteService.getById(dto.getIdPoste());
+        }
+
+        if ("submit".equals(action)) {
+            validerReglesMetier(dto, errors, poste);
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationMetierException(errors);
+        }
+
+        // 3. Mise à jour des champs
         Utilisateur manager = utilisateurService.getById(dto.getIdManager());
-        Poste poste = posteService.getById(dto.getIdPoste());
+        if (poste == null) {
+            poste = posteService.getById(dto.getIdPoste());
+        }
         MotifDemande motif = motifDemandeService.getById(dto.getMotif().getIdMotifDemande());
 
         demande.setManager(manager);
@@ -93,6 +185,7 @@ public class DemandeRecrutementService {
         demande.setMotif(motif);
         demande.setCommentaires(dto.getRemarque());
 
+        // 4. Gestion de l'état et historique
         if ("submit".equals(action)) {
             EtatDemande nouvelEtat = etatDemandeService.getByIntitule("Cree");
             demande.setEtatDemande(nouvelEtat);
@@ -105,10 +198,21 @@ public class DemandeRecrutementService {
         return demande;
     }
 
-    @Transactional
-    public DemandeRecrutement updateStateDemande(Integer idDemande, Utilisateur validateur,
-            String remarque, String action) {
+    // =========================================================
+    // AUTRES MÉTHODES (inchangées)
+    // =========================================================
 
+    public DemandeRecrutement getById(Integer id) {
+        return demandeRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
+    }
+
+    public List<DemandeRecrutement> getAllDemandeValide(DemandeRecrutementFilter filter) {
+        return demandeRepository.getAllDemandeValide(filter);
+    }
+
+    @Transactional
+    public DemandeRecrutement updateStateDemande(Integer idDemande, Utilisateur validateur, String remarque, String action) {
         DemandeRecrutement demande = getById(idDemande);
         demande.setCommentaires(remarque);
 
@@ -150,7 +254,6 @@ public class DemandeRecrutementService {
         return demandeRepository.findAllLib(filter, pageable);
     }
 
-    @Transactional(readOnly = true)
     public DemandeRecrutementDTO getDtoForEdit(Integer id) {
         DemandeRecrutement demande = getById(id);
         if (!"Brouillon".equalsIgnoreCase(demande.getEtatDemande().getIntitule())) {
@@ -160,39 +263,26 @@ public class DemandeRecrutementService {
     }
 
     private DemandeRecrutementDTO toDto(DemandeRecrutement demande) {
-        if (demande == null) {
-            return null;
-        }
-
+        if (demande == null) return null;
         DemandeRecrutementDTO dto = new DemandeRecrutementDTO();
         dto.setIdDemandeRecrutement(demande.getIdDemandeRecrutement());
-
-        if (demande.getManager() != null) {
-            dto.setIdManager(demande.getManager().getIdUtilisateur());
-        }
-        if (demande.getPoste() != null) {
-            dto.setIdPoste(demande.getPoste().getIdPoste());
-        }
+        if (demande.getManager() != null) dto.setIdManager(demande.getManager().getIdUtilisateur());
+        if (demande.getPoste() != null) dto.setIdPoste(demande.getPoste().getIdPoste());
         dto.setDateSouhaitee(demande.getDateSouhaitee());
         dto.setEffectif(demande.getEffectif());
-        if (demande.getMotif() != null) {
-            dto.setMotif(demande.getMotif());
-        }
+        if (demande.getMotif() != null) dto.setMotif(demande.getMotif());
         if (demande.getEtatDemande() != null) {
             dto.setIdEtat(demande.getEtatDemande().getIdEtatDemande());
             dto.setEtat(demande.getEtatDemande().getIntitule());
         }
         dto.setRemarque(demande.getCommentaires());
-
         return dto;
     }
 
-    @Transactional(readOnly = true)
     public boolean canValidate(String etat, String role) {
         return ("cree".equals(etat) && "rh".equals(role)) ||
                ("validerh".equals(etat) && "finance".equals(role)) ||
-               ("validefinance".equals(etat) && "dg".equals(role)) ||
-               "refuse".equals(etat);
+               ("validefinance".equals(etat) && "dg".equals(role));
     }
 
     @Transactional(readOnly = true)

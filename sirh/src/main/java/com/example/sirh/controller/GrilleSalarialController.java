@@ -1,16 +1,23 @@
 package com.example.sirh.controller;
 
+import com.example.sirh.dto.GrilleSalarialFilter;
+import com.example.sirh.exception.ValidationMetierException;
+import com.example.sirh.model.Departement;
 import com.example.sirh.model.GrilleSalarial;
+import com.example.sirh.model.Poste;
 import com.example.sirh.service.DepartementService;
 import com.example.sirh.service.GrilleSalarialService;
 import com.example.sirh.service.PosteService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/grilles")
@@ -18,44 +25,57 @@ import java.math.BigDecimal;
 public class GrilleSalarialController {
 
     private final GrilleSalarialService grilleService;
-    private final PosteService posteService;             // Injection du Service au lieu du Repository
-    private final DepartementService departementService; // Injection du Service au lieu du Repository
+    private final PosteService posteService;
+    private final DepartementService departementService;
 
     @GetMapping
-    public String index(Model model) {
-        model.addAttribute("grilles", grilleService.lister());
+    public String index(
+            @ModelAttribute("filter") GrilleSalarialFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size, // 5 par défaut
+            Model model) {
+
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 20), Sort.by("idGrille").descending());
+        Page<GrilleSalarial> grillesPage = grilleService.getGrillesFiltrees(filter, pageable);
+
+        model.addAttribute("grilles", grillesPage);
+        model.addAttribute("departements", departementService.getAllDepartements());
+
         return "grille/index";
     }
 
     @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("grille", new GrilleSalarial());
+    public String create(@ModelAttribute("grille") GrilleSalarial grille, Model model) {
+        // Spring injecte le flash attribute (retour d'erreur) ou un objet vide
+        model.addAttribute("grille", grille);
         model.addAttribute("postes", posteService.getAllPostes());
-        model.addAttribute("departements", departementService.getAllDepartements());
         return "grille/form";
     }
 
     @PostMapping
-    public String store(
-            @RequestParam Integer idPoste,
-            @RequestParam Integer idDepartement,
-            @RequestParam BigDecimal salaireMin,
-            @RequestParam BigDecimal salaireMax,
-            @RequestParam BigDecimal salaireMoyen,
-            RedirectAttributes redirect) {
-
+    public String store(@ModelAttribute("grille") GrilleSalarial grille, RedirectAttributes redirect) {
         try {
-            GrilleSalarial grille = grilleService.creer(
-                    idPoste,
-                    idDepartement,
-                    salaireMin,
-                    salaireMax,
-                    salaireMoyen);
+            // Chargement sécurisé (évite les NPE si l'utilisateur n'a rien sélectionné)
+            if (grille.getPoste() != null && grille.getPoste().getIdPoste() != null) {
+                grille.setPoste(posteService.getById(grille.getPoste().getIdPoste()));
+            }
+            if (grille.getDepartement() != null && grille.getDepartement().getIdDepartement() != null) {
+                grille.setDepartement(departementService.getById(grille.getDepartement().getIdDepartement()));
+            }
 
-            return "redirect:/grilles/" + grille.getIdGrille();
+            GrilleSalarial saved = grilleService.creer(grille);
+            return "redirect:/grilles/" + saved.getIdGrille();
+
+        } catch (ValidationMetierException e) {
+            redirect.addFlashAttribute("errors", e.getErrors());
+            redirect.addFlashAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            redirect.addFlashAttribute("grille", grille);
+            return "redirect:/grilles/create";
 
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
+            // Erreurs de doublons (unicité gérée par le service)
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("grille", grille);
             return "redirect:/grilles/create";
         }
     }
@@ -67,36 +87,49 @@ public class GrilleSalarialController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable Integer id, Model model) {
-        model.addAttribute("grille", grilleService.trouver(id));
+    public String edit(@PathVariable Integer id,
+            @ModelAttribute("grille") GrilleSalarial flashGrille,
+            Model model) {
+
+        // 1. Priorité au flash attribute (retour d'erreur)
+        if (flashGrille.getIdGrille() != null) {
+            model.addAttribute("grille", flashGrille);
+        } else {
+            // 2. Chargement initial
+            model.addAttribute("grille", grilleService.trouver(id));
+        }
+
         model.addAttribute("postes", posteService.getAllPostes());
         model.addAttribute("departements", departementService.getAllDepartements());
         return "grille/form";
     }
 
     @PostMapping("/{id}")
-    public String update(
-            @PathVariable Integer id,
-            @RequestParam Integer idPoste,
-            @RequestParam Integer idDepartement,
-            @RequestParam BigDecimal salaireMin,
-            @RequestParam BigDecimal salaireMax,
-            @RequestParam BigDecimal salaireMoyen,
-            RedirectAttributes redirect) {
+    public String update(@PathVariable Integer id,
+                         @ModelAttribute("grille") GrilleSalarial grille,
+                         RedirectAttributes redirect) {
 
         try {
-            grilleService.modifier(
-                    id,
-                    idPoste,
-                    idDepartement,
-                    salaireMin,
-                    salaireMax,
-                    salaireMoyen);
+            // Chargement sécurisé
+            if (grille.getPoste() != null && grille.getPoste().getIdPoste() != null) {
+                grille.setPoste(posteService.getById(grille.getPoste().getIdPoste()));
+            }
+            if (grille.getDepartement() != null && grille.getDepartement().getIdDepartement() != null) {
+                grille.setDepartement(departementService.getById(grille.getDepartement().getIdDepartement()));
+            }
 
+            grilleService.modifier(grille);
             return "redirect:/grilles/" + id;
 
+        } catch (ValidationMetierException e) {
+            redirect.addFlashAttribute("errors", e.getErrors());
+            redirect.addFlashAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            redirect.addFlashAttribute("grille", grille);
+            return "redirect:/grilles/" + id + "/edit";
+            
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("grille", grille);
             return "redirect:/grilles/" + id + "/edit";
         }
     }

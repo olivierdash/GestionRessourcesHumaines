@@ -1,6 +1,7 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.model.Utilisateur;
+import com.example.sirh.config.CustomUserDetails;
 import com.example.sirh.service.CandidatureService;
 import com.example.sirh.service.EvaluationService;
 import com.example.sirh.service.TypeEvaluationService;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @Controller
 @RequestMapping("/candidatures")
@@ -37,11 +39,12 @@ public class EvaluationController {
             @RequestParam Integer idTypeEvaluation,
             @RequestParam(required = false) Double note,
             @RequestParam String commentaire,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
         
         try {
             // On utilise le service pour récupérer le premier utilisateur (factice)
-            Utilisateur evaluateur = utilisateurService.getFirstUtilisateur();
+            Utilisateur evaluateur = userDetails.getUtilisateur();
 
             evaluationService.ajouterEvaluation(idCandidature, evaluateur.getIdUtilisateur(), idTypeEvaluation, commentaire, note);
             redirectAttributes.addFlashAttribute("success", "Évaluation enregistrée avec succès !");
