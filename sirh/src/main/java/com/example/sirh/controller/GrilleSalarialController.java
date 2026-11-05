@@ -1,6 +1,7 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.dto.GrilleSalarialFilter;
+import com.example.sirh.exception.ValidationMetierException;
 import com.example.sirh.model.Departement;
 import com.example.sirh.model.GrilleSalarial;
 import com.example.sirh.model.Poste;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 
 @Controller
 @RequestMapping("/grilles")
@@ -45,32 +45,36 @@ public class GrilleSalarialController {
     }
 
     @GetMapping("/create")
-    public String create(Model model) {
-        if (!model.containsAttribute("grille")) {
-            GrilleSalarial grille = new GrilleSalarial();
-            grille.setPoste(new Poste());
-            grille.setDepartement(new Departement());
-            model.addAttribute("grille", grille);
-        }
+    public String create(@ModelAttribute("grille") GrilleSalarial grille, Model model) {
+        // Spring injecte le flash attribute (retour d'erreur) ou un objet vide
+        model.addAttribute("grille", grille);
         model.addAttribute("postes", posteService.getAllPostes());
-        model.addAttribute("departements", departementService.getAllDepartements());
         return "grille/form";
     }
 
     @PostMapping
-    public String store(GrilleSalarial grille, RedirectAttributes redirect) {
+    public String store(@ModelAttribute("grille") GrilleSalarial grille, RedirectAttributes redirect) {
         try {
-            Poste poste = posteService.getById(grille.getPoste().getIdPoste());
-            Departement departement = departementService.getById(grille.getDepartement().getIdDepartement());
-
-            grille.setPoste(poste);
-            grille.setDepartement(departement);
+            // Chargement sécurisé (évite les NPE si l'utilisateur n'a rien sélectionné)
+            if (grille.getPoste() != null && grille.getPoste().getIdPoste() != null) {
+                grille.setPoste(posteService.getById(grille.getPoste().getIdPoste()));
+            }
+            if (grille.getDepartement() != null && grille.getDepartement().getIdDepartement() != null) {
+                grille.setDepartement(departementService.getById(grille.getDepartement().getIdDepartement()));
+            }
 
             GrilleSalarial saved = grilleService.creer(grille);
             return "redirect:/grilles/" + saved.getIdGrille();
 
-        } catch (Exception e) {
-            redirect.addFlashAttribute("error", e.getMessage());
+        } catch (ValidationMetierException e) {
+            redirect.addFlashAttribute("errors", e.getErrors());
+            redirect.addFlashAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            redirect.addFlashAttribute("grille", grille);
+            return "redirect:/grilles/create";
+
+        } catch (IllegalArgumentException e) {
+            // Erreurs de doublons (unicité gérée par le service)
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
             redirect.addFlashAttribute("grille", grille);
             return "redirect:/grilles/create";
         }
@@ -83,28 +87,49 @@ public class GrilleSalarialController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable Integer id, Model model) {
-        model.addAttribute("grille", grilleService.trouver(id));
+    public String edit(@PathVariable Integer id,
+            @ModelAttribute("grille") GrilleSalarial flashGrille,
+            Model model) {
+
+        // 1. Priorité au flash attribute (retour d'erreur)
+        if (flashGrille.getIdGrille() != null) {
+            model.addAttribute("grille", flashGrille);
+        } else {
+            // 2. Chargement initial
+            model.addAttribute("grille", grilleService.trouver(id));
+        }
+
         model.addAttribute("postes", posteService.getAllPostes());
         model.addAttribute("departements", departementService.getAllDepartements());
         return "grille/form";
     }
 
     @PostMapping("/{id}")
-    public String update(
-            @PathVariable Integer id,
-            GrilleSalarial grille,
-            RedirectAttributes redirect) {
+    public String update(@PathVariable Integer id,
+                         @ModelAttribute("grille") GrilleSalarial grille,
+                         RedirectAttributes redirect) {
 
         try {
-            Poste poste = posteService.getById(grille.getPoste().getIdPoste());
-            Departement departement = departementService.getById(grille.getDepartement().getIdDepartement());
+            // Chargement sécurisé
+            if (grille.getPoste() != null && grille.getPoste().getIdPoste() != null) {
+                grille.setPoste(posteService.getById(grille.getPoste().getIdPoste()));
+            }
+            if (grille.getDepartement() != null && grille.getDepartement().getIdDepartement() != null) {
+                grille.setDepartement(departementService.getById(grille.getDepartement().getIdDepartement()));
+            }
 
             grilleService.modifier(grille);
             return "redirect:/grilles/" + id;
 
+        } catch (ValidationMetierException e) {
+            redirect.addFlashAttribute("errors", e.getErrors());
+            redirect.addFlashAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            redirect.addFlashAttribute("grille", grille);
+            return "redirect:/grilles/" + id + "/edit";
+            
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("grille", grille);
             return "redirect:/grilles/" + id + "/edit";
         }
     }
