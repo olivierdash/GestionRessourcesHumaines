@@ -7,7 +7,7 @@
     <title>SIRH Pro - Connexion sécurisée</title>
 
     <!-- 1. Tailwind CSS -->
-     <script th:src="@{/js/tailwind.js}"></script>
+    <script th:src="@{/js/tailwind.js}"></script>
 
     <script>
         tailwind.config = {
@@ -44,10 +44,12 @@
 
     <!-- Conteneur des messages Spring Security (flottants) -->
     <div class="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-md z-50 pointer-events-none px-4">
-        <div th:if="${param.error}" class="bg-red-50 border border-red-200 text-red-800 rounded p-3 text-center text-sm font-semibold shadow-sm alert-floating auto-dismiss-alert">
+        <div th:if="${param.error}"
+            class="bg-red-50 border border-red-200 text-red-800 rounded p-3 text-center text-sm font-semibold shadow-sm alert-floating auto-dismiss-alert">
             Email ou mot de passe incorrect.
         </div>
-        <div th:if="${param.logout}" class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded p-3 text-center text-sm font-semibold shadow-sm alert-floating auto-dismiss-alert">
+        <div th:if="${param.logout}"
+            class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded p-3 text-center text-sm font-semibold shadow-sm alert-floating auto-dismiss-alert">
             Vous avez été déconnecté avec succès.
         </div>
     </div>
@@ -57,7 +59,7 @@
 
         <!-- La Carte (Card) du formulaire -->
         <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border w-full max-w-md p-8">
-            
+
             <!-- En-tête -->
             <div class="mb-8 text-center">
                 <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight mb-2">Connexion</h1>
@@ -73,23 +75,32 @@
                         Adresse email <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">mail</span>
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">mail</span>
                         <input type="email" id="email" name="email" required autofocus
                             class="w-full h-11 pl-10 pr-4 bg-white border border-slate-300 rounded text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors"
-                            placeholder="prenom.nom@entreprise.com"value="rh@sirh.com">
+                            placeholder="prenom.nom@entreprise.com" value="rh@sirh.com">
                     </div>
                 </div>
 
                 <!-- Mot de passe -->
+                <!-- Mot de passe -->
                 <div>
-                    <label for="motDePasse" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                    <label for="motDePasse"
+                        class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
                         Mot de passe <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">lock</span>
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">lock</span>
                         <input type="password" id="motDePasse" name="motDePasse" required
-                            class="w-full h-11 pl-10 pr-4 bg-white border border-slate-300 rounded text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors"
+                            class="w-full h-11 pl-10 pr-11 bg-white border border-slate-300 rounded text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors"
                             placeholder="••••••••••••" value="password123">
+                        <button type="button" id="togglePassword" title="Afficher le mot de passe"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-slate-400 hover:text-cobalt-800 transition-colors">
+                            <span id="togglePasswordIcon"
+                                class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
                     </div>
                 </div>
 
@@ -116,8 +127,19 @@
                     setTimeout(() => { alert.remove(); }, 500);
                 }, 3500);
             });
+            const input = document.getElementById('motDePasse');
+            const btn = document.getElementById('togglePassword');
+            const icon = document.getElementById('togglePasswordIcon');
+
+            btn.addEventListener('click', function () {
+                const visible = input.type === 'text';
+                input.type = visible ? 'password' : 'text';
+                icon.textContent = visible ? 'visibility' : 'visibility_off';
+                btn.title = visible ? 'Afficher le mot de passe' : 'Masquer le mot de passe';
+            });
         });
     </script>
 
 </body>
+
 </html>
