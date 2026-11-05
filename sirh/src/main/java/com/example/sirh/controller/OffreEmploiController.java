@@ -44,7 +44,7 @@ public class OffreEmploiController {
         Page<OffreEmploi> offresPage = offreService.getOffresFiltrees(filter, pageable);
 
         // On récupère uniquement les managers et RH pour le select
-        List<Utilisateur> managers = utilisateurService.getManagersEtRH();
+        List<Utilisateur> managers = utilisateurService.getByRolesList(List.of("MANAGER", "RH"));
 
         model.addAttribute("offres", offresPage);
         model.addAttribute("managers", managers);

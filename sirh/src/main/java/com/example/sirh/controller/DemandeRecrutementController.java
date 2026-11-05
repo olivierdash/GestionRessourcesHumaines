@@ -35,11 +35,6 @@ public class DemandeRecrutementController {
     private MotifDemandeService motifDemandeService;
     private HistoriqueDemandeRecrutementService historiqueService;
 
-    @ModelAttribute("managers")
-    public List<Utilisateur> populateManagers() {
-        return utilisateurService.getManagers();
-    }
-
     @ModelAttribute("postes")
     public List<Poste> populatePostes() {
         return posteService.getAllPostes();
@@ -68,7 +63,7 @@ public class DemandeRecrutementController {
 
         model.addAttribute("demandes", demandesPage);
         model.addAttribute("departements", departementService.getAllDepartements());
-        model.addAttribute("managers", utilisateurService.getAllUtilisateurs());
+        model.addAttribute("managers", utilisateurService.getByRolesList(List.of("MANAGER")));
 
         return "demande/index";
     }

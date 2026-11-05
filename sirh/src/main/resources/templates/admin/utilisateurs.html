@@ -13,14 +13,18 @@
             </div>
             <button type="button" onclick="openUserModal()"
                     class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[16px]">person_add</span> 
+                <span class="material-symbols-outlined text-[16px]">person_add</span>
                 Ajouter un utilisateur
             </button>
         </div>
 
-        <!-- Messages Flash -->
+        <!-- Messages flash -->
         <div th:if="${success}" class="p-4 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${success}"></div>
         <div th:if="${error}" class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm" th:text="${error}"></div>
+        <div th:if="${errorMessage}" class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">error</span>
+            <span th:text="${errorMessage}"></span>
+        </div>
 
         <!-- Liste -->
         <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
@@ -32,11 +36,12 @@
                             <th scope="col">Nom</th>
                             <th scope="col">Email</th>
                             <th scope="col">Rôle</th>
+                            <th scope="col" class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${utilisateurs.isEmpty()}">
-                            <td colspan="4" class="td-empty py-8 text-center text-slate-500 italic">
+                            <td colspan="5" class="td-empty py-8 text-center text-slate-500 italic">
                                 Aucun utilisateur enregistré.
                             </td>
                         </tr>
@@ -49,13 +54,24 @@
                                       th:text="${u.role.libelle}">
                                 </span>
                             </td>
+                            <td class="text-right whitespace-nowrap">
+                                <button type="button"
+                                        th:attr="data-id=${u.idUtilisateur}, data-self=${u.idUtilisateur == #authentication.principal.utilisateur.idUtilisateur}"
+                                        onclick="openPasswordModal(this)"
+                                        class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                    <span class="material-symbols-outlined text-[14px]">lock_reset</span>
+                                    Mot de passe
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- MODAL D'AJOUT -->
+        <!-- ========================================================= -->
+        <!-- MODAL : AJOUTER UN UTILISATEUR -->
+        <!-- ========================================================= -->
         <div id="userModal"
              class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all">
             <div id="userModalContent"
@@ -91,6 +107,7 @@
                         <label for="motDePasse" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Mot de passe <span class="text-red-500">*</span></label>
                         <input type="password" th:field="*{motDePasse}" id="motDePasse" required placeholder="••••••••••••"
                                class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                        <p th:if="${errors != null and errors['motDePasse'] != null}" th:text="${errors['motDePasse']}" class="mt-1 text-xs text-red-500 font-semibold"></p>
                     </div>
 
                     <!-- Rôle -->
@@ -98,12 +115,27 @@
                         <label for="role" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Rôle <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <select th:field="*{role.idRole}" id="role" required
+                                    onchange="toggleCodeSecretCreation(this)"
                                     class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
                                 <option value="" disabled selected>-- Sélectionnez un rôle --</option>
-                                <option th:each="r : ${roles}" th:value="${r.idRole}" th:text="${r.libelle}"></option>
+                                <option th:each="r : ${roles}" th:value="${r.idRole}"
+                                        th:text="${r.libelle}"
+                                        th:attr="data-admin=${r.libelle == 'ADMIN'}"></option>
                             </select>
                             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
                         </div>
+                    </div>
+
+                    <!-- Code secret (affiché si rôle = ADMIN) -->
+                    <div id="codeSecretCreationContainer" class="hidden">
+                        <label for="codeSecretCreation" class="block text-[11px] uppercase tracking-wider text-red-700 font-bold mb-2">
+                            Code secret ADMIN <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" name="codeSecret" id="codeSecretCreation" placeholder="Requis pour créer un administrateur"
+                               class="w-full h-11 px-3 bg-red-50 border border-red-300 rounded text-sm text-slate-900 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors placeholder:text-slate-400">
+                        <p class="mt-1 text-xs text-red-600 font-medium">Le code secret est requis pour créer un compte administrateur.</p>
+                        <!-- Affichage de l'erreur pour le code secret -->
+                        <p th:if="${errors != null and errors['codeSecret'] != null}" th:text="${errors['codeSecret']}" class="mt-1 text-xs text-red-500 font-semibold"></p>
                     </div>
 
                     <!-- Actions -->
@@ -121,33 +153,227 @@
             </div>
         </div>
 
-        <!-- SCRIPT -->
+        <!-- ========================================================= -->
+        <!-- MODAL : CHANGER LE MOT DE PASSE -->
+        <!-- ========================================================= -->
+        <div id="passwordModal"
+             class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all">
+            <div id="passwordModalContent"
+                 class="bg-surface-card w-full max-w-lg rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col transform transition-transform scale-95">
+
+                <div class="px-5 py-4 border-b border-neutral-border flex items-center justify-between bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Changer le mot de passe</h3>
+                    <button type="button" onclick="closePasswordModal()"
+                            class="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+
+                <form id="passwordForm" method="post" class="p-6 flex flex-col gap-5">
+
+                    <!-- CSRF -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <!-- Nouveau mot de passe -->
+                    <div>
+                        <label for="nouveauMotDePasse" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Nouveau mot de passe <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" name="nouveauMotDePasse" id="nouveauMotDePasse" required
+                               placeholder="8 caractères minimum"
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                        <p th:if="${errors != null and errors['nouveauMotDePasse'] != null}"
+                           th:text="${errors['nouveauMotDePasse']}"
+                           class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Confirmation -->
+                    <div>
+                        <label for="confirmationMotDePasse" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Confirmer le mot de passe <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" name="confirmationMotDePasse" id="confirmationMotDePasse" required
+                               placeholder="Retapez le mot de passe"
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                        <p th:if="${errors != null and errors['confirmationMotDePasse'] != null}"
+                           th:text="${errors['confirmationMotDePasse']}"
+                           class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Code secret (affiché seulement si self) -->
+                    <div id="codeSecretSelfContainer" class="hidden">
+                        <label for="codeSecretSelf" class="block text-[11px] uppercase tracking-wider text-red-700 font-bold mb-2">
+                            Code secret ADMIN <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" name="codeSecret" id="codeSecretSelf" placeholder="Requis pour modifier votre propre mot de passe"
+                               class="w-full h-11 px-3 bg-red-50 border border-red-300 rounded text-sm text-slate-900 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors placeholder:text-slate-400">
+                        <p class="mt-1 text-xs text-red-600 font-medium">Vous modifiez votre propre mot de passe : le code secret est requis.</p>
+                        <!-- Affichage de l'erreur pour le code secret -->
+                        <p th:if="${errors != null and errors['codeSecret'] != null}" th:text="${errors['codeSecret']}" class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-neutral-border">
+                        <button type="button" onclick="closePasswordModal()"
+                                class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm">
+                            Annuler
+                        </button>
+                        <button type="submit"
+                                class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                            Modifier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- SCRIPTS -->
+        <!-- ========================================================= -->
+
+        <script th:inline="javascript">
+            window.flashData = {
+                openPasswordModalFor: /*[[${openPasswordModalFor}]]*/ null,
+                nouveauMotDePasse:    /*[[${nouveauMotDePasse}]]*/ null,
+                openUserModalFor:     /*[[${openUserModalFor}]]*/ false
+            };
+        </script>
+
         <script>
             (function () {
-                const modal = document.getElementById('userModal');
-                const content = document.getElementById('userModalContent');
+                // =====================================================
+                // MODAL : AJOUTER UN UTILISATEUR
+                // =====================================================
+                const userModal = document.getElementById('userModal');
+                const userContent = document.getElementById('userModalContent');
 
                 window.openUserModal = function () {
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
+                    userModal.classList.remove('hidden');
+                    userModal.classList.add('flex');
                     setTimeout(() => {
-                        content.classList.remove('scale-95');
-                        content.classList.add('scale-100');
+                        userContent.classList.remove('scale-95');
+                        userContent.classList.add('scale-100');
                     }, 10);
                 };
 
                 window.closeUserModal = function () {
-                    content.classList.remove('scale-100');
-                    content.classList.add('scale-95');
+                    userContent.classList.remove('scale-100');
+                    userContent.classList.add('scale-95');
                     setTimeout(() => {
-                        modal.classList.add('hidden');
-                        modal.classList.remove('flex');
+                        userModal.classList.add('hidden');
+                        userModal.classList.remove('flex');
                     }, 150);
                 };
 
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) window.closeUserModal();
+                userModal.addEventListener('click', (e) => {
+                    if (e.target === userModal) window.closeUserModal();
                 });
+
+                // =====================================================
+                // Code secret conditionnel : création d'un ADMIN
+                // =====================================================
+                window.toggleCodeSecretCreation = function (select) {
+                    const selected = select.options[select.selectedIndex];
+                    const container = document.getElementById('codeSecretCreationContainer');
+                    const input = document.getElementById('codeSecretCreation');
+                    const isAdmin = selected && selected.getAttribute('data-admin') === 'true';
+
+                    if (isAdmin) {
+                        container.classList.remove('hidden');
+                        input.setAttribute('required', 'required');
+                    } else {
+                        container.classList.add('hidden');
+                        input.removeAttribute('required');
+                        input.value = '';
+                    }
+                };
+
+                // =====================================================
+                // MODAL : CHANGER LE MOT DE PASSE
+                // =====================================================
+                const passwordModal = document.getElementById('passwordModal');
+                const passwordContent = document.getElementById('passwordModalContent');
+                const passwordForm = document.getElementById('passwordForm');
+                const codeSecretSelfContainer = document.getElementById('codeSecretSelfContainer');
+                const codeSecretSelfInput = document.getElementById('codeSecretSelf');
+                const nouveauMotDePasseInput = document.getElementById('nouveauMotDePasse');
+
+                window.openPasswordModal = function (button) {
+                    const id = button.getAttribute('data-id');
+                    const isSelf = button.getAttribute('data-self') === 'true';
+
+                    passwordForm.action = '/admin/utilisateurs/' + id + '/password';
+
+                    if (isSelf) {
+                        codeSecretSelfContainer.classList.remove('hidden');
+                        codeSecretSelfInput.setAttribute('required', 'required');
+                    } else {
+                        codeSecretSelfContainer.classList.add('hidden');
+                        codeSecretSelfInput.removeAttribute('required');
+                        codeSecretSelfInput.value = '';
+                    }
+
+                    passwordModal.classList.remove('hidden');
+                    passwordModal.classList.add('flex');
+                    setTimeout(() => {
+                        passwordContent.classList.remove('scale-95');
+                        passwordContent.classList.add('scale-100');
+                    }, 10);
+                };
+
+                window.closePasswordModal = function () {
+                    passwordContent.classList.remove('scale-100');
+                    passwordContent.classList.add('scale-95');
+                    setTimeout(() => {
+                        passwordModal.classList.add('hidden');
+                        passwordModal.classList.remove('flex');
+                    }, 150);
+                };
+
+                passwordModal.addEventListener('click', (e) => {
+                    if (e.target === passwordModal) window.closePasswordModal();
+                });
+
+                // =====================================================
+                // Réouverture automatique du modal de création (Q1=A)
+                // =====================================================
+                if (window.flashData && window.flashData.openUserModalFor) {
+                    window.openUserModal();
+                    const roleSelect = document.getElementById('role');
+                    if (roleSelect) {
+                        window.toggleCodeSecretCreation(roleSelect);
+                    }
+                }
+
+                // =====================================================
+                // Réouverture automatique du modal mot de passe
+                // =====================================================
+                if (window.flashData && window.flashData.openPasswordModalFor) {
+                    const targetId = window.flashData.openPasswordModalFor;
+                    const button = document.querySelector('main table button[data-id="' + targetId + '"]');
+                    const isSelf = button ? button.getAttribute('data-self') === 'true' : false;
+                    
+                    passwordForm.action = '/admin/utilisateurs/' + targetId + '/password';
+
+                    if (isSelf) {
+                        codeSecretSelfContainer.classList.remove('hidden');
+                        codeSecretSelfInput.setAttribute('required', 'required');
+                    } else {
+                        codeSecretSelfContainer.classList.add('hidden');
+                        codeSecretSelfInput.removeAttribute('required');
+                    }
+
+                    if (window.flashData.nouveauMotDePasse) {
+                        nouveauMotDePasseInput.value = window.flashData.nouveauMotDePasse;
+                    }
+
+                    passwordModal.classList.remove('hidden');
+                    passwordModal.classList.add('flex');
+                    setTimeout(() => {
+                        passwordContent.classList.remove('scale-95');
+                        passwordContent.classList.add('scale-100');
+                    }, 10);
+                }
             })();
         </script>
 
