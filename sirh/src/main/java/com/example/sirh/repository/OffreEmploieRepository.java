@@ -1,5 +1,6 @@
 package com.example.sirh.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,8 @@ public interface OffreEmploieRepository extends JpaRepository<OffreEmploi, Integ
     long countByStatutLibelle(String libelle);
 
     long countByStatutLibelleAndDemandeRecrutementManagerIdUtilisateur(String libelle, Integer idManager);
+
+    long countByDatePublicationBetween(LocalDateTime start, LocalDateTime end);
 
     @Query("""
                 SELECT o FROM OffreEmploi o

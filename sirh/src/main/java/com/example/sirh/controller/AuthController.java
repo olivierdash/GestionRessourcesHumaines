@@ -13,6 +13,6 @@ public class AuthController {
 
     @GetMapping("/")
     public String accueil() {
-        return "redirect:/utilisateur/dashboard";
+        return "redirect:/utilisateur";
     }
 }

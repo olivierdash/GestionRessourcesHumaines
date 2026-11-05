@@ -66,7 +66,6 @@ public class BreadcrumbService {
             case "candidatures" -> "Candidatures";
             case "propositions" -> "Propositions";
             case "contrats" -> "Contrats";
-            case "utilisateur" -> "Mon espace";
             case "admin" -> "Administration";
             case "onboarding" -> "Onboarding";
             default -> capitalize(module);

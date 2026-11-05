@@ -3,9 +3,8 @@ package com.example.sirh.repository;
 import com.example.sirh.dto.DemandeRecrutementFilter;
 import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.model.DemandeRecrutement;
-import com.example.sirh.model.MotifDemande;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -92,19 +91,27 @@ public interface DemandeRecrutementRepository
 
     long countByEtatDemandeIntituleInAndManagerIdUtilisateur(List<String> intitules, Integer idManager);
 
-    // NOUVEAU : Limite dynamique pour la table
     List<DemandeRecrutement> findAllByOrderByDateCreationDesc(Pageable pageable);
 
     List<DemandeRecrutement> findByManagerIdUtilisateurOrderByDateCreationDesc(Integer idManager, Pageable pageable);
 
     @Query("""
                 SELECT COUNT(d) > 0 FROM DemandeRecrutement d
-                WHERE (
-                        d.poste.idPoste = :idPoste
-                      )
+                WHERE d.poste.idPoste = :idPoste
                   AND d.etatDemande.intitule NOT IN :etatsExclus
             """)
     boolean existsDemandeActive(
             @Param("idPoste") Integer idPoste,
             @Param("etatsExclus") List<String> etatsExclus);
+
+    @Query("""
+                SELECT COUNT(d) FROM DemandeRecrutement d
+                WHERE LOWER(d.etatDemande.intitule) = LOWER(:intitule)
+                  AND d.dateCreation >= COALESCE(:start, d.dateCreation)
+                  AND d.dateCreation <= COALESCE(:end, d.dateCreation)
+            """)
+    long countByEtatAndDateRange(
+            @Param("intitule") String intitule,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 }

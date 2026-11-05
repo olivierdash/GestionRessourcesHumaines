@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <style>
+            .expandable-section .chart-area {
+                transition: height 0.3s ease;
+            }
+
+            .expandable-section.is-expanded {
+                position: fixed !important;
+                inset: 1rem !important;
+                z-index: 100 !important;
+                margin: 0 !important;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+            }
+
+            .expandable-section.is-expanded .chart-area {
+                flex: 1;
+                height: auto !important;
+                min-height: 0;
+            }
+
+            .section-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.5);
+                backdrop-filter: blur(2px);
+                z-index: 99;
+            }
+        </style>
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Tableau de bord RH</h2>
+                <p class="text-sm text-slate-600 mt-1">
+                    Vue d'ensemble du recrutement et de l'intégration —
+                    <span th:text="${dashboard.periodLabel}">30 derniers jours</span>
+                </p>
+            </div>
+
+            <div class="inline-flex rounded border border-neutral-border overflow-hidden">
+                <a th:href="@{/utilisateur(period='7d')}"
+                   th:classappend="${dashboard.period == '7d'} ? 'bg-cobalt-700 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                   class="px-4 h-9 flex items-center text-xs font-semibold transition-colors border-r border-neutral-border">7 jours</a>
+                <a th:href="@{/utilisateur(period='30d')}"
+                   th:classappend="${dashboard.period == '30d'} ? 'bg-cobalt-700 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                   class="px-4 h-9 flex items-center text-xs font-semibold transition-colors border-r border-neutral-border">30 jours</a>
+                <a th:href="@{/utilisateur(period='trimestre')}"
+                   th:classappend="${dashboard.period == 'trimestre'} ? 'bg-cobalt-700 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                   class="px-4 h-9 flex items-center text-xs font-semibold transition-colors border-r border-neutral-border">Trimestre</a>
+                <a th:href="@{/utilisateur(period='annee')}"
+                   th:classappend="${dashboard.period == 'annee'} ? 'bg-cobalt-700 text-white' : 'bg-white text-slate-700 hover:bg-slate-50'"
+                   class="px-4 h-9 flex items-center text-xs font-semibold transition-colors">Année</a>
+            </div>
+        </div>
+
+        <!-- Section 1 — À traiter maintenant -->
+        <section class="flex flex-col gap-4">
+            <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">À traiter maintenant</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a th:href="@{/demandes/validations}"
+                   class="bg-surface-card p-5 border border-neutral-border rounded-lg shadow-sm flex flex-col justify-between h-32 hover:border-cobalt-700 transition-colors group">
+                    <div class="flex items-start justify-between">
+                        <div class="flex flex-col">
+                            <span class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Demandes à valider</span>
+                            <span class="text-3xl font-extrabold text-cobalt-900 mt-1" th:text="${dashboard.demandesAValider}">0</span>
+                        </div>
+                        <div class="w-9 h-9 border border-neutral-border bg-slate-50 flex items-center justify-center text-cobalt-800 rounded group-hover:bg-cobalt-50 group-hover:border-cobalt-200 transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-500 font-medium">Cliquez pour traiter</span>
+                </a>
+
+                <div class="bg-surface-card p-5 border border-neutral-border rounded-lg shadow-sm flex flex-col justify-between h-32">
+                    <div class="flex items-start justify-between">
+                        <div class="flex flex-col">
+                            <span class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Contrats à renouveler</span>
+                            <span class="text-3xl font-extrabold text-cobalt-900 mt-1" th:text="${dashboard.contratsARenouvelerSous30j}">0</span>
+                        </div>
+                        <div class="w-9 h-9 border border-neutral-border bg-slate-50 flex items-center justify-center text-cobalt-800 rounded">
+                            <span class="material-symbols-outlined text-[20px]">event</span>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-500 font-medium">Dans les 30 prochains jours</span>
+                </div>
+
+                <div class="bg-surface-card p-5 border border-neutral-border rounded-lg shadow-sm flex flex-col justify-between h-32">
+                    <div class="flex items-start justify-between">
+                        <div class="flex flex-col">
+                            <span class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Onboardings en cours</span>
+                            <span class="text-3xl font-extrabold text-cobalt-900 mt-1" th:text="${dashboard.onboardingsEnCours}">0</span>
+                        </div>
+                        <div class="w-9 h-9 border border-neutral-border bg-slate-50 flex items-center justify-center text-cobalt-800 rounded">
+                            <span class="material-symbols-outlined text-[20px]">groups</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1 bg-slate-100 border border-slate-200 rounded-full h-1.5 overflow-hidden">
+                            <div class="bg-cobalt-700 h-full rounded-full"
+                                 th:style="'width: ' + ${dashboard.onboardingsProgressionMoyenne} + '%'"></div>
+                        </div>
+                        <span class="text-xs font-bold text-cobalt-900"
+                              th:text="${#numbers.formatDecimal(dashboard.onboardingsProgressionMoyenne, 1, 0)} + '%'">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2 — Pipeline de recrutement -->
+        <section id="pipelineSection"
+                 class="expandable-section relative bg-surface-card p-6 border border-neutral-border rounded-lg shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-cobalt-900 tracking-tight">Pipeline de recrutement</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">Conversion sur la période — <span th:text="${dashboard.periodLabel}"></span></p>
+                </div>
+                <button type="button"
+                        data-expand-btn
+                        onclick="toggleExpand('pipelineSection')"
+                        class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-cobalt-900 hover:bg-slate-100 rounded transition-colors"
+                        title="Agrandir">
+                    <span class="material-symbols-outlined text-[20px]">open_in_full</span>
+                </button>
+            </div>
+
+            <div th:if="${#lists.isEmpty(dashboard.funnel)}"
+                 class="py-12 text-center text-slate-500 italic text-sm">
+                Aucune donnée sur cette période.
+            </div>
+
+            <div th:if="${!#lists.isEmpty(dashboard.funnel)}" class="chart-area relative w-full h-56">
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Section 3 — Évolution des candidatures -->
+        <section id="evolutionSection"
+                 class="expandable-section relative bg-surface-card p-6 border border-neutral-border rounded-lg shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-cobalt-900 tracking-tight">Évolution des candidatures</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">Réceptions par jour</p>
+                </div>
+                <button type="button"
+                        data-expand-btn
+                        onclick="toggleExpand('evolutionSection')"
+                        class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-cobalt-900 hover:bg-slate-100 rounded transition-colors"
+                        title="Agrandir">
+                    <span class="material-symbols-outlined text-[20px]">open_in_full</span>
+                </button>
+            </div>
+
+            <div th:if="${#lists.isEmpty(dashboard.chartData)}"
+                 class="h-64 flex items-center justify-center text-slate-500 italic text-sm">
+                Aucune candidature sur cette période.
+            </div>
+
+            <div th:if="${!#lists.isEmpty(dashboard.chartData)}" class="chart-area relative w-full h-64">
+                <canvas id="evolutionChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Chart.js -->
+        <script th:src="@{/js/chart.umd.js}"></script>
+        <script th:inline="javascript">
+            let funnelChartInstance = null;
+            let evolutionChartInstance = null;
+
+            function toggleExpand(sectionId) {
+                const section = document.getElementById(sectionId);
+                if (!section) return;
+
+                const isExpanding = !section.classList.contains('is-expanded');
+                const icon = section.querySelector('button[data-expand-btn] span');
+                const overlayId = 'overlay-' + sectionId;
+
+                if (isExpanding) {
+                    const overlay = document.createElement('div');
+                    overlay.id = overlayId;
+                    overlay.className = 'section-overlay';
+                    overlay.addEventListener('click', () => toggleExpand(sectionId));
+                    document.body.appendChild(overlay);
+
+                    section.classList.add('is-expanded');
+                    if (icon) icon.textContent = 'close_fullscreen';
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    const overlay = document.getElementById(overlayId);
+                    if (overlay) overlay.remove();
+
+                    section.classList.remove('is-expanded');
+                    if (icon) icon.textContent = 'open_in_full';
+                    document.body.style.overflow = '';
+                }
+
+                setTimeout(() => {
+                    if (sectionId === 'pipelineSection' && funnelChartInstance) {
+                        funnelChartInstance.resize();
+                    } else if (sectionId === 'evolutionSection' && evolutionChartInstance) {
+                        evolutionChartInstance.resize();
+                    }
+                }, 350);
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.expandable-section.is-expanded').forEach((s) => {
+                        toggleExpand(s.id);
+                    });
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const funnelData = /*[[${dashboard.funnel}]]*/ [];
+                if (funnelData && funnelData.length > 0) {
+                    const ctxFunnel = document.getElementById('funnelChart').getContext('2d');
+                    funnelChartInstance = new Chart(ctxFunnel, {
+                        type: 'bar',
+                        data: {
+                            labels: funnelData.map(f => f.label),
+                            datasets: [{
+                                label: 'Volume',
+                                data: funnelData.map(f => f.count),
+                                backgroundColor: '#1e40af',
+                                borderRadius: 4,
+                                barThickness: 24
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (item) => {
+                                            const step = funnelData[item.dataIndex];
+                                            let label = ` ${step.count} `;
+                                            if (step.tauxConversion != null) {
+                                                label += `(${step.tauxConversion}% de l'étape précédente)`;
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 1, color: '#64748b', font: { family: 'Inter', size: 11 } },
+                                    grid: { color: '#e2e8f0' }
+                                },
+                                y: {
+                                    ticks: { color: '#1e293b', font: { family: 'Inter', size: 12, weight: '600' } },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                const chartData = /*[[${dashboard.chartData}]]*/ [];
+                if (chartData && chartData.length > 0) {
+                    const ctxEvo = document.getElementById('evolutionChart').getContext('2d');
+                    const gradient = ctxEvo.createLinearGradient(0, 0, 0, 300);
+                    gradient.addColorStop(0, 'rgba(30, 64, 175, 0.18)');
+                    gradient.addColorStop(1, 'rgba(30, 64, 175, 0.01)');
+
+                    evolutionChartInstance = new Chart(ctxEvo, {
+                        type: 'line',
+                        data: {
+                            labels: chartData.map(d => {
+                                const p = d.date.split('-');
+                                return `${p[2]}/${p[1]}`;
+                            }),
+                            datasets: [{
+                                data: chartData.map(d => d.count),
+                                borderColor: '#1E40AF',
+                                backgroundColor: gradient,
+                                borderWidth: 2.5,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#1E40AF',
+                                pointBorderWidth: 2,
+                                pointRadius: 3,
+                                tension: 0,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 1, color: '#64748b', font: { family: 'Inter', size: 11 } },
+                                    grid: { color: '#e2e8f0', borderDash: [2, 3], drawBorder: false }
+                                },
+                                x: {
+                                    ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+
+    </main>
+</body>
+</html>
