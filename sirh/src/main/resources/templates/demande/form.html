@@ -1,224 +1,169 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
 <body>
 
     <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
 
         <!-- En-tête -->
         <div>
-            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight" 
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight"
                 th:text="${isBrouillon != null} ? 'Modifier la demande' : 'Nouvelle demande'">
             </h2>
         </div>
 
         <!-- Carte du formulaire -->
         <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            
+            <!-- Bandeau d'erreur global -->
+            <div th:if="${errorMessage}"
+                class="p-4 m-6 mb-0 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">error</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
+
             <div class="p-6 md:p-8">
-                <form th:action="${isBrouillon != null} ? @{/demandes/update} : @{/demandes/create}"
-                      method="post" th:object="${demandeRecrutementForm}" id="demandeForm" novalidate>
+                <form th:action="${isBrouillon != null} ? @{/demandes/update} : @{/demandes/create}" method="post"
+                    th:object="${demandeRecrutementForm}" id="demandeForm" novalidate>
 
                     <input type="hidden" th:field="*{idDemandeRecrutement}" />
 
-                    <!-- État actuel -->
-                    <div class="mb-6">
-                        <label class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">État actuel</label>
-                        <input type="text" readonly
-                               th:value="${demandeRecrutementForm.etat != null ? demandeRecrutementForm.etat : 'Brouillon'}"
-                               class="w-full h-11 px-3 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold text-sm cursor-not-allowed outline-none">
-                    </div>
-
                     <!-- Manager -->
                     <div class="mb-6">
-                        <label for="idManager" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Manager demandeur <span class="text-red-500">*</span></label>
-                        <select class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer" 
-                                id="idManager" th:field="*{idManager}" required>
-                            <option value="" disabled>Sélectionnez un manager...</option>
+                        <label for="idManager"
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Manager
+                            demandeur <span class="text-red-500">*</span></label>
+                        <select
+                            class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors cursor-pointer"
+                            th:classappend="${errors != null and errors['idManager'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'"
+                            id="idManager" th:field="*{idManager}" required>
+                            <option value="">Sélectionnez un manager...</option>
                             <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}"
                                 th:text="${manager.nom + ' (' + manager.role.libelle + ')'}"></option>
                         </select>
-                        <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('idManager')}" th:errors="*{idManager}"></p>
+                        <p th:if="${errors != null and errors['idManager'] != null}" th:text="${errors['idManager']}"
+                            class="mt-1 text-xs text-red-500 font-semibold"></p>
                     </div>
 
                     <!-- Poste (Custom Select) -->
                     <div class="mb-6">
-                        <label for="posteSearch" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Poste concerné <span class="text-red-500">*</span></label>
+                        <label for="posteSearch"
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Poste
+                            concerné <span class="text-red-500">*</span></label>
                         <div class="custom-select-wrapper relative">
-                            <input type="text" id="posteSearch" placeholder="Rechercher..." autocomplete="off" required
-                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
-                            <div class="custom-dropdown absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-border rounded shadow-lg z-50 max-h-60 overflow-y-auto hidden" id="posteDropdown"></div>
-                            <select class="hidden" id="posteSelect" th:field="*{idPoste}" required>
+                            <input type="text" id="posteSearch"
+                                class="custom-select-search w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                                th:classappend="${errors != null and errors['idPoste'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'"
+                                placeholder="Rechercher..." autocomplete="off" required>
+
+                            <div
+                                class="custom-dropdown absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-border rounded shadow-lg z-50 max-h-60 overflow-y-auto">
+                            </div>
+
+                            <select class="custom-select-hidden hidden" id="posteSelect" th:field="*{idPoste}" required>
                                 <option value=""></option>
-                                <option th:each="poste : ${postes}" th:value="${poste.idPoste}" th:text="${poste.intitule}"></option>
+                                <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
+                                    th:text="${poste.intitule}"></option>
                             </select>
                         </div>
-                        <p class="mt-1 text-xs text-red-500 font-semibold" id="posteError" th:if="${#fields.hasErrors('idPoste')}" th:errors="*{idPoste}"></p>
+                        <p th:if="${errors != null and errors['idPoste'] != null}" th:text="${errors['idPoste']}"
+                            class="mt-1 text-xs text-red-500 font-semibold"></p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <!-- Date -->
+                        <!-- Date (Ajout de th:min pour bloquer les dates passées côté navigateur) -->
                         <div>
-                            <label for="dateSouhaitee" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Date d'entrée <span class="text-red-500">*</span></label>
+                            <label for="dateSouhaitee"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Date
+                                d'entrée <span class="text-red-500">*</span></label>
                             <input type="date" id="dateSouhaitee" th:field="*{dateSouhaitee}" required
-                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
-                            <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('dateSouhaitee')}" th:errors="*{dateSouhaitee}"></p>
+                                th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                                class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                                th:classappend="${errors != null and errors['dateSouhaitee'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                            <p th:if="${errors != null and errors['dateSouhaitee'] != null}"
+                                th:text="${errors['dateSouhaitee']}" class="mt-1 text-xs text-red-500 font-semibold">
+                            </p>
                         </div>
                         <!-- Effectif -->
                         <div>
-                            <label for="effectif" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Effectif requis <span class="text-red-500">*</span></label>
+                            <label for="effectif"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Effectif
+                                requis <span class="text-red-500">*</span></label>
                             <input type="number" id="effectif" th:field="*{effectif}" min="1" required
-                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
-                            <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('effectif')}" th:errors="*{effectif}"></p>
+                                class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                                th:classappend="${errors != null and errors['effectif'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                            <p th:if="${errors != null and errors['effectif'] != null}" th:text="${errors['effectif']}"
+                                class="mt-1 text-xs text-red-500 font-semibold"></p>
                         </div>
                     </div>
 
                     <!-- Motif -->
                     <div class="mb-8">
-                        <label for="idMotif" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Motif de la demande <span class="text-red-500">*</span></label>
+                        <label for="idMotif"
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Motif de la
+                            demande <span class="text-red-500">*</span></label>
                         <select id="idMotif" th:field="*{motif.idMotifDemande}" required
-                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer">
+                            class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors cursor-pointer"
+                            th:classappend="${errors != null and errors['motif'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
                             <option value="" disabled>Sélectionnez un motif...</option>
-                            <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}" th:text="${motif.libelle}"></option>
+                            <option th:each="motif : ${motifs}" th:value="${motif.idMotifDemande}"
+                                th:text="${motif.libelle}"></option>
                         </select>
-                        <p class="mt-1 text-xs text-red-500 font-semibold" th:if="${#fields.hasErrors('motif.idMotifDemande')}" th:errors="*{motif.idMotifDemande}"></p>
+                        <p th:if="${errors != null and errors['motif'] != null}" th:text="${errors['motif']}"
+                            class="mt-1 text-xs text-red-500 font-semibold"></p>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border">
-                        <button type="submit" name="action" value="save" 
-                                class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm">
+                        <button type="submit" name="action" value="save"
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm">
                             Enregistrer le brouillon
                         </button>
-                        <button type="submit" name="action" value="submit" 
-                                class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm"
-                                th:text="${isBrouillon != null} ? 'Mettre à jour et Soumettre' : 'Soumettre la demande'">
+                        <button type="submit" name="action" value="submit"
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm"
+                            th:text="${isBrouillon != null} ? 'Mettre à jour et Soumettre' : 'Soumettre la demande'">
                         </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- SCRIPT (Inchangé) -->
+        <!-- SCRIPT LOCAL (Nettoyage UX uniquement) -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                const form = document.getElementById('demandeForm');
                 const searchInput = document.getElementById('posteSearch');
                 const hiddenSelect = document.getElementById('posteSelect');
-                const dropdown = document.getElementById('posteDropdown');
                 const effectifInput = document.getElementById('effectif');
+                const dateInput = document.getElementById('dateSouhaitee');
 
-                function initDropdown() {
-                    const options = Array.from(hiddenSelect.options).filter(opt => opt.value !== "");
-                    options.forEach(opt => {
-                        const div = document.createElement('div');
-                        div.className = 'px-3 py-2 text-sm text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors border-b border-slate-100 last:border-0 custom-option';
-                        div.textContent = opt.text;
-                        div.dataset.value = opt.value;
-                        if (opt.selected) {
-                            div.classList.add('bg-slate-100', 'font-bold', 'text-cobalt-800');
-                            searchInput.value = opt.text;
-                        }
-                        div.addEventListener('click', () => selectOption(opt, div));
-                        dropdown.appendChild(div);
-                    });
-                }
-
-                function selectOption(opt, divElement) {
-                    searchInput.value = opt.text;
-                    hiddenSelect.value = opt.value;
-                    searchInput.classList.remove('border-red-500');
-                    dropdown.querySelectorAll('.custom-option').forEach(el => el.classList.remove('bg-slate-100', 'font-bold', 'text-cobalt-800'));
-                    divElement.classList.add('bg-slate-100', 'font-bold', 'text-cobalt-800');
-                    closeDropdown();
-                }
-
-                function filterList() {
-                    const query = searchInput.value.toLowerCase();
-                    const items = dropdown.querySelectorAll('.custom-option:not(.no-result)');
-                    let hasVisible = false;
-                    items.forEach(item => {
-                        if (item.textContent.toLowerCase().includes(query)) {
-                            item.style.display = 'block';
-                            hasVisible = true;
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                    toggleNoResultMessage(!hasVisible);
-                }
-
-                function toggleNoResultMessage(show) {
-                    let noResultDiv = dropdown.querySelector('.no-result');
-                    if (show) {
-                        if (!noResultDiv) {
-                            noResultDiv = document.createElement('div');
-                            noResultDiv.className = 'px-3 py-2 text-sm text-slate-500 italic custom-option no-result';
-                            noResultDiv.textContent = 'Aucun poste trouvé';
-                            dropdown.appendChild(noResultDiv);
-                        }
-                        noResultDiv.style.display = 'block';
-                    } else if (noResultDiv) {
-                        noResultDiv.style.display = 'none';
-                    }
-                }
-
-                function openDropdown() { dropdown.classList.remove('hidden'); filterList(); }
-                function closeDropdown() { dropdown.classList.add('hidden'); }
-
-                function isFormValid() {
-                    let isValid = true;
-                    if (hiddenSelect.value === "") {
-                        searchInput.classList.add('border-red-500');
-                        isValid = false;
-                    } else {
-                        searchInput.classList.remove('border-red-500');
-                    }
-                    if (effectifInput) {
-                        const effectifValue = parseInt(effectifInput.value, 10);
-                        if (isNaN(effectifValue) || effectifValue <= 0) {
-                            effectifInput.classList.add('border-red-500');
-                            isValid = false;
-                        } else {
-                            effectifInput.classList.remove('border-red-500');
-                        }
-                    }
-                    if (!form.checkValidity()) isValid = false;
-                    return isValid;
-                }
-
-                if (searchInput && hiddenSelect && dropdown) {
-                    searchInput.addEventListener('focus', openDropdown);
+                // Nettoyer l'erreur visuelle quand l'utilisateur saisit une valeur
+                if (searchInput) {
                     searchInput.addEventListener('input', () => {
-                        hiddenSelect.value = "";
-                        openDropdown();
-                    });
-                    document.addEventListener('click', (e) => {
-                        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-                            closeDropdown();
-                            if (hiddenSelect.value === "") searchInput.classList.add('border-red-500');
+                        if (hiddenSelect.value !== "") {
+                            searchInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
                         }
                     });
                 }
 
                 if (effectifInput) {
                     effectifInput.addEventListener('input', () => {
-                        if (parseInt(effectifInput.value, 10) > 0) effectifInput.classList.remove('border-red-500');
-                    });
-                }
-
-                if (form) {
-                    form.addEventListener('submit', function (e) {
-                        if (!isFormValid()) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        if (parseInt(effectifInput.value, 10) > 0) {
+                            effectifInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
                         }
                     });
                 }
 
-                if (hiddenSelect) initDropdown();
+                if (dateInput) {
+                    dateInput.addEventListener('input', () => {
+                        if (dateInput.value) {
+                            dateInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                        }
+                    });
+                }
             });
         </script>
 
     </main>
 </body>
+
 </html>

@@ -5,6 +5,7 @@ import com.example.sirh.dto.DemandeRecrutementLib;
 import com.example.sirh.model.DemandeRecrutement;
 import com.example.sirh.model.MotifDemande;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -88,9 +89,22 @@ public interface DemandeRecrutementRepository
     List<DemandeRecrutement> getAllDemandeValide(@Param("filter") DemandeRecrutementFilter filter);
 
     long countByEtatDemandeIntituleIn(List<String> intitules);
+
     long countByEtatDemandeIntituleInAndManagerIdUtilisateur(List<String> intitules, Integer idManager);
 
     // NOUVEAU : Limite dynamique pour la table
     List<DemandeRecrutement> findAllByOrderByDateCreationDesc(Pageable pageable);
+
     List<DemandeRecrutement> findByManagerIdUtilisateurOrderByDateCreationDesc(Integer idManager, Pageable pageable);
+
+    @Query("""
+                SELECT COUNT(d) > 0 FROM DemandeRecrutement d
+                WHERE (
+                        d.poste.idPoste = :idPoste
+                      )
+                  AND d.etatDemande.intitule NOT IN :etatsExclus
+            """)
+    boolean existsDemandeActive(
+            @Param("idPoste") Integer idPoste,
+            @Param("etatsExclus") List<String> etatsExclus);
 }
