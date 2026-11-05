@@ -6,6 +6,9 @@ import com.example.sirh.service.EmployeService;
 import com.example.sirh.service.UtilisateurService;
 
 import lombok.AllArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +43,7 @@ public class DepartementController {
             return "redirect:/departements";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("managers", utilisateurService.getManagers());
+            model.addAttribute("managers", utilisateurService.getByRolesList(List.of("MANAGER")));
 
             Departement dep = new Departement();
             dep.setTitre(titre);
@@ -65,7 +68,7 @@ public class DepartementController {
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable Integer id, Model model) {
         Departement departement = departementService.getById(id);
-        model.addAttribute("managers", utilisateurService.getManagers());
+        model.addAttribute("managers", utilisateurService.getByRolesList(List.of("MANAGER")));
         model.addAttribute("departement", departement);
         return "departement/form";
     }
@@ -81,7 +84,7 @@ public class DepartementController {
             return "redirect:/departements";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("managers", utilisateurService.getManagers());
+            model.addAttribute("managers", utilisateurService.getByRolesList(List.of("MANAGER")));
 
             Departement dep = departementService.getById(id);
             dep.setTitre(titre);
