@@ -1,7 +1,9 @@
 package com.example.sirh.service;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.sirh.dto.OffreFilter;
 import com.example.sirh.dto.OffrePublicDto;
+import com.example.sirh.exception.ValidationMetierException;
 import com.example.sirh.model.OffreEmploi;
 import com.example.sirh.model.StatutOffreEmploi;
 import com.example.sirh.repository.OffreEmploieRepository;
@@ -42,10 +45,33 @@ public class OffreEmploieService {
      */
     @Transactional
     public OffreEmploi createNewOffer(OffreEmploi offre, Integer idStatutOffreEmploi) {
-        if (offre.getDemandeRecrutement() == null || offre.getDemandeRecrutement().getIdDemandeRecrutement() == null) {
-            throw new IllegalArgumentException("La demande de recrutement est obligatoire");
+
+        // --- RÈGLES DE GESTION (Accumulation des erreurs) ---
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        // 1. Demande de recrutement
+        if (offre.getDemandeRecrutement() == null
+                || offre.getDemandeRecrutement().getIdDemandeRecrutement() == null) {
+            errors.put("demandeRecrutement.idDemandeRecrutement",
+                    "La demande de recrutement est obligatoire.");
         }
 
+        // 2. Titre
+        if (offre.getTitre() == null || offre.getTitre().isBlank()) {
+            errors.put("titre", "Le titre de l'offre est obligatoire.");
+        }
+
+        // 3. Description
+        if (offre.getDescription() == null || offre.getDescription().isBlank()) {
+            errors.put("description", "La description de l'offre est obligatoire.");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationMetierException(errors);
+        }
+        // ----------------------------------------------------
+
+        // Suite de la logique (si pas d'erreur)
         offre.setIdOffre(null);
         offre.setDemandeRecrutement(
                 demandeRecrutementService.getById(offre.getDemandeRecrutement().getIdDemandeRecrutement()));
