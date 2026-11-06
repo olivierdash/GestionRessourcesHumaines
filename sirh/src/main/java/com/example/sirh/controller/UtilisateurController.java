@@ -31,7 +31,7 @@ public class UtilisateurController {
         String role = utilisateur.getRole().getLibelle().toUpperCase();
 
         if ("ADMIN".equals(role)) {
-            return "redirect:/admin/utilisateurs";
+            return "redirect:/admin";
         }
 
         if ("RH".equals(role)) {
