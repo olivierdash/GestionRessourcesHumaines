@@ -1,15 +1,21 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.dto.EmployeFilter;
+import com.example.sirh.model.Affectation;
+import com.example.sirh.model.Contrat;
 import com.example.sirh.model.Employe;
 import com.example.sirh.service.AffectationService;
 import com.example.sirh.service.CandidatureService;
 import com.example.sirh.service.ContratService;
 import com.example.sirh.service.DepartementService;
+import com.example.sirh.service.DocumentService;
 import com.example.sirh.service.EmployeService;
 import com.example.sirh.service.EmbaucheService;
 
 import lombok.AllArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +33,8 @@ public class EmployeController {
     private final EmployeService employeService;
     private final CandidatureService candidatureService;
     private final DepartementService departementService; // <-- Ajouté pour le select
+    private final ContratService contratService;
+    private final DocumentService documentService;
 
     @GetMapping
     public String index(
@@ -66,9 +74,26 @@ public class EmployeController {
     /** Fiche salarié avec matricule, contrat et affectation. */
     @GetMapping("/{id}")
     public String show(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("employe", employeService.getById(id));
-        // model.addAttribute("contrats", embaucheService.contratsDe(id));
-        // model.addAttribute("affectations", embaucheService.affectationsDe(id));
+        Employe employe = employeService.getById(id);
+
+        List<Contrat> contrats = contratService.historique(id); // déjà trié DESC
+        // List<Affectation> affectations = affectationService.findByEmployeOrderByDateDebutDesc(id);
+
+        // Affectation active : celle dont dateFin == null
+        // Affectation affectationActive = affectations.stream()
+        //         .filter(a -> a.getDateFin() == null)
+        //         .findFirst()
+        //         .orElse(null);
+
+        // Contrat actif : via le service (déjà présent dans ContratService)
+        Contrat contratActif = contratService.contratActif(id).orElse(null);
+
+        model.addAttribute("employe", employe);
+        model.addAttribute("contrats", contrats);
+        // model.addAttribute("affectations", affectations);
+        // model.addAttribute("affectationActive", affectationActive);
+        model.addAttribute("contratActif", contratActif);
+
         return "employe/fiche";
     }
 }
