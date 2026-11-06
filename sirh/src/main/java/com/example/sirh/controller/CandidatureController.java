@@ -3,6 +3,7 @@ package com.example.sirh.controller;
 import com.example.sirh.model.Candidat;
 import com.example.sirh.service.CandidatService;
 import com.example.sirh.service.CandidatureService;
+import com.example.sirh.service.EvaluationService;
 import com.example.sirh.service.OffreEmploieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ public class CandidatureController {
     private final CandidatureService candidatureService;
     private final OffreEmploieService offreService;
     private final CandidatService candidatService; // Injection du Service
+    private final EvaluationService evaluationService;
 
     // TÂCHE 10 : Candidatures d'une offre
     @GetMapping("/offres/{idOffre}")
@@ -31,16 +33,22 @@ public class CandidatureController {
     public String ficheCandidat(@PathVariable Integer idCandidat, Model model) {
         // Appel au Service au lieu du Repository
         Candidat candidat = candidatService.getCandidatById(idCandidat);
-        
         model.addAttribute("candidat", candidat);
         model.addAttribute("candidatures", candidatureService.listeCandidatureByCandidat(idCandidat));
         return "candidats/fiche";
     }
 
+    @GetMapping("/candidatures/{id}")
+    public String pageCandidature(@PathVariable Integer id, Model model) {
+        model.addAttribute("candidature", candidatureService.getCandidatureById(id));
+        model.addAttribute("evaluations", evaluationService.listerEvaluationsParCandidature(id));
+        return "candidatures/show";
+    }
+
     @PostMapping("/candidatures/{id}/retenir")
     public String retenirCandidat(
-            @PathVariable Integer id, 
-            @RequestParam Integer idOffre, 
+            @PathVariable Integer id,
+            @RequestParam Integer idOffre,
             RedirectAttributes redirectAttributes) {
         candidatureService.changerStatutCandidature(id, 3); // 3 = RETENU
         redirectAttributes.addFlashAttribute("success", "Le candidat a été retenu !");
@@ -50,9 +58,9 @@ public class CandidatureController {
     // TÂCHE 12 bis : Refuser un candidat
     @PostMapping("/candidatures/{id}/refuser")
     public String refuserCandidat(
-        @PathVariable Integer id, 
-        @RequestParam Integer idOffre, 
-        RedirectAttributes redirectAttributes) {
+            @PathVariable Integer id,
+            @RequestParam Integer idOffre,
+            RedirectAttributes redirectAttributes) {
         candidatureService.changerStatutCandidature(id, 4); // 4 = REFUSE
         redirectAttributes.addFlashAttribute("success", "Le candidat a été refusé.");
         return "redirect:/offres/" + idOffre + "/candidatures";

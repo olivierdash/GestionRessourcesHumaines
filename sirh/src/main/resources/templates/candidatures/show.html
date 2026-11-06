@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <!-- ============ EN-TÊTE ============ -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight flex flex-wrap items-center gap-3">
+                    Candidature
+                    <span class="px-2.5 py-1 bg-cobalt-800 text-white font-mono text-sm rounded font-bold tracking-wide"
+                        th:text="${'#' + candidature.idCandidature}">
+                    </span>
+                </h1>
+                <p class="text-xs text-slate-500 mt-1 font-mono" th:text="${candidature.dateDepotCandidature != null
+                            ? 'Déposée le ' + #temporals.format(candidature.dateDepotCandidature, 'dd/MM/yyyy à HH:mm')
+                            : 'Date de dépôt inconnue'}">
+                </p>
+            </div>
+
+            <span
+                class="inline-flex items-center px-3 py-1 rounded border text-[11px] font-bold uppercase tracking-wider self-start md:self-auto"
+                th:classappend="${statutClass}" th:text="${candidature.statutCandidature.libelle}">
+            </span>
+        </div>
+
+        <!-- ============ MESSAGES FLASH ============ -->
+        <div th:if="${success}"
+            class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
+            th:text="${success}"></div>
+        <div th:if="${error}"
+            class="p-4 rounded bg-rose-50 text-rose-700 border border-rose-200 text-sm font-semibold shadow-sm"
+            th:text="${error}"></div>
+
+        <!-- ============ CANDIDAT / OFFRE ============ -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Carte candidat -->
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50 flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Candidat</h3>
+                    <a th:href="@{/candidats/{id}(id=${candidature.candidat.idCandidat})}"
+                        class="text-xs font-bold text-cobalt-800 hover:text-cobalt-900 underline">
+                        Voir la fiche complète →
+                    </a>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nom
+                            complet</span>
+                        <div class="text-sm font-bold text-slate-800"
+                            th:text="${candidature.candidat.prenom + ' ' + candidature.candidat.nom}"></div>
+                    </div>
+                    <div>
+                        <span
+                            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Email</span>
+                        <a th:href="${'mailto:' + candidature.candidat.email}"
+                            class="text-sm text-cobalt-800 hover:text-cobalt-900 underline"
+                            th:text="${candidature.candidat.email}"></a>
+                    </div>
+                    <div>
+                        <span
+                            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Téléphone</span>
+                        <div class="text-sm font-mono text-slate-700"
+                            th:text="${candidature.candidat.telephone != null ? candidature.candidat.telephone : EMPTY_VALUE}">
+                        </div>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">CV</span>
+                        <a th:if="${candidature.candidat.cvUrl != null}" th:href="@{${candidature.candidat.cvUrl}}"
+                            target="_blank"
+                            class="inline-flex items-center gap-1 text-sm font-bold text-cobalt-800 hover:text-cobalt-900 underline">
+                            Consulter le CV ↗
+                        </a>
+                        <span th:if="${candidature.candidat.cvUrl == null}" class="text-sm text-slate-400 italic"
+                            th:text="${NO_CV_LABEL}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte offre (titre + statut retirés) -->
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50 flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Offre ciblée</h3>
+                    <a th:href="@{/offres/{id}(id=${candidature.offre.idOffre})}"
+                        class="text-xs font-bold text-cobalt-800 hover:text-cobalt-900 underline">
+                        Voir l'offre →
+                    </a>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <span
+                            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Poste</span>
+                        <div class="text-sm text-slate-700"
+                            th:text="${candidature.offre.demandeRecrutement.poste.intitule}"></div>
+                    </div>
+                    <div>
+                        <span
+                            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Département</span>
+                        <div class="text-sm text-slate-700"
+                            th:text="${candidature.offre.demandeRecrutement.poste.departement.titre}"></div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Publiée
+                            le</span>
+                        <div class="text-sm font-mono text-slate-600" th:text="${candidature.offre.datePublication != null
+                                    ? #temporals.format(candidature.offre.datePublication, 'dd/MM/yyyy')
+                                    : EMPTY_VALUE}"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ============ ÉVALUATIONS ============ -->
+        <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mt-2">Évaluations</h2>
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Évaluateur</th>
+                            <th scope="col">Note</th>
+                            <th scope="col" class="text-right">Commentaire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(evaluations)}">
+                            <td colspan="5" class="td-empty py-6 text-center text-slate-500 italic">Aucune évaluation
+                                enregistrée.</td>
+                        </tr>
+                        <tr th:each="e : ${evaluations}">
+                            <td class="font-mono text-slate-600"
+                                th:text="${e.dateEvaluation != null ? #temporals.format(e.dateEvaluation, 'dd/MM/yyyy') : EMPTY_VALUE}">
+                            </td>
+                            <td class="font-bold text-cobalt-900" th:text="${e.typeEvaluation.libelle}"></td>
+                            <td class="text-slate-700" th:text="${e.evaluateur.nom}"></td>
+                            <td>
+                                <span th:if="${e.note != null}"
+                                    class="inline-flex items-center px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded"
+                                    th:text="${#numbers.formatDecimal(e.note, 1, 'COMMA', 1, 'POINT') + ' / ' + NOTE_MAX}">
+                                </span>
+                                <span th:if="${e.note == null}" class="text-slate-400 italic text-xs"
+                                    th:text="${EMPTY_VALUE}"></span>
+                            </td>
+                            <td class="text-right">
+                                <!-- Bouton « Voir le commentaire » : n'apparaît que si un commentaire existe -->
+                                <button th:if="${e.evaluation != null and !#strings.isEmpty(e.evaluation)}"
+                                    type="button"
+                                    class="inline-flex items-center px-3 py-1 text-xs font-bold text-cobalt-800 bg-slate-50 hover:bg-slate-100 border border-neutral-border rounded transition"
+                                    th:attr="data-eval-type=${e.typeEvaluation.libelle},
+                                             data-eval-date=${e.dateEvaluation != null
+                                                                ? #temporals.format(e.dateEvaluation, 'dd/MM/yyyy')
+                                                                : EMPTY_VALUE},
+                                             data-eval-evaluateur=${e.evaluateur.nom},
+                                             data-eval-comment=${e.evaluation}" onclick="openEvalModal(this)">
+                                    Voir le commentaire
+                                </button>
+                                <span th:if="${e.evaluation == null or #strings.isEmpty(e.evaluation)}"
+                                    class="text-slate-400 italic text-xs" th:text="${EMPTY_VALUE}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============ PROPOSITION ============ -->
+        <div th:if="${proposition != null}">
+            <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mt-2">Proposition d'embauche</h2>
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Salaire
+                            proposé</span>
+                        <div class="text-sm font-mono font-bold text-slate-800"
+                            th:text="${#numbers.formatDecimal(proposition.salairePropose, 0, 'COMMA', 2, 'POINT') + ' €'}">
+                        </div>
+                    </div>
+                    <div>
+                        <span
+                            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Statut</span>
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider bg-slate-100 border-slate-200 text-slate-600"
+                            th:text="${proposition.statut.libelle}"></span>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Expire
+                            le</span>
+                        <div class="text-sm font-mono text-slate-600" th:text="${proposition.dateExpiration != null
+                                    ? #temporals.format(proposition.dateExpiration, 'dd/MM/yyyy')
+                                    : EMPTY_VALUE}"></div>
+                    </div>
+                </div>
+                <div class="px-6 py-3 border-t border-neutral-border bg-slate-50">
+                    <a th:href="@{/propositions/{id}(id=${proposition.idProposition})}"
+                        class="text-xs font-bold text-cobalt-800 hover:text-cobalt-900 underline">
+                        Voir la proposition complète →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ MODAL COMMENTAIRE ============ -->
+        <dialog id="evalModal"
+            class="rounded-lg shadow-xl border border-neutral-border bg-surface-card w-full max-w-lg p-0 backdrop:bg-slate-900/50">
+
+            <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-border bg-slate-50">
+                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Commentaire</h3>
+                <button type="button"
+                    class="inline-flex items-center justify-center w-9 h-9 text-2xl leading-none text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition"
+                    onclick="document.getElementById('evalModal').close()" aria-label="Fermer">
+                    &times;
+                </button>
+            </div>
+
+            <div id="evalModalComment"
+                class="px-6 py-5 text-sm text-slate-700 whitespace-pre-line leading-relaxed max-h-96 overflow-y-auto">
+            </div>
+
+        </dialog>
+        <!-- ============ SCRIPT MODAL ============ -->
+        <script>
+            function openEvalModal(btn) {
+                document.getElementById('evalModalComment').textContent = btn.dataset.evalComment || '';
+                document.getElementById('evalModal').showModal();
+            }
+
+            // Fermeture au clic sur le backdrop
+            (function () {
+                var d = document.getElementById('evalModal');
+                d.addEventListener('click', function (event) {
+                    var rect = d.getBoundingClientRect();
+                    var inside = event.clientX >= rect.left && event.clientX <= rect.right
+                        && event.clientY >= rect.top && event.clientY <= rect.bottom;
+                    if (!inside) d.close();
+                });
+            })();
+        </script>
+    </main>
+
+</body>
+
+</html>
