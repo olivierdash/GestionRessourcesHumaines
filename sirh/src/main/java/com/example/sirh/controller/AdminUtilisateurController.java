@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
-@RequestMapping("/admin/utilisateurs")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminUtilisateurController {
 
@@ -76,7 +76,7 @@ public class AdminUtilisateurController {
     // CHANGEMENT DE MOT DE PASSE (POST)
     // =========================================================
 
-    @PostMapping("/{id}/password")
+    @PostMapping("/{id}")
     public String changerMotDePasse(
             @PathVariable Integer id,
             @ModelAttribute("changeLogin") LoginChangeDTO request,

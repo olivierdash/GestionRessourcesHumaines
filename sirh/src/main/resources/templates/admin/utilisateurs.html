@@ -85,7 +85,7 @@
                     </button>
                 </div>
 
-                <form th:action="@{/admin/utilisateurs}" th:object="${utilisateur}" method="post"
+                <form th:action="@{/admin}" th:object="${utilisateur}" method="post"
                       class="p-6 flex flex-col gap-5">
 
                     <!-- Nom -->
@@ -302,7 +302,7 @@
                     const id = button.getAttribute('data-id');
                     const isSelf = button.getAttribute('data-self') === 'true';
 
-                    passwordForm.action = '/admin/utilisateurs/' + id + '/password';
+                    passwordForm.action = '/admin/' + id;
 
                     if (isSelf) {
                         codeSecretSelfContainer.classList.remove('hidden');
@@ -353,7 +353,7 @@
                     const button = document.querySelector('main table button[data-id="' + targetId + '"]');
                     const isSelf = button ? button.getAttribute('data-self') === 'true' : false;
                     
-                    passwordForm.action = '/admin/utilisateurs/' + targetId + '/password';
+                    passwordForm.action = '/admin/' + targetId;
 
                     if (isSelf) {
                         codeSecretSelfContainer.classList.remove('hidden');
