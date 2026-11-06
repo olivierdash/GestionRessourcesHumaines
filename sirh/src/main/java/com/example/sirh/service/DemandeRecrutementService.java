@@ -46,7 +46,7 @@ public class DemandeRecrutementService {
 
     private void validerChampsObligatoires(DemandeRecrutementDTO dto, Map<String, String> errors) {
         if (dto.getIdManager() == null) {
-            errors.put("idManager", "Le manager demandeur est obligatoire.");
+            throw new RuntimeException("Le manager est obligatoire pour créer une demande.");
         }
         if (dto.getIdPoste() == null) {
             errors.put("idPoste", "Le poste concerné est obligatoire.");
@@ -57,7 +57,6 @@ public class DemandeRecrutementService {
     }
 
     private void validerReglesMetier(DemandeRecrutementDTO dto, Map<String, String> errors, Poste poste) {
-        // Date
          // Doublon actif (Poste OR Date+Département)
         if (poste != null && dto.getDateSouhaitee() != null 
                 && !errors.containsKey("idPoste") && !errors.containsKey("dateSouhaitee")) {

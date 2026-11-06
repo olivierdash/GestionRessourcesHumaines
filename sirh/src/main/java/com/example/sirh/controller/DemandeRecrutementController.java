@@ -79,8 +79,10 @@ public class DemandeRecrutementController {
     @PostMapping("/create")
     public String store(@ModelAttribute("demandeRecrutementForm") DemandeRecrutementDTO data,
             @RequestParam(value = "action", defaultValue = "save") String action,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
         try {
+            data.setIdManager(userDetails.getUtilisateur().getIdUtilisateur()   );
             DemandeRecrutement saved = demandeRecrutementService.createDemande(data, action);
 
             String msg = "submit".equals(action) ? "Demande soumise avec succès." : "Brouillon enregistré.";
@@ -90,6 +92,10 @@ public class DemandeRecrutementController {
         } catch (ValidationMetierException e) {
             redirectAttributes.addFlashAttribute("errors", e.getErrors());
             redirectAttributes.addFlashAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            redirectAttributes.addFlashAttribute("demandeRecrutementForm", data);
+            return "redirect:/demandes/create";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("demandeRecrutementForm", data);
             return "redirect:/demandes/create";
         }
@@ -135,6 +141,10 @@ public class DemandeRecrutementController {
         } catch (ValidationMetierException e) {
             redirectAttributes.addFlashAttribute("errors", e.getErrors());
             redirectAttributes.addFlashAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            redirectAttributes.addFlashAttribute("demandeRecrutementForm", data);
+            return "redirect:/demandes/update/" + data.getIdDemandeRecrutement();
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("demandeRecrutementForm", data);
             return "redirect:/demandes/update/" + data.getIdDemandeRecrutement();
         }
