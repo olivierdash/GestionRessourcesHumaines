@@ -69,7 +69,7 @@ public class AdminUtilisateurController {
             redirect.addFlashAttribute("utilisateur", utilisateur);
             redirect.addFlashAttribute("openUserModalFor", true);
         }
-        return "redirect:/admin/utilisateurs";
+        return "redirect:/admin";
     }
 
     // =========================================================
@@ -86,6 +86,7 @@ public class AdminUtilisateurController {
         request.setIdAdminConnecte(userDetails != null ? userDetails.getUtilisateur().getIdUtilisateur() : null);
 
         try {
+            request.setIdUtilisateur(id);
             utilisateurService.changerMotDePasse(request);
             redirect.addFlashAttribute("success", "Mot de passe modifié avec succès.");
         } catch (ValidationMetierException e) {
@@ -97,6 +98,6 @@ public class AdminUtilisateurController {
             log.error("Erreur inattendue lors du changement de mot de passe : {}", e.getMessage());
             redirect.addFlashAttribute("errorMessage", "Erreur lors de la modification du mot de passe.");
         }
-        return "redirect:/admin/utilisateurs";
+        return "redirect:/admin";
     }
 }
