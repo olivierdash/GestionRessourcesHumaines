@@ -17,6 +17,10 @@ public class Employe {
     private String matricule;
     @Column(name = "hiring_date", nullable = false)
     private LocalDate hiringDate;
-    @Column(name = "status_employer", nullable = false)
+    @Column(name = "status_employer")
     private String statusEmployer;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "statut_employe_id", nullable = false)
+    private StatutEmploye statusEmploye;
 }

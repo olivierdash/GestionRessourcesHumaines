@@ -14,5 +14,5 @@ public class EmployeFilter {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateMax;
     
-    private String statusEmployer; 
+    private Integer statusEmployer = null; 
 }

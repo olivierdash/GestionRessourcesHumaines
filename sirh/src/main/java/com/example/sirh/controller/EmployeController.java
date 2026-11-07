@@ -10,6 +10,7 @@ import com.example.sirh.service.ContratService;
 import com.example.sirh.service.DepartementService;
 import com.example.sirh.service.DocumentService;
 import com.example.sirh.service.EmployeService;
+import com.example.sirh.service.StatutEmployeService;
 import com.example.sirh.service.EmbaucheService;
 
 import lombok.AllArgsConstructor;
@@ -32,23 +33,17 @@ public class EmployeController {
 
     private final EmployeService employeService;
     private final CandidatureService candidatureService;
-    private final DepartementService departementService; // <-- Ajouté pour le select
+    private final DepartementService departementService; 
     private final ContratService contratService;
     private final DocumentService documentService;
+    private final StatutEmployeService statutEmployeService;
 
     @GetMapping
     public String index(
             @ModelAttribute("filter") EmployeFilter filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String filterApplied, // Permet de savoir si le formulaire a été soumis
             Model model) {
-
-        if (filterApplied == null) {
-            filter.setStatusEmployer("ACTIF");
-        } else if (filter.getStatusEmployer() == null || filter.getStatusEmployer().isEmpty()) {
-            filter.setStatusEmployer(null);
-        }
 
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 100),
                 Sort.by("hiringDate").descending());
@@ -57,6 +52,7 @@ public class EmployeController {
 
         model.addAttribute("employes", employesPage);
         model.addAttribute("departements", departementService.getAllDepartements());
+        model.addAttribute("statuts", statutEmployeService.getAll());
 
         return "employe/index"; // ou "employes/index" selon ton arborescence
     }
