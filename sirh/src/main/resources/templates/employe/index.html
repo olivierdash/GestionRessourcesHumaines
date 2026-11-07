@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
 <body>
 
     <main th:fragment="mainContent" class="w-full flex flex-col gap-6 select-none">
@@ -13,7 +13,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <button type="button" onclick="document.getElementById('filter-modal-backdrop').style.display='flex'"
-                        class="flex items-center gap-1.5 px-4 h-9 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm transition-colors">
+                    class="flex items-center gap-1.5 px-4 h-9 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm transition-colors">
                     <span class="material-symbols-outlined text-[16px]">tune</span>
                     <span>Filtrer</span>
                 </button>
@@ -45,16 +45,17 @@
                                 #<span th:text="${employe.idEmployer}"></span>
                             </td>
                             <td class="font-bold text-cobalt-900" th:text="${employe.matricule}"></td>
-                            <td class="text-slate-600 font-mono" th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
+                            <td class="text-slate-600 font-mono"
+                                th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
                             <td>
                                 <span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                                      th:classappend="${employe.statusEmployer == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmployer == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
-                                      th:text="${employe.statusEmployer}">
+                                    th:classappend="${employe.statusEmployer == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmployer == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
+                                    th:text="${employe.statusEmployer}">
                                 </span>
                             </td>
                             <td class="text-right whitespace-nowrap">
-                                <a th:href="@{/employes/{id}(id=${employe.idEmployer})}" 
-                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                <a th:href="@{/employes/{id}(id=${employe.idEmployer})}"
+                                    class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
                                     <span>Consulter</span>
                                     <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
                                 </a>
@@ -65,10 +66,12 @@
             </div>
 
             <!-- Pagination -->
-            <div class="p-3 bg-slate-50 border-t border-neutral-border flex flex-col sm:flex-row items-center justify-between gap-4" th:if="${employes.totalPages > 1}">
+            <div class="p-3 bg-slate-50 border-t border-neutral-border flex flex-col sm:flex-row items-center justify-between gap-4"
+                th:if="${employes.totalPages > 1}">
                 <span class="text-xs text-slate-600 font-medium">
-                    Affichage de <span class="font-bold" th:text="${employes.number * employes.size + 1}"></span> à 
-                    <span class="font-bold" th:text="${employes.number * employes.size + employes.numberOfElements}"></span> sur 
+                    Affichage de <span class="font-bold" th:text="${employes.number * employes.size + 1}"></span> à
+                    <span class="font-bold"
+                        th:text="${employes.number * employes.size + employes.numberOfElements}"></span> sur
                     <span class="font-bold" th:text="${employes.totalElements}"></span> employés
                 </span>
 
@@ -79,21 +82,22 @@
                     <input type="hidden" name="dateMin" th:value="${filter.dateMin}">
                     <input type="hidden" name="dateMax" th:value="${filter.dateMax}">
                     <input type="hidden" name="statusEmployer" th:value="${filter.statusEmployer}">
-                    <input type="hidden" name="filterApplied" value="true">
 
                     <button type="submit" name="page" th:value="${employes.number - 1}"
-                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-                            th:disabled="${employes.first}">
+                        class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                        th:disabled="${employes.first}">
                         Précédent
                     </button>
-                    
-                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded">
-                        Page <span th:text="${employes.number + 1}"></span> / <span th:text="${employes.totalPages}"></span>
+
+                    <span
+                        class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded">
+                        Page <span th:text="${employes.number + 1}"></span> / <span
+                            th:text="${employes.totalPages}"></span>
                     </span>
 
                     <button type="submit" name="page" th:value="${employes.number + 1}"
-                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-                            th:disabled="${employes.last}">
+                        class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                        th:disabled="${employes.last}">
                         Suivant
                     </button>
                 </form>
@@ -101,69 +105,86 @@
         </div>
 
         <!-- MODAL DE FILTRE -->
-        <div id="filter-modal-backdrop" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all duration-200">
-            <div class="bg-surface-card w-full max-w-2xl rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transform max-h-[90vh]" role="dialog">
-                
+        <div id="filter-modal-backdrop"
+            class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all duration-200">
+            <div class="bg-surface-card w-full max-w-2xl rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transform max-h-[90vh]"
+                role="dialog">
+
                 <div class="px-6 py-4 border-b border-neutral-border flex justify-between items-center bg-slate-50">
                     <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Filtres employés</h3>
-                    <button type="button" class="text-slate-400 hover:text-slate-700" onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
+                    <button type="button" class="text-slate-400 hover:text-slate-700"
+                        onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
                         <span class="material-symbols-outlined text-[20px]">close</span>
                     </button>
                 </div>
 
                 <form th:action="@{/employes}" method="get" class="p-6 flex flex-col gap-5 overflow-y-auto">
                     <!-- Champ caché pour signaler que le filtre a été appliqué -->
-                    <input type="hidden" name="filterApplied" value="true">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <!-- Département -->
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Département</label>
-                            <select name="idDepartement" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
+                            <label
+                                class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Département</label>
+                            <select name="idDepartement"
+                                class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
                                 <option value="">Tous les départements</option>
-                                <option th:each="dept : ${departements}" th:value="${dept.idDepartement}" th:text="${dept.titre}" th:selected="${filter.idDepartement == dept.idDepartement}"></option>
+                                <option th:each="dept : ${departements}" th:value="${dept.idDepartement}"
+                                    th:text="${dept.titre}" th:selected="${filter.idDepartement == dept.idDepartement}">
+                                </option>
                             </select>
                         </div>
 
                         <!-- Statut -->
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Statut</label>
-                            <select name="statusEmployer" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
-                                <option value="">Tous les statuts</option>
-                                <option value="ACTIF" th:selected="${filter.statusEmployer == 'ACTIF'}">Actif</option>
-                                <option value="EN_ONBOARDING" th:selected="${filter.statusEmployer == 'EN_ONBOARDING'}">En onboarding</option>
-                                <option value="SORTI" th:selected="${filter.statusEmployer == 'SORTI'}">Sorti</option>
+                            <select name="statusEmployer"
+                                class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
+                                <option value="" th:selected="${filter.statusEmployer == null}">Tous</option>
+                                <option th:each="statut : ${statuts}" th:value="${statut.id}"
+                                    th:text="${statut.libelle}" th:selected="${filter.statusEmployer == statut.id}">
+                                </option>
                             </select>
                         </div>
                     </div>
 
                     <!-- Période d'arrivée -->
                     <div class="bg-slate-50 border border-neutral-border p-4 rounded flex flex-col gap-3">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                        <span
+                            class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                             <span class="material-symbols-outlined text-[16px]">calendar_month</span> Date d'embauche
                         </span>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="flex flex-col gap-1">
                                 <span class="text-xs text-slate-600">Du</span>
-                                <input name="dateMin" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white" type="date" th:value="${filter.dateMin}"/>
+                                <input name="dateMin"
+                                    class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white"
+                                    type="date" th:value="${filter.dateMin}" />
                             </div>
                             <div class="flex flex-col gap-1">
                                 <span class="text-xs text-slate-600">Au</span>
-                                <input name="dateMax" class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white" type="date" th:value="${filter.dateMax}"/>
+                                <input name="dateMax"
+                                    class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white"
+                                    type="date" th:value="${filter.dateMax}" />
                             </div>
                         </div>
                     </div>
 
                     <!-- Footer Modal -->
-                    <div class="px-2 py-3 mt-2 border-t border-neutral-border flex items-center justify-between gap-4 shrink-0">
-                        <a th:href="@{/employes}" class="text-xs font-bold text-slate-500 hover:text-cobalt-900 hover:underline transition-all flex items-center gap-1">
+                    <div
+                        class="px-2 py-3 mt-2 border-t border-neutral-border flex items-center justify-between gap-4 shrink-0">
+                        <a th:href="@{/employes}"
+                            class="text-xs font-bold text-slate-500 hover:text-cobalt-900 hover:underline transition-all flex items-center gap-1">
                             <span class="material-symbols-outlined text-[16px]">restart_alt</span> Réinitialiser
                         </a>
                         <div class="flex items-center gap-2">
-                            <button type="button" class="px-4 h-9 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors" onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
+                            <button type="button"
+                                class="px-4 h-9 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors"
+                                onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
                                 Annuler
                             </button>
-                            <button type="submit" class="px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-1.5">
+                            <button type="submit"
+                                class="px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-[16px]">check</span> Appliquer
                             </button>
                         </div>
@@ -174,4 +195,5 @@
 
     </main>
 </body>
+
 </html>

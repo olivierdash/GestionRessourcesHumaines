@@ -25,6 +25,7 @@ public class EmbaucheService {
     private final ContratService contratService;
     private final TypeContratService typeContratService;
     private final AffectationService affectationService;
+    private final StatutEmployeService statutEmployeService;
 
     /**
      * Bouton « Créer dossier » : matricule + employé + contrat + affectation en UNE transaction.
@@ -66,7 +67,7 @@ public class EmbaucheService {
         Employe employe = employeService.save(Employe.builder()
                 .candidature(candidature)
                 .hiringDate(dateDebut)
-                .statusEmployer("ACTIF")
+                .statusEmploye(statutEmployeService.getByLibelle("ACTIF")) 
                 .build());
 
         // Délègue la validation complète (CDD, grille, chevauchement) à ContratService

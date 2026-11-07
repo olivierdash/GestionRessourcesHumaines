@@ -24,15 +24,15 @@ public interface EmployeRepository extends JpaRepository<Employe, Integer> {
     Optional<Employe> findByCandidatureIdCandidature(Integer idCandidature);
 
     @Query("""
-                SELECT e FROM Employe e
-                JOIN e.candidature c
-                JOIN c.demandeRecrutement dr
-                JOIN dr.poste p
-                JOIN p.departement dep
-                WHERE dep.idDepartement = COALESCE(:#{#filter.idDepartement}, dep.idDepartement)
-                  AND e.hiringDate >= COALESCE(:#{#filter.dateMin}, e.hiringDate)
-                  AND e.hiringDate <= COALESCE(:#{#filter.dateMax}, e.hiringDate)
-                  AND e.statusEmployer = COALESCE(:#{#filter.statusEmployer}, e.statusEmployer)
+            SELECT e FROM Employe e
+            JOIN e.candidature c
+            JOIN c.demandeRecrutement dr
+            JOIN dr.poste p
+            JOIN p.departement dep
+            WHERE dep.idDepartement = COALESCE(:#{#filter.idDepartement}, dep.idDepartement)
+              AND e.hiringDate >= COALESCE(:#{#filter.dateMin}, e.hiringDate)
+              AND e.hiringDate <= COALESCE(:#{#filter.dateMax}, e.hiringDate)
+              AND (:#{#filter.statusEmployer} IS NULL OR e.statusEmploye.id = :#{#filter.statusEmployer})
             """)
     Page<Employe> findWithFilters(@Param("filter") EmployeFilter filter, Pageable pageable);
 
