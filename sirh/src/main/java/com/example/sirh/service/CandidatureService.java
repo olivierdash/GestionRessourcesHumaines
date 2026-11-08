@@ -11,6 +11,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.sirh.constants.ConstantSirh.Statut;
+import com.example.sirh.dto.CandidatureAvecPropositionDTO;
 import com.example.sirh.model.Candidat;
 import com.example.sirh.model.Candidature;
 import com.example.sirh.model.OffreEmploi;
@@ -32,6 +34,10 @@ public class CandidatureService {
     private final CandidatService candidatService;
     private final OffreEmploieService offreService;
     private final StatutCandidatureService statutCandidatureService;
+
+    public List<CandidatureAvecPropositionDTO> findAvecPropositionActive(Integer idOffre) {
+        return candidatureRepo.findAvecPropositionActive(idOffre,List.of(Statut.EN_ATTENTE, Statut.SOUMISE, Statut.APPROUVEE));
+    }
 
     public List<Candidature> listeCandidatureByOffre(Integer id_offre) {
         return candidatureRepo.findByOffreIdOffre(id_offre);

@@ -26,7 +26,7 @@
                             <th scope="col">Manager</th>
                             <th scope="col" class="text-center">Effectif</th>
                             <th th:if="${role == 'FINANCE'}" scope="col">Faisabilité (Grille)</th>
-                            <th scope="col" class="text-right">Action rapide</th>
+                            <th scope="col" class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,10 +87,6 @@
                                         class="h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors flex items-center gap-1 shadow-sm">
                                         <span class="material-symbols-outlined text-[14px]">check</span> Valider
                                     </button>
-                                    <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement})}"
-                                        class="h-7 px-3 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors flex items-center">
-                                        Détails
-                                    </a>
                                 </div>
                             </td>
                         </tr>

@@ -1,10 +1,12 @@
 package com.example.sirh.controller;
 
+import com.example.sirh.constants.ConstantSirh.Statut;
 import com.example.sirh.model.Candidat;
 import com.example.sirh.service.CandidatService;
 import com.example.sirh.service.CandidatureService;
 import com.example.sirh.service.EvaluationService;
 import com.example.sirh.service.OffreEmploieService;
+import com.example.sirh.service.StatutCandidatureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,12 +21,19 @@ public class CandidatureController {
     private final OffreEmploieService offreService;
     private final CandidatService candidatService; // Injection du Service
     private final EvaluationService evaluationService;
+    private final StatutCandidatureService statutCandidatureService;
 
     // TÂCHE 10 : Candidatures d'une offre
     @GetMapping("/offres/{idOffre}")
     public String listeCandidatures(@PathVariable Integer idOffre, Model model) {
+        Integer idRetenu = statutCandidatureService.getByLibelle(Statut.RETENU).getId();
+        Integer idRefuse = statutCandidatureService.getByLibelle(Statut.REFUSE).getId();
+
         model.addAttribute("offre", offreService.getOffreEmploiById(idOffre));
-        model.addAttribute("candidatures", candidatureService.listeCandidatureByOffre(idOffre));
+        model.addAttribute("lignes", candidatureService.findAvecPropositionActive(idOffre));
+        model.addAttribute("idRetenu", idRetenu);
+        model.addAttribute("idRefuse", idRefuse);
+
         return "candidatures/liste";
     }
 
@@ -50,9 +59,10 @@ public class CandidatureController {
             @PathVariable Integer id,
             @RequestParam Integer idOffre,
             RedirectAttributes redirectAttributes) {
-        candidatureService.changerStatutCandidature(id, 3); // 3 = RETENU
+        Integer idRetenu = statutCandidatureService.getByLibelle(Statut.RETENU).getId();
+        candidatureService.changerStatutCandidature(id, idRetenu); 
         redirectAttributes.addFlashAttribute("success", "Le candidat a été retenu !");
-        return "redirect:/offres/" + idOffre + "/candidatures";
+        return "redirect:/offres/" + idOffre;
     }
 
     // TÂCHE 12 bis : Refuser un candidat
@@ -61,8 +71,9 @@ public class CandidatureController {
             @PathVariable Integer id,
             @RequestParam Integer idOffre,
             RedirectAttributes redirectAttributes) {
-        candidatureService.changerStatutCandidature(id, 4); // 4 = REFUSE
+        Integer idRefuse = statutCandidatureService.getByLibelle(Statut.REFUSE).getId();
+        candidatureService.changerStatutCandidature(id, idRefuse); 
         redirectAttributes.addFlashAttribute("success", "Le candidat a été refusé.");
-        return "redirect:/offres/" + idOffre + "/candidatures";
+        return "redirect:/offres/" + idOffre;
     }
 }
