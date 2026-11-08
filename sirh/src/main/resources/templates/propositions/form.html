@@ -1,55 +1,120 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
 <body>
 
     <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
 
-        <!-- En-tête -->
         <div>
             <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Proposer un poste</h1>
         </div>
 
-        <!-- Message d'erreur -->
-        <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+        <div th:if="${erreur}"
+            class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+            th:text="${erreur}"></div>
 
-        <!-- Carte d'infos -->
         <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
                 <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Détails de la candidature</h3>
             </div>
             <div class="p-6 flex flex-col gap-3">
-                <p class="m-0 text-sm"><strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Candidat :</strong>
-                    <span class="text-slate-800 font-semibold" th:text="${candidature.candidat.prenom + ' ' + candidature.candidat.nom}"></span></p>
-                <p class="m-0 text-sm"><strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Poste :</strong>
-                    <span class="text-slate-800 font-semibold" th:text="${candidature.demandeRecrutement.poste.intitule}"></span></p>
-                <p class="m-0 text-sm flex items-center"><strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Statut :</strong>
-                    <span class="inline-flex px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider" th:text="${candidature.statutCandidature.libelle}"></span></p>
+                <p class="m-0 text-sm"><strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Candidat
+                        :</strong>
+                    <span class="text-slate-800 font-semibold"
+                        th:text="${candidature.candidat.prenom + ' ' + candidature.candidat.nom}"></span>
+                </p>
+                <p class="m-0 text-sm"><strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Poste
+                        :</strong>
+                    <span class="text-slate-800 font-semibold"
+                        th:text="${candidature.demandeRecrutement.poste.intitule}"></span>
+                </p>
+                <p class="m-0 text-sm flex items-center"><strong
+                        class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Statut :</strong>
+                    <span
+                        class="inline-flex px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider"
+                        th:text="${candidature.statutCandidature.libelle}"></span>
+                </p>
             </div>
         </div>
 
-        <!-- Formulaire -->
         <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="p-6 md:p-8">
-                <form th:action="@{/candidatures/{id}/proposer(id=${candidature.idCandidature})}" method="post" class="flex flex-col gap-5">
-                    
+                <form th:action="@{/candidatures/{id}/proposer(id=${candidature.idCandidature})}" method="post"
+                    class="flex flex-col gap-5">
+
                     <div>
-                        <label for="salaire" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Salaire mensuel proposé (€)</label>
-                        <input type="number" step="0.01" min="0" id="salaire" name="salaire" required
-                               class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                        <label for="salaire"
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Salaire mensuel proposé (€)
+                        </label>
+
+                        <div class="relative">
+                            <input type="number" step="0.01" th:attr="min=${salaireMin}, max=${salaireMax}"
+                                th:value="${salaireDefaut}" id="salaire" name="salaire" required
+                                placeholder="Saisir un montant"
+                                class="w-full h-11 pl-3 pr-8 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                            <span
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                        </div>
+
+                        <div th:if="${salaireMin != null}"
+                            class="mt-4 p-4 bg-slate-50 border border-neutral-border rounded">
+
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">
+                                    Grille salariale
+                                </span>
+                                <span class="text-[11px] font-mono text-slate-500">
+                                    <span
+                                        th:text="${#numbers.formatDecimal(salaireMin, 0, 'COMMA', 2, 'POINT')}"></span>
+                                    <span class="mx-1">–</span>
+                                    <span
+                                        th:text="${#numbers.formatDecimal(salaireMax, 0, 'COMMA', 2, 'POINT')}"></span>
+                                    €
+                                </span>
+                            </div>
+
+                            <div
+                                class="relative h-2 rounded-full bg-gradient-to-r from-cobalt-200 via-cobalt-400 to-cobalt-700">
+                            </div>
+
+                            <div class="flex justify-between mt-2">
+                                <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Min</span>
+                                <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Max</span>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <span class="text-sm font-mono font-bold text-cobalt-900"
+                                    th:text="${#numbers.formatDecimal(salaireMin, 0, 'COMMA', 2, 'POINT')} + ' €'"></span>
+                                <span class="text-sm font-mono font-bold text-cobalt-900"
+                                    th:text="${#numbers.formatDecimal(salaireMax, 0, 'COMMA', 2, 'POINT')} + ' €'"></span>
+                            </div>
+
+                        </div>
+
+                        <p th:if="${salaireMin == null}"
+                            class="text-[11px] text-amber-700 mt-2 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">warning</span>
+                            Aucune grille salariale pour ce poste. Le salaire ne pourra pas être vérifié.
+                        </p>
                     </div>
-                    
+
                     <div>
-                        <label for="joursValidite" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Validité de la proposition (jours)</label>
+                        <label for="joursValidite"
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Validité de la proposition (jours)
+                        </label>
                         <input type="number" min="1" value="7" id="joursValidite" name="joursValidite" required
-                               class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                            class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-neutral-border">
-                        <a th:href="@{/propositions}" class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
+                        <a th:href="@{/candidatures/{id}(id=${candidature.idCandidature})}"
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
                             Annuler
                         </a>
-                        <button type="submit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                        <button type="submit"
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
                             Créer la proposition
                         </button>
                     </div>
@@ -59,4 +124,5 @@
 
     </main>
 </body>
+
 </html>

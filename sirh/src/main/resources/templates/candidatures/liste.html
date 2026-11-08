@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
-      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
 <body>
 
     <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
@@ -25,51 +25,84 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:if="${candidatures.isEmpty()}">
-                            <td colspan="5" class="td-empty py-8 text-center text-slate-500 italic">
+                        <tr th:if="${lignes.isEmpty()}">
+                            <td colspan="4" class="td-empty py-8 text-center text-slate-500 italic">
                                 Aucune candidature pour cette offre.
                             </td>
                         </tr>
-                        <tr th:each="cand : ${candidatures}">
-                            <td class="font-bold text-cobalt-900" th:text="${cand.candidat.nom + ' ' + cand.candidat.prenom}"></td>
-                            <td class="text-slate-700 font-mono text-xs whitespace-nowrap" th:text="${#temporals.format(cand.dateDepotCandidature, 'dd/MM/yyyy HH:mm')}"></td>
+
+                        <tr th:each="ligne : ${lignes}">
+                            <td class="font-bold text-cobalt-900"
+                                th:text="${ligne.prenomCandidat + ' ' + ligne.nomCandidat}"></td>
+
+                            <td class="text-slate-700 font-mono text-xs whitespace-nowrap"
+                                th:text="${#temporals.format(ligne.dateDepot, 'dd/MM/yyyy HH:mm')}"></td>
+
                             <td>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                                      th:classappend="${cand.statutCandidature.libelle == 'RETENU' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : (cand.statutCandidature.libelle == 'REFUSE' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-slate-100 border-slate-300 text-slate-700')}"
-                                      th:text="${cand.statutCandidature.libelle}">
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                    th:classappend="${ligne.idStatutCandidature == idRetenu
+                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                                        : (ligne.idStatutCandidature == idRefuse
+                                            ? 'bg-red-50 border-red-200 text-red-800'
+                                            : 'bg-slate-100 border-slate-300 text-slate-700')}"
+                                    th:text="${ligne.statutCandidatureLibelle}">
                                 </span>
                             </td>
+
                             <td class="text-right whitespace-nowrap">
                                 <div class="inline-flex gap-2">
-                                    <a th:href="@{/candidats/{id}(id=${cand.candidat.idCandidat})}" 
-                                       class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+
+                                    <a th:href="@{/candidats/{id}(id=${ligne.idCandidature})}"
+                                        class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
                                         Fiche
                                     </a>
-                                    <a th:href="@{/candidatures/{id}/evaluer(id=${cand.idCandidature})}" 
-                                       class="inline-flex items-center justify-center h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 text-xs font-semibold transition-colors shadow-sm">
+
+                                    <a th:href="@{/candidatures/{id}/evaluer(id=${ligne.idCandidature})}"
+                                        class="inline-flex items-center justify-center h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 text-xs font-semibold transition-colors shadow-sm">
                                         Évaluer
                                     </a>
 
-                                    <!-- Boutons RETENIR / REFUSER -->
-                                    <div th:if="${cand.statutCandidature.id != 3 and cand.statutCandidature.id != 4}" class="inline-flex gap-2 ml-2 pl-2 border-l border-slate-300">
-                                        
-                                        <!-- Bouton RETENIR -->
-                                        <form th:action="@{/candidatures/{id}/retenir(id=${cand.idCandidature})}" method="post" class="m-0">
+                                    <div th:if="${ligne.idStatutCandidature != idRetenu and ligne.idStatutCandidature != idRefuse}"
+                                        class="inline-flex gap-2 ml-2 pl-2 border-l border-slate-300">
+
+                                        <form th:action="@{/candidatures/{id}/retenir(id=${ligne.idCandidature})}"
+                                            method="post" class="m-0">
                                             <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
-                                            <button type="submit" class="inline-flex items-center justify-center h-7 px-3 rounded bg-emerald-50 border border-emerald-300 text-emerald-800 hover:bg-emerald-100 text-xs font-semibold transition-colors" title="Retenir ce candidat">
+                                            <button type="submit"
+                                                class="inline-flex items-center justify-center h-7 px-3 rounded bg-emerald-50 border border-emerald-300 text-emerald-800 hover:bg-emerald-100 text-xs font-semibold transition-colors">
                                                 Retenir
                                             </button>
                                         </form>
-                                        
-                                        <!-- Bouton REFUSER -->
-                                        <form th:action="@{/candidatures/{id}/refuser(id=${cand.idCandidature})}" method="post" class="m-0">
+
+                                        <form th:action="@{/candidatures/{id}/refuser(id=${ligne.idCandidature})}"
+                                            method="post" class="m-0">
                                             <input type="hidden" name="idOffre" th:value="${offre.idOffre}">
-                                            <button type="submit" class="inline-flex items-center justify-center h-7 px-3 rounded bg-red-50 border border-red-300 text-red-800 hover:bg-red-100 text-xs font-semibold transition-colors" title="Refuser ce candidat">
+                                            <button type="submit"
+                                                class="inline-flex items-center justify-center h-7 px-3 rounded bg-red-50 border border-red-300 text-red-800 hover:bg-red-100 text-xs font-semibold transition-colors">
                                                 Refuser
                                             </button>
                                         </form>
-                                        
+
                                     </div>
+
+                                    <div th:if="${ligne.idStatutCandidature == idRetenu}"
+                                        class="inline-flex gap-2 ml-2 pl-2 border-l border-slate-300">
+
+                                        <a th:if="${ligne.idProposition == null}"
+                                            th:href="@{/candidatures/{id}/proposer(id=${ligne.idCandidature})}"
+                                            class="inline-flex items-center justify-center h-7 px-3 rounded bg-amber-50 border border-amber-300 text-amber-800 hover:bg-amber-100 text-xs font-semibold transition-colors shadow-sm">
+                                            Proposer
+                                        </a>
+
+                                        <a th:if="${ligne.idProposition != null}"
+                                            th:href="@{/propositions/{id}(id=${ligne.idProposition})}"
+                                            class="inline-flex items-center justify-center h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 text-xs font-semibold transition-colors shadow-sm">
+                                            Voir proposition
+                                        </a>
+
+                                    </div>
+
                                 </div>
                             </td>
                         </tr>
@@ -80,4 +113,5 @@
 
     </main>
 </body>
+
 </html>

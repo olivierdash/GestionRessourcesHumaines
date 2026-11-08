@@ -1,59 +1,78 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
       th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
-    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
 
-        <!-- En-tête -->
-        <div>
-            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Propositions d'embauche</h1>
+    <div>
+        <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Propositions d'embauche</h1>
+        <p class="text-xs text-slate-500 mt-1"
+           th:text="${#lists.size(propositions)} + ' proposition(s)'"></p>
+    </div>
+
+    <div th:if="${succes}"
+         class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
+         th:text="${succes}"></div>
+    <div th:if="${erreur}"
+         class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+         th:text="${erreur}"></div>
+
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th scope="col">N°</th>
+                        <th scope="col">Candidat</th>
+                        <th scope="col">Poste</th>
+                        <th scope="col">Salaire proposé</th>
+                        <th scope="col">Expiration</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col" class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(propositions)}">
+                        <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">
+                            Aucune proposition enregistrée.
+                        </td>
+                    </tr>
+                    <tr th:each="p : ${propositions}">
+                        <td class="font-mono text-cobalt-800 font-bold"
+                            th:text="${p.idProposition}"></td>
+                        <td class="font-bold text-cobalt-900"
+                            th:text="${p.candidature.candidat.prenom + ' ' + p.candidature.candidat.nom}"></td>
+                        <td class="text-slate-600"
+                            th:text="${p.candidature.demandeRecrutement.poste.intitule}"></td>
+                        <td class="font-mono font-semibold text-slate-700"
+                            th:text="${#numbers.formatDecimal(p.salairePropose, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
+                        <td class="text-slate-600 font-mono whitespace-nowrap"
+                            th:text="${#temporals.format(p.dateExpiration, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <span class="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                  th:classappend="${p.statut.libelle == 'ACCEPTE'   ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                                 : (p.statut.libelle == 'APPROUVEE'  ? 'bg-blue-50 border-blue-200 text-blue-700'
+                                                 : (p.statut.libelle == 'SOUMISE'    ? 'bg-amber-50 border-amber-200 text-amber-800'
+                                                 : (p.statut.libelle == 'REFUSE'     ? 'bg-red-50 border-red-200 text-red-700'
+                                                 : (p.statut.libelle == 'EXPIREE'    ? 'bg-slate-100 border-slate-300 text-slate-500'
+                                                 : 'bg-slate-100 border-slate-200 text-slate-600'))))}"
+                                  th:text="${p.statut.libelle}">
+                            </span>
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            <a th:href="@{/propositions/{id}(id=${p.idProposition})}"
+                               class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                Ouvrir
+                                <span class="material-symbols-outlined text-[14px] ml-1">arrow_forward</span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- Tableau -->
-        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="sirh-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">N°</th>
-                            <th scope="col">Candidat</th>
-                            <th scope="col">Poste</th>
-                            <th scope="col">Salaire proposé</th>
-                            <th scope="col">Expiration</th>
-                            <th scope="col">Statut</th>
-                            <th scope="col" class="text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${#lists.isEmpty(propositions)}">
-                            <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">Aucune proposition enregistrée.</td>
-                        </tr>
-                        <tr th:each="p : ${propositions}">
-                            <td class="font-mono text-cobalt-800 font-bold" th:text="${p.idProposition}"></td>
-                            <td class="font-bold text-cobalt-900" th:text="${p.candidature.candidat.prenom + ' ' + p.candidature.candidat.nom}"></td>
-                            <td class="text-slate-600" th:text="${p.candidature.demandeRecrutement.poste.intitule}"></td>
-                            <td class="font-mono font-semibold text-slate-700" th:text="${#numbers.formatDecimal(p.salairePropose, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
-                            <td class="text-slate-600 font-mono whitespace-nowrap" th:text="${#temporals.format(p.dateExpiration, 'dd/MM/yyyy HH:mm')}"></td>
-                            <td>
-                                <span class="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                                      th:classappend="${p.statut.libelle == 'APPROUVEE' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (p.statut.libelle == 'REFUSE' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
-                                      th:text="${p.statut.libelle}">
-                                </span>
-                            </td>
-                            <td class="text-right whitespace-nowrap">
-                                <a th:href="@{/propositions/{id}(id=${p.idProposition})}" 
-                                   class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
-                                    Ouvrir
-                                    <span class="material-symbols-outlined text-[14px] ml-1">arrow_forward</span>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </main>
+</main>
 </body>
 </html>
