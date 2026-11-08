@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">
+                Type de contrat : <span th:text="${type.libelle}"></span>
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">
+                Paramétrage de la durée maximale autorisée pour ce type de contrat.
+            </p>
+        </div>
+        <a th:href="@{/types-contrat}"
+           class="inline-flex items-center gap-1.5 px-3 h-9 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm transition-colors self-start md:self-auto">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Retour à la liste
+        </a>
+    </div>
+
+    <div th:if="${succes}"
+         class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm flex items-start gap-2">
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+        <span th:text="${succes}"></span>
+    </div>
+    <div th:if="${erreur}"
+         class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm flex items-start gap-2">
+        <span class="material-symbols-outlined text-[20px]">error</span>
+        <span th:text="${erreur}"></span>
+    </div>
+
+    <div class="p-4 rounded bg-blue-50 text-blue-900 border border-blue-200 shadow-sm flex items-start gap-3">
+        <span class="material-symbols-outlined text-[22px] text-blue-700 shrink-0">info</span>
+        <div>
+            <p class="font-bold m-0 text-sm">
+                À propos de cette configuration
+            </p>
+            <p class="m-0 text-xs mt-1 text-blue-800">
+                La durée maximale définit la limite au-delà de laquelle un contrat
+                de ce type ne pourra plus être créé dans l'application.
+                Elle protège l'entreprise contre des engagements non conformes
+                au Code du travail et à la convention collective applicable.
+                En cas de doute, référez-vous à votre service juridique.
+            </p>
+        </div>
+    </div>
+
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+            <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">
+                Durée maximale autorisée
+            </h3>
+        </div>
+        <div class="p-6">
+            <form th:action="@{/types-contrat/{id}(id=${type.id})}" method="post"
+                  class="flex flex-col gap-5">
+
+                <div>
+                    <label for="dureeMaxMois"
+                           class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                        Durée maximale
+                    </label>
+
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <input type="number" id="dureeMaxMois" name="dureeMaxMois"
+                               th:value="${type.dureeMaxMois}" min="1" max="120"
+                               placeholder="Ex : 18"
+                               class="w-40 h-11 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+
+                        <span class="text-sm font-semibold text-slate-700">mois</span>
+
+                        <span th:if="${type.dureeMaxMois != null}"
+                              class="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold">
+                            Actuellement : <span th:text="${type.dureeMaxMois}"></span> mois
+                        </span>
+
+                        <span th:if="${type.dureeMaxMois == null}"
+                              class="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold">
+                            Actuellement : aucune limite
+                        </span>
+                    </div>
+
+                    <div class="mt-3 p-3 bg-slate-50 border border-slate-200 rounded text-xs text-slate-600 leading-relaxed">
+                        <p class="m-0">
+                            <strong class="text-slate-800">Laissez vide</strong> pour un contrat
+                            à durée indéterminée (pas de date de fin).
+                        </p>
+                        <p class="m-0 mt-1">
+                            <strong class="text-slate-800">Renseignez une valeur</strong> pour
+                            rendre la date de fin obligatoire lors de la création d'un contrat.
+                            Toute création qui dépasserait cette durée sera bloquée par le système.
+                        </p>
+                        <p class="m-0 mt-1">
+                            <strong class="text-slate-800">En cas de doute</strong>, référez-vous
+                            au Code du travail ou à votre convention collective avant de modifier cette valeur.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-6 border-t border-neutral-border">
+                    <a th:href="@{/types-contrat}"
+                       class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm flex items-center">
+                        Annuler
+                    </a>
+                    <button type="submit"
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mt-4">
+        <div>
+            <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider m-0">
+                Historique des modifications
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+                Toutes les modifications de la durée maximale sont tracées pour audit.
+            </p>
+        </div>
+    </div>
+
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Modifié par</th>
+                        <th scope="col">Ancienne durée</th>
+                        <th scope="col">Nouvelle durée</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(historique)}">
+                        <td colspan="4" class="td-empty py-8 text-center text-slate-500">
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="material-symbols-outlined text-[32px] text-slate-300">history</span>
+                                <span class="italic">Aucune modification enregistrée</span>
+                                <span class="text-xs text-slate-400">
+                                    Les modifications apparaîtront ici pour audit.
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="h : ${historique}">
+                        <td class="text-xs text-slate-600 whitespace-nowrap">
+                            <div class="font-mono"
+                                 th:text="${#temporals.format(h.dateModification, 'dd/MM/yyyy')}"></div>
+                            <div class="text-[10px] text-slate-400"
+                                 th:text="${#temporals.format(h.dateModification, 'HH:mm')}"></div>
+                        </td>
+                        <td class="font-bold text-cobalt-900 text-sm" th:text="${h.utilisateur.nom}"></td>
+                        <td class="text-slate-600 text-sm">
+                            <span th:if="${h.ancienneDuree != null}"
+                                  th:text="${h.ancienneDuree} + ' mois'"></span>
+                            <span th:if="${h.ancienneDuree == null}"
+                                  class="text-slate-400 italic">Sans limite</span>
+                        </td>
+                        <td class="text-slate-600 font-semibold text-sm">
+                            <span th:if="${h.nouvelleDuree != null}"
+                                  th:text="${h.nouvelleDuree} + ' mois'"></span>
+                            <span th:if="${h.nouvelleDuree == null}"
+                                  class="text-slate-400 italic">Sans limite</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

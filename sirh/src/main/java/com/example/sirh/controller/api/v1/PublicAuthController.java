@@ -36,7 +36,7 @@ public class PublicAuthController {
         Candidat candidat = new Candidat();
         candidat.setEmail(request.getEmail());
         candidat.setNom(request.getNom());
-        candidat.setNom(request.getPrenom());
+        candidat.setPrenom(request.getPrenom());
         candidat.setMotDePasse(request.getPassword());
 
         Candidat cdt = candidatService.register(candidat);

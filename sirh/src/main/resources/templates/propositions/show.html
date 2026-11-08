@@ -249,10 +249,18 @@
 
         <div th:if="${estAcceptee and employe == null}"
             class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+
             <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
-                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Convertir en salarié</h3>
+                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">
+                    Convertir en salarié
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">
+                    Créez le dossier salarié à partir de cette proposition acceptée.
+                </p>
             </div>
-            <div class="p-6">
+
+            <div class="p-6" th:with="typeContrat=${proposition.candidature.demandeRecrutement.typeContrat}">
+
                 <form th:action="@{/propositions/{id}/dossier(id=${proposition.idProposition})}" method="post"
                     class="flex flex-col gap-4">
 
@@ -260,22 +268,42 @@
                         <div>
                             <label for="dateDebut"
                                 class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
-                                Date de début
+                                Date de début <span class="text-red-500">*</span>
                             </label>
-                            <input type="date" id="dateDebut" name="dateDebut" required
+                            <input type="date" id="dateDebut" name="dateDebut" required th:value="${proposition.candidature.demandeRecrutement.dateSouhaitee != null
+                                       ? #temporals.format(proposition.candidature.demandeRecrutement.dateSouhaitee, 'yyyy-MM-dd')
+                                       : ''}" th:attr="data-duree-max=${typeContrat != null and typeContrat.dureeMaxMois != null
+                                                    ? typeContrat.dureeMaxMois
+                                                    : ''}"
                                 class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
                         </div>
+
                         <div>
                             <label for="dateFin"
                                 class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
-                                Date de fin (CDD, stage)
+                                Date de fin
                             </label>
                             <input type="date" id="dateFin" name="dateFin"
-                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+                                th:disabled="${typeContrat == null or typeContrat.dureeMaxMois == null}"
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed">
+                            <p id="dateFinHint" class="mt-1 text-[11px] text-slate-500">
+                                <span th:if="${typeContrat != null and typeContrat.dureeMaxMois != null}"
+                                    th:text="${'Calculée automatiquement à partir de la durée maximale (' + typeContrat.dureeMaxMois + ' mois). Modifiable si nécessaire.'}"></span>
+                                <span th:if="${typeContrat == null or typeContrat.dureeMaxMois == null}">
+                                    Contrat à durée indéterminée — pas de date de fin nécessaire.
+                                </span>
+                            </p>
                         </div>
                     </div>
+
+                    <div id="dateFinError"
+                        class="hidden p-3 rounded bg-red-50 text-red-700 border border-red-200 text-xs font-semibold flex items-start gap-2">
+                        <span class="material-symbols-outlined text-[16px]">error</span>
+                        <span id="dateFinErrorText"></span>
+                    </div>
+
                     <div>
-                        <button type="submit"
+                        <button type="submit" id="submitBtn"
                             class="h-9 px-4 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-sm">
                             Créer le dossier
                         </button>
@@ -340,25 +368,121 @@
             </div>
         </div>
 
+        <script th:inline="javascript">
+            (function () {
+                const dateDebut = document.getElementById('dateDebut');
+                const dateFin = document.getElementById('dateFin');
+                const dateFinHint = document.getElementById('dateFinHint');
+                const dateFinError = document.getElementById('dateFinError');
+                const dateFinErrorText = document.getElementById('dateFinErrorText');
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (!dateDebut || !dateFin) return;
+
+                const dureeMaxMois = parseInt(dateDebut.dataset.dureeMax, 10);
+                const hasDureeMax = !isNaN(dureeMaxMois) && dureeMaxMois > 0;
+
+                if (!hasDureeMax) return;
+
+                function computeDateFin(dateStr, months) {
+                    const parts = dateStr.split('-').map(Number);
+                    if (parts.length !== 3) return null;
+                    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+                    if (isNaN(d.getTime())) return null;
+                    d.setMonth(d.getMonth() + months);
+                    d.setDate(d.getDate() - 1);
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${day}`;
+                }
+
+                function formatDateFr(dateStr) {
+                    if (!dateStr) return '';
+                    const [y, m, d] = dateStr.split('-');
+                    return `${d}/${m}/${y}`;
+                }
+
+                function clearError() {
+                    dateFinError.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+
+                function showError(message) {
+                    dateFinErrorText.textContent = message;
+                    dateFinError.classList.remove('hidden');
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+
+                function validateDateFin() {
+                    if (!dateFin.value || !dateDebut.value) {
+                        clearError();
+                        return;
+                    }
+                    const fin = new Date(dateFin.value + 'T00:00:00');
+                    const debut = new Date(dateDebut.value + 'T00:00:00');
+                    if (fin < debut) {
+                        showError('La date de fin ne peut pas précéder la date de début.');
+                        return;
+                    }
+                    const limite = computeDateFin(dateDebut.value, dureeMaxMois);
+                    if (limite && dateFin.value > limite) {
+                        showError('La date de fin dépasse la durée maximale de ' + dureeMaxMois
+                            + ' mois (limite : ' + formatDateFr(limite) + ').');
+                        return;
+                    }
+                    clearError();
+                }
+
+                dateDebut.addEventListener('change', function () {
+                    if (!this.value) {
+                        dateFin.value = '';
+                        clearError();
+                        return;
+                    }
+                    const calc = computeDateFin(this.value, dureeMaxMois);
+                    if (calc) {
+                        dateFin.value = calc;
+                        validateDateFin();
+                    }
+                });
+
+                dateFin.addEventListener('change', function () {
+                    if (dateFinHint) {
+                        dateFinHint.classList.add('text-amber-700');
+                    }
+                    validateDateFin();
+                });
+
+                if (dateDebut.value && !dateFin.value) {
+                    const calc = computeDateFin(dateDebut.value, dureeMaxMois);
+                    if (calc) dateFin.value = calc;
+                    validateDateFin();
+                }
+            })();
+        </script>
+
+        <script>
+            function confirmValidation(form) {
+                const decision = form.querySelector('input[name="decision"]:checked').value;
+                const comment = form.querySelector('textarea[name="commentaire"]').value.trim();
+
+                if (decision === 'REFUSER' && !comment) {
+                    alert('Un commentaire est obligatoire pour refuser une proposition.');
+                    return false;
+                }
+
+                if (decision === 'APPROUVER') {
+                    return confirm('Confirmer l\'approbation de cette proposition ? Elle sera transmise au candidat.');
+                }
+
+                return confirm('Confirmer le refus ? La proposition reviendra en préparation pour le RH.');
+            }
+        </script>
+
     </main>
-
-    <script>
-        function confirmValidation(form) {
-            const decision = form.querySelector('input[name="decision"]:checked').value;
-            const comment = form.querySelector('textarea[name="commentaire"]').value.trim();
-
-            if (decision === 'REFUSER' && !comment) {
-                alert('Un commentaire est obligatoire pour refuser une proposition.');
-                return false;
-            }
-
-            if (decision === 'APPROUVER') {
-                return confirm('Confirmer l\'approbation de cette proposition ? Elle sera transmise au candidat.');
-            }
-
-            return confirm('Confirmer le refus ? La proposition reviendra en préparation pour le RH.');
-        }
-    </script>
 
 </body>
 

@@ -7,7 +7,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>SIRH Pro</title>
 
-    <!-- CSS compilé (Sass + Tailwind) -->
     <script th:src="@{/js/tailwind.js}"></script>
 
     <script>
@@ -41,7 +40,6 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 
     <style>
-        /* --- Règles pour la Sidebar Rétractable --- */
         #sidebar {
             transition: width 0.3s ease;
             overflow: hidden;
@@ -91,35 +89,45 @@
             justify-content: center;
         }
 
-        /* --- Règle pour l'état actif (JS) --- */
-        /* Utilisation de !important pour écraser les classes de base de Tailwind */
         .nav-link-active {
             background-color: #f1f5f9 !important;
-            /* bg-slate-100 */
             color: #1e3a8a !important;
-            /* text-cobalt-900 */
             font-weight: 600 !important;
-            /* font-semibold */
             border-left-color: #1e40af !important;
-            /* border-cobalt-800 */
         }
 
         .nav-link-active .material-symbols-outlined {
             color: #1e40af !important;
-            /* text-cobalt-800 */
+        }
+
+        .submenu-toggle.submenu-open .submenu-chevron {
+            transform: rotate(180deg);
+        }
+
+        body.sidebar-collapsed [data-submenu] {
+            display: none !important;
+        }
+
+        body.sidebar-collapsed .submenu-chevron {
+            display: none !important;
+        }
+
+        body.sidebar-collapsed .submenu-toggle {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+            border-left-width: 0;
+            margin: 0 0.5rem;
         }
     </style>
 </head>
 
 <body class="bg-surface-bg font-sans text-sm text-body-text antialiased h-screen overflow-hidden">
 
-    <!-- SIDEBAR -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-    <!-- CONTENU PRINCIPAL -->
     <div id="main-content" class="ml-64 flex flex-col h-screen min-h-0">
 
-        <!-- TOPBAR -->
         <header
             class="h-14 shrink-0 bg-surface-card border-b border-neutral-border z-40 px-4 flex items-center justify-end">
             <div class="flex items-center gap-4">
@@ -137,23 +145,18 @@
             </div>
         </header>
 
-        <!-- ZONE D'INJECTION DYNAMIQUE -->
         <main class="flex-1 min-h-0 overflow-y-auto bg-surface-bg">
             <div class="max-w-7xl mx-auto w-full p-4 md:p-6 flex flex-col gap-6">
-                <!-- Breadcrumb -->
                 <div th:replace="~{fragments/breadcrumb :: breadcrumb}"></div>
-                <!-- Contenu -->
                 <div th:replace="${content}"></div>
             </div>
         </main>
 
     </div>
 
-    <!-- SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- 1. Gestion de la Sidebar Rétractable ---
             const toggleBtn = document.getElementById('sidebar-toggle');
             const body = document.body;
 
@@ -170,7 +173,6 @@
                 }
             });
 
-            // --- 2. Gestion de l'état Actif de la Sidebar ---
             const currentPath = window.location.pathname;
             const links = document.querySelectorAll('.sidebar-nav-link');
 
@@ -180,15 +182,12 @@
 
                 let isActive = false;
 
-                // Cas 1 : Racine
                 if (currentPath === '/' && path === '/utilisateur') {
                     isActive = true;
                 }
-                // Cas 2 : Exception Demandes vs Validations
                 else if (path === '/demandes' && currentPath.startsWith('/demandes/validations')) {
                     isActive = false;
                 }
-                // Cas standard (startsWith)
                 else if (currentPath.startsWith(path)) {
                     isActive = true;
                 }
@@ -196,6 +195,51 @@
                 if (isActive) {
                     link.classList.add('nav-link-active');
                 }
+            });
+
+            (function autoOpenSubmenu() {
+                const currentPath = window.location.pathname;
+
+                document.querySelectorAll('[data-submenu]').forEach(function (submenu) {
+                    const subLinks = submenu.querySelectorAll('.sidebar-nav-link[data-path]');
+                    let shouldOpen = false;
+
+                    subLinks.forEach(function (link) {
+                        const path = link.getAttribute('data-path');
+                        if (path && currentPath.startsWith(path)) {
+                            shouldOpen = true;
+                        }
+                    });
+
+                    if (shouldOpen) {
+                        submenu.classList.remove('hidden');
+                        const toggle = document.querySelector(
+                            '[data-submenu-target="' + submenu.dataset.submenu + '"]'
+                        );
+                        if (toggle) toggle.classList.add('submenu-open');
+                    }
+                });
+            })();
+
+            document.querySelectorAll('[data-submenu-target]').forEach(function (toggle) {
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.dataset.submenuTarget;
+                    const items = document.querySelector('[data-submenu="' + targetId + '"]');
+                    if (!items) return;
+
+                    if (document.body.classList.contains('sidebar-collapsed')) {
+                        document.body.classList.remove('sidebar-collapsed');
+                        localStorage.setItem('sidebarState', 'expanded');
+                        this.classList.add('submenu-open');
+                        items.classList.remove('hidden');
+                        return;
+                    }
+
+                    const isOpen = this.classList.toggle('submenu-open');
+                    items.classList.toggle('hidden', !isOpen);
+                });
             });
         });
     </script>

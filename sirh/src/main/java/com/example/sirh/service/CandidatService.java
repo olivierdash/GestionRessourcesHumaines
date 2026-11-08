@@ -72,6 +72,7 @@ public class CandidatService {
         if (!errors.isEmpty()) {
             throw new ValidationMetierException(errors);
         }
+        
         candidat.setEmail(emailNorm);
         candidat.setMotDePasse(new BCryptPasswordEncoder().encode(password));
         return candidatRepository.save(candidat);

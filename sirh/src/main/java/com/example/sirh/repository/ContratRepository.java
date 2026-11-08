@@ -11,19 +11,19 @@ import java.util.Optional;
 
 public interface ContratRepository extends JpaRepository<Contrat, Integer> {
 
-    List<Contrat> findByEmployeIdEmployerOrderByDateDebutDesc(Integer idEmploye);
+     List<Contrat> findByEmployeIdEmployerOrderByDateDebutDesc(Integer idEmploye);
 
     Optional<Contrat> findFirstByEmployeIdEmployerAndStatutLibelle(Integer idEmploye, String libelle);
 
     @Query("""
-                SELECT COUNT(c) > 0 FROM Contrat c
-                WHERE c.employe.idEmployer = :idEmploye
-                  AND (c.dateFin IS NULL OR c.dateFin >= :debut)
-                  AND (:fin IS NULL OR c.dateDebut <= :fin)
+            SELECT COUNT(c) > 0 FROM Contrat c
+            WHERE c.employe.idEmployer = :idEmploye
+              AND (c.dateFin IS NULL OR c.dateFin >= :debut)
+              AND (CAST(:fin AS date) IS NULL OR c.dateDebut <= :fin)
             """)
     boolean existeChevauchement(@Param("idEmploye") Integer idEmploye,
-            @Param("debut") LocalDate debut,
-            @Param("fin") LocalDate fin);
+                                 @Param("debut") LocalDate debut,
+                                 @Param("fin") LocalDate fin);
 
     List<Contrat> findByEmployeIdEmployer(Integer idEmployer);
     long countByStatutLibelleAndDateFinBetween(
