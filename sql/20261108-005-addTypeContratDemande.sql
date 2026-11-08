@@ -13,7 +13,7 @@ END $$;
 
 -- Valeur par défaut pour les demandes existantes (CDI = le plus courant)
 UPDATE demande_recrutement
-SET id_type_contrat = (SELECT id FROM type_contrat WHERE libelle = 'CDI' LIMIT 1)
+SET id_type_contrat = (SELECT id_type_contrat FROM type_contrat WHERE libelle = 'CDI' LIMIT 1)
 WHERE id_type_contrat IS NULL;
 
 ALTER TABLE demande_recrutement ALTER COLUMN id_type_contrat SET NOT NULL;
