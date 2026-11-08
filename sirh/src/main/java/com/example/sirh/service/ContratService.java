@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +51,7 @@ public class ContratService {
     public Contrat creer(Contrat contrat) {
         Integer idEmploye = contrat.getEmploye().getIdEmployer();
 
-        verifierDatesCdd(contrat);
+        verifierDureeContrat(contrat);
         verifierSalaire(contrat.getPoste().getIdPoste(), contrat.getSalaireMensuel());
         verifierPasDeChevauchement(idEmploye, contrat.getDateDebut(), contrat.getDateFin());
 
@@ -66,15 +67,12 @@ public class ContratService {
 
         StatutContrat termine = statutContratService.getByLibelle("terminé");
 
-        // Le nouveau contrat est pour le même salarié
         nouveau.setEmploye(ancien.getEmploye());
 
-        // 1. Clôturer l'ancien : il finit la veille du nouveau
         ancien.setDateFin(nouveau.getDateDebut().minusDays(1));
         ancien.setStatut(termine);
         contratRepository.saveAndFlush(ancien);
 
-        // 2. Créer le nouveau (les 3 règles sont vérifiées dans creer)
         return creer(nouveau);
     }
 
@@ -119,17 +117,33 @@ public class ContratService {
         return contratRepository.findFirstByEmployeIdEmployerAndStatutLibelle(idEmploye, "actif");
     }
 
-    // ---------- Règles métier privées ----------
+    private void verifierDureeContrat(Contrat contrat) {
+        TypeContrat type = contrat.getTypeContrat();
 
-    private void verifierDatesCdd(Contrat contrat) {
-        boolean estCdd = "CDD".equals(contrat.getTypeContrat().getLibelle());
-        if (estCdd && contrat.getDateFin() == null) {
-            throw new IllegalArgumentException("La date de fin est obligatoire pour un CDD");
+        if (type.getDureeMaxMois() == null) {
+            if (contrat.getDateFin() != null
+                    && contrat.getDateFin().isBefore(contrat.getDateDebut())) {
+                throw new IllegalArgumentException(
+                        "La date de fin ne peut pas précéder la date de début.");
+            }
+            return;
         }
-        if (contrat.getDateFin() != null
-                && contrat.getDateFin().isBefore(contrat.getDateDebut())) {
+
+        if (contrat.getDateFin() == null) {
             throw new IllegalArgumentException(
-                    "La date de fin ne peut pas précéder la date de début");
+                    "La date de fin est obligatoire pour un contrat " + type.getLibelle() + ".");
+        }
+
+        if (contrat.getDateFin().isBefore(contrat.getDateDebut())) {
+            throw new IllegalArgumentException(
+                    "La date de fin ne peut pas précéder la date de début.");
+        }
+
+        long mois = ChronoUnit.MONTHS.between(contrat.getDateDebut(), contrat.getDateFin());
+        if (mois > type.getDureeMaxMois()) {
+            throw new IllegalArgumentException(
+                    "La durée du contrat " + type.getLibelle() + " ne peut pas dépasser "
+                            + type.getDureeMaxMois() + " mois. Calculé : " + mois + " mois.");
         }
     }
 
@@ -148,7 +162,8 @@ public class ContratService {
     private void verifierPasDeChevauchement(Integer idEmploye, LocalDate debut, LocalDate fin) {
         if (contratRepository.existeChevauchement(idEmploye, debut, fin)) {
             throw new IllegalArgumentException(
-                    "Ce contrat chevauche un contrat existant de ce salarié");
+                    "Ce contrat chevauche un contrat existant de ce salarié. "
+                            + "Utilisez le renouvellement ou corrigez les dates.");
         }
     }
 }
