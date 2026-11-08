@@ -28,25 +28,31 @@
         </p>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <label for="password" class="text-sm font-medium">Mot de passe</label>
-        <input
-          id="password"
-          type="password"
-          v-model="form.password"
-          autocomplete="current-password"
-          required
-          :aria-invalid="!!errors.password"
-          :aria-describedby="errors.password ? 'password-error' : undefined"
-          class="px-3 py-2.5 border rounded-lg bg-white text-sm
-                 focus:outline-none focus:ring-2 focus:ring-primary"
-          :class="errors.password ? 'border-red-500' : 'border-gray-200'"
-          @input="clearError('password')"
-        />
-        <p v-if="errors.password" id="password-error" class="text-xs text-red-600">
-          {{ errors.password }}
-        </p>
-      </div>
+     <div class="flex flex-col gap-2">
+  <label for="password" class="text-sm font-medium">Mot de passe</label>
+  <input
+    id="password"
+    type="password"
+    v-model="form.password"
+    autocomplete="current-password"
+    required
+    :aria-invalid="!!errors.password"
+    :aria-describedby="errors.password ? 'password-error' : undefined"
+    class="px-3 py-2.5 border rounded-lg bg-white text-sm
+           focus:outline-none focus:ring-2 focus:ring-primary"
+    :class="errors.password ? 'border-red-500' : 'border-gray-200'"
+    @input="clearError('password')"
+  />
+  <p v-if="errors.password" id="password-error" class="text-xs text-red-600">
+    {{ errors.password }}
+  </p>
+  <RouterLink
+    :to="{ name: 'forgot-password' }"
+    class="text-xs text-primary font-medium hover:underline self-end"
+  >
+    Mot de passe oublié ?
+  </RouterLink>
+</div>
 
       <p v-if="globalError" class="text-sm text-red-600">{{ globalError }}</p>
 

@@ -83,11 +83,9 @@ public class AdminUtilisateurController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirect) {
 
-        request.setIdAdminConnecte(userDetails != null ? userDetails.getUtilisateur().getIdUtilisateur() : null);
-
         try {
             request.setIdUtilisateur(id);
-            utilisateurService.changerMotDePasse(request);
+            utilisateurService.changerMotDePasse(request, userDetails.getUtilisateur());
             redirect.addFlashAttribute("success", "Mot de passe modifié avec succès.");
         } catch (ValidationMetierException e) {
             redirect.addFlashAttribute("errors", e.getErrors());

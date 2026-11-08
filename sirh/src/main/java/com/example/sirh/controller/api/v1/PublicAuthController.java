@@ -1,11 +1,18 @@
 package com.example.sirh.controller.api.v1;
 
+import com.example.sirh.dto.CandidatLoginChangeDTO;
 import com.example.sirh.dto.CandidatPublicDto;
+import com.example.sirh.dto.LoginChangeDTO;
 import com.example.sirh.dto.LoginRequestDto;
 import com.example.sirh.dto.RegisterRequestDto;
 import com.example.sirh.model.Candidat;
 import com.example.sirh.service.CandidatService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +33,20 @@ public class PublicAuthController {
 
     @PostMapping("/register")
     public ResponseEntity<CandidatPublicDto> register(@RequestBody RegisterRequestDto request) {
-        Candidat candidat = candidatService.register(
-                request.getPrenom(), request.getNom(),
-                request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(toDto(candidat));
+        Candidat candidat = new Candidat();
+        candidat.setEmail(request.getEmail());
+        candidat.setNom(request.getNom());
+        candidat.setNom(request.getPrenom());
+        candidat.setMotDePasse(request.getPassword());
+
+        Candidat cdt = candidatService.register(candidat);
+        return ResponseEntity.ok(toDto(cdt));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody CandidatLoginChangeDTO request) {
+        candidatService.resetMotDePasse(request);
+        return ResponseEntity.accepted().body(Map.of("message", "Mot de passe réinitialisé avec succès."));
     }
 
     private CandidatPublicDto toDto(Candidat c) {

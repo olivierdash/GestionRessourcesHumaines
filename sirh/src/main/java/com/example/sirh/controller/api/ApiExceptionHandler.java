@@ -5,12 +5,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.sirh.exception.ValidationMetierException;
+
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
  * Transforme les exceptions métier en JSON { "message": "..." }.
- * Limité au package controller.api pour ne pas interférer avec les controllers Thymeleaf.
+ * Limité au package controller.api pour ne pas interférer avec les controllers
+ * Thymeleaf.
  */
 @RestControllerAdvice(basePackages = "com.example.sirh.controller.api.v1")
 public class ApiExceptionHandler {
@@ -33,6 +36,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(RuntimeException ex) {
         return build(400, ex.getMessage());
+    }
+
+    @ExceptionHandler(ValidationMetierException.class)
+    public ResponseEntity<?> handleValidation(ValidationMetierException e) {
+        return ResponseEntity.badRequest().body(Map.of("errors", e.getErrors()));
     }
 
     private ResponseEntity<Map<String, Object>> build(int status, String message) {

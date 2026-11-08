@@ -8,7 +8,7 @@ const routes = [
 
   { path: '/auth/login', name: 'login', component: () => import('@/modules/auth/LoginView.vue'), meta: { layout: 'auth' } },
   { path: '/auth/register', name: 'register', component: () => import('@/modules/auth/RegisterView.vue'), meta: { layout: 'auth' } },
-
+  { path: '/auth/forgot-password', name: 'forgot-password', component: () => import('@/modules/auth/ForgotPasswordView.vue'), meta: { layout: 'auth' } },
   {
     path: '/mes-candidatures',
     name: 'my-applications',
