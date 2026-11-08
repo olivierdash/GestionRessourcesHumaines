@@ -100,7 +100,8 @@ public class UtilisateurService {
     }
 
     @Transactional
-    public void changerMotDePasse(LoginChangeDTO request) {
+    public void changerMotDePasse(LoginChangeDTO request, Utilisateur utilisateur) {
+
         Map<String, String> errors = new LinkedHashMap<>();
 
         if (request.getNouveauMotDePasse() == null || request.getNouveauMotDePasse().isBlank()) {
@@ -115,11 +116,7 @@ public class UtilisateurService {
             errors.put("confirmationMotDePasse", "Les mots de passe ne correspondent pas.");
         }
 
-        // 2. Validation du code secret si self
-        boolean isSelf = request.getIdAdminConnecte() != null
-                && request.getIdAdminConnecte().equals(request.getIdUtilisateur());
-
-        if (isSelf) {
+        if (utilisateur == null || utilisateur.getIdUtilisateur() == null) {
             if (adminSecretCode == null || adminSecretCode.isBlank()) {
                 log.error("Configuration manquante : app.admin.secret-code non défini.");
                 errors.put("codeSecret", "Configuration manquante côté serveur.");
@@ -134,9 +131,9 @@ public class UtilisateurService {
         }
 
         // 3. Hash et sauvegarde
-        Utilisateur utilisateur = getById(request.getIdUtilisateur());
-        utilisateur.setMotDePasse(new BCryptPasswordEncoder().encode(request.getNouveauMotDePasse()));
-        utilisateurRepository.save(utilisateur);
+        Utilisateur user = getById(request.getIdUtilisateur());
+        user.setMotDePasse(new BCryptPasswordEncoder().encode(request.getNouveauMotDePasse()));
+        utilisateurRepository.save(user);
     }
 
     private boolean estRoleAdmin(Integer idRole) {

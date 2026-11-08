@@ -14,4 +14,10 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
+
+  resetPassword: (payload) =>
+    requete(`${BASE_URL}/auth/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 }
