@@ -15,6 +15,7 @@ public class DemandeRecrutementDTO {
     private Integer idDemandeRecrutement;
     private Integer idManager;
     private Integer idPoste;
+    private Integer idTypeContrat;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateSouhaitee;
     private Integer effectif;

@@ -11,6 +11,7 @@ public final class ConstantSirh {
         public static final String ACTIF_EMPLOYE = "ACTIF";
         public static final String APPROUVEE = "APPROUVEE";
         public static final String BROUILLON = "BROUILLON";
+        public static final String BROUILLON_DEMANDE = "Brouillon";
         public static final String CLOTUREE = "CLOTUREE";
         public static final String CREE = "Cree";
         public static final String EMBAUCHE = "EMBAUCHE";
@@ -23,9 +24,11 @@ public final class ConstantSirh {
         public static final String PUBLIEE = "PUBLIEE";
         public static final String RECU = "RECU";
         public static final String REFUSE = "REFUSE";
+        public static final String REFUSE_DEMANDE = "Refuse";
         public static final String RETENU = "RETENU";
         public static final String SOUMISE = "SOUMISE";
         public static final String TERMINE = "terminé";
+        public static final String TERMINEE = "terminée";
         public static final String VALIDE = "Valide";
         public static final String VALIDE_FINANCE = "ValideFinance";
         public static final String VALIDE_RH = "ValideRH";
@@ -47,5 +50,10 @@ public final class ConstantSirh {
         public static final String REFUSER = "REFUSER";
         public static final String SAVE = "save";
         public static final String SUBMIT = "submit";
+    }
+
+    public static final class Decision {
+        public static final String APPROUVEE = "APPROUVEE";
+        public static final String REFUSEE = "REFUSEE";
     }
 }

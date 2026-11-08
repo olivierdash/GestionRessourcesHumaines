@@ -173,7 +173,6 @@ public class OffreEmploieService {
                 .statut(offre.getStatut().getLibelle())
                 .intitulePoste(poste.getIntitule())
                 .departement(poste.getDepartement().getTitre())
-                .lieu(poste.getLieu())
                 .dureeHebdo(poste.getDureeHebdo())
                 .effectif(demande.getEffectif())
                 .dateSouhaitee(demande.getDateSouhaitee())

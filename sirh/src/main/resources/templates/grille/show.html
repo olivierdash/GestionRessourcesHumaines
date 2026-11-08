@@ -41,10 +41,6 @@
                         <span class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Salaire minimum</span>
                         <div class="text-lg font-bold text-slate-900 font-mono" th:text="${#numbers.formatDecimal(grille.salaireMin, 0, 'COMMA', 2, 'POINT')} + ' €'"></div>
                     </div>
-                    <div class="bg-cobalt-50 border border-cobalt-200 p-4 rounded">
-                        <span class="block text-[11px] font-bold text-cobalt-800 uppercase tracking-wider mb-1">Salaire moyen</span>
-                        <div class="text-lg font-bold text-cobalt-900 font-mono" th:text="${#numbers.formatDecimal(grille.salaireMoyen, 0, 'COMMA', 2, 'POINT')} + ' €'"></div>
-                    </div>
                     <div class="bg-slate-50 border border-neutral-border p-4 rounded">
                         <span class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Salaire maximum</span>
                         <div class="text-lg font-bold text-slate-900 font-mono" th:text="${#numbers.formatDecimal(grille.salaireMax, 0, 'COMMA', 2, 'POINT')} + ' €'"></div>

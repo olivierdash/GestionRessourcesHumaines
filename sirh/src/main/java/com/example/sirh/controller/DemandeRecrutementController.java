@@ -1,6 +1,7 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.config.CustomUserDetails;
+import com.example.sirh.constants.ConstantSirh.Statut;
 import com.example.sirh.dto.DemandeRecrutementDTO;
 import com.example.sirh.dto.DemandeRecrutementFilter;
 import com.example.sirh.dto.DemandeRecrutementLib;
@@ -20,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.sirh.constants.ConstantSirh.Role;
 import java.util.List;
 
 @Controller
@@ -34,10 +36,16 @@ public class DemandeRecrutementController {
     private DepartementService departementService;
     private MotifDemandeService motifDemandeService;
     private HistoriqueDemandeRecrutementService historiqueService;
+    private TypeContratService typeContratService;
 
     @ModelAttribute("postes")
     public List<Poste> populatePostes() {
         return posteService.getAllPostes();
+    }
+
+    @ModelAttribute("typesContrats")
+    public List<TypeContrat> populaTypeContrats() {
+        return typeContratService.getAllTypes();
     }
 
     @ModelAttribute("motifs")
@@ -63,7 +71,12 @@ public class DemandeRecrutementController {
 
         model.addAttribute("demandes", demandesPage);
         model.addAttribute("departements", departementService.getAllDepartements());
-        model.addAttribute("managers", utilisateurService.getByRolesList(List.of("MANAGER")));
+        model.addAttribute("managers", utilisateurService.getByRolesList(List.of(Role.MANAGER)));
+        model.addAttribute("postes", posteService.getAllPostes());
+        model.addAttribute("motifs", motifDemandeService.getAll());
+        model.addAttribute("enAttente", 0);
+        model.addAttribute("validees", 0);
+        model.addAttribute("refusees", 0);
 
         return "demande/index";
     }
@@ -82,7 +95,7 @@ public class DemandeRecrutementController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
         try {
-            data.setIdManager(userDetails.getUtilisateur().getIdUtilisateur()   );
+            data.setIdManager(userDetails.getUtilisateur().getIdUtilisateur());
             DemandeRecrutement saved = demandeRecrutementService.createDemande(data, action);
 
             String msg = "submit".equals(action) ? "Demande soumise avec succès." : "Brouillon enregistré.";
@@ -165,6 +178,8 @@ public class DemandeRecrutementController {
         model.addAttribute("demande", demande);
         model.addAttribute("historique", historique);
         model.addAttribute("peutValider", demandeRecrutementService.canValidate(etat, role));
+        model.addAttribute("estBrouillon",
+                Statut.BROUILLON_DEMANDE.equalsIgnoreCase(demande.getEtatDemande().getIntitule()));
 
         return "demande/show";
     }

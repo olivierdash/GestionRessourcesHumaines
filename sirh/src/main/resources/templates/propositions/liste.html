@@ -1,78 +1,177 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr"
-      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
 <body>
 
-<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
 
-    <div>
-        <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Propositions d'embauche</h1>
-        <p class="text-xs text-slate-500 mt-1"
-           th:text="${#lists.size(propositions)} + ' proposition(s)'"></p>
-    </div>
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Propositions d'embauche</h1>
+            <p class="text-xs text-slate-500 mt-1" th:text="${#lists.size(propositions)} + ' proposition(s)'"></p>
+        </div>
 
-    <div th:if="${succes}"
-         class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
-         th:text="${succes}"></div>
-    <div th:if="${erreur}"
-         class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
-         th:text="${erreur}"></div>
+        <div th:if="${succes}"
+            class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
+            th:text="${succes}"></div>
+        <div th:if="${erreur}"
+            class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+            th:text="${erreur}"></div>
 
-    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="sirh-table">
-                <thead>
-                    <tr>
-                        <th scope="col">N°</th>
-                        <th scope="col">Candidat</th>
-                        <th scope="col">Poste</th>
-                        <th scope="col">Salaire proposé</th>
-                        <th scope="col">Expiration</th>
-                        <th scope="col">Statut</th>
-                        <th scope="col" class="text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${#lists.isEmpty(propositions)}">
-                        <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">
-                            Aucune proposition enregistrée.
-                        </td>
-                    </tr>
-                    <tr th:each="p : ${propositions}">
-                        <td class="font-mono text-cobalt-800 font-bold"
-                            th:text="${p.idProposition}"></td>
-                        <td class="font-bold text-cobalt-900"
-                            th:text="${p.candidature.candidat.prenom + ' ' + p.candidature.candidat.nom}"></td>
-                        <td class="text-slate-600"
-                            th:text="${p.candidature.demandeRecrutement.poste.intitule}"></td>
-                        <td class="font-mono font-semibold text-slate-700"
-                            th:text="${#numbers.formatDecimal(p.salairePropose, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
-                        <td class="text-slate-600 font-mono whitespace-nowrap"
-                            th:text="${#temporals.format(p.dateExpiration, 'dd/MM/yyyy HH:mm')}"></td>
-                        <td>
-                            <span class="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                                  th:classappend="${p.statut.libelle == 'ACCEPTE'   ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+        <div class="bg-surface-card border border-neutral-border rounded-lg p-4 shadow-sm">
+            <form method="get" th:action="@{/propositions}" th:object="${filter}" id="filter-form"
+                class="flex flex-wrap items-end gap-3">
+
+                <div class="flex flex-col gap-1.5 min-w-[180px]">
+                    <label for="statut" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Statut
+                    </label>
+                    <select id="statut" th:field="*{statut}"
+                        class="h-9 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 cursor-pointer">
+                        <option value="">Tous les statuts</option>
+                        <option th:each="s : ${statuts}" th:value="${s.id}" th:text="${s.libelle}"></option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5 min-w-[200px]">
+                    <label for="idDepartement" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Département
+                    </label>
+                    <select id="idDepartement" th:field="*{idDepartement}" onchange="onDepartementChange()"
+                        class="h-9 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 cursor-pointer">
+                        <option value="">Tous les départements</option>
+                        <option th:each="d : ${departements}" th:value="${d.idDepartement}" th:text="${d.titre}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5 min-w-[200px]">
+                    <label for="idPoste" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Poste
+                    </label>
+                    <select id="idPoste" th:field="*{idPoste}"
+                        class="h-9 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 cursor-pointer">
+                        <option value="">Tous les postes</option>
+                    </select>
+                </div>
+
+                <button type="submit"
+                    class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">filter_list</span>
+                    Filtrer
+                </button>
+
+                <a th:href="@{/propositions}"
+                    th:if="${filter.statut != null or filter.idDepartement != null or filter.idPoste != null}"
+                    class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+                    Réinitialiser
+                </a>
+            </form>
+        </div>
+
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">N°</th>
+                            <th scope="col">Candidat</th>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Salaire proposé</th>
+                            <th scope="col">Expiration</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(propositions)}">
+                            <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">
+                                <span th:if="${filter.statut == null or filter.statut.isEmpty()}">
+                                    Aucune proposition enregistrée.
+                                </span>
+                                <span th:if="${filter.statut != null and !filter.statut.isEmpty()}">
+                                    Aucune proposition ne correspond à ce filtre.
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:each="p : ${propositions}">
+                            <td class="font-mono text-cobalt-800 font-bold" th:text="${p.idProposition}"></td>
+                            <td class="font-bold text-cobalt-900"
+                                th:text="${p.candidature.candidat.prenom + ' ' + p.candidature.candidat.nom}"></td>
+                            <td class="text-slate-600" th:text="${p.candidature.demandeRecrutement.poste.intitule}">
+                            </td>
+                            <td class="font-mono font-semibold text-slate-700"
+                                th:text="${#numbers.formatDecimal(p.salairePropose, 0, 'COMMA', 2, 'POINT')} + ' €'">
+                            </td>
+                            <td class="text-slate-600 font-mono whitespace-nowrap"
+                                th:text="${#temporals.format(p.dateExpiration, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <span
+                                    class="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                    th:classappend="${p.statut.libelle == 'ACCEPTE'   ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                                                  : (p.statut.libelle == 'APPROUVEE'  ? 'bg-blue-50 border-blue-200 text-blue-700'
                                                  : (p.statut.libelle == 'SOUMISE'    ? 'bg-amber-50 border-amber-200 text-amber-800'
                                                  : (p.statut.libelle == 'REFUSE'     ? 'bg-red-50 border-red-200 text-red-700'
                                                  : (p.statut.libelle == 'EXPIREE'    ? 'bg-slate-100 border-slate-300 text-slate-500'
                                                  : 'bg-slate-100 border-slate-200 text-slate-600'))))}"
-                                  th:text="${p.statut.libelle}">
-                            </span>
-                        </td>
-                        <td class="text-right whitespace-nowrap">
-                            <a th:href="@{/propositions/{id}(id=${p.idProposition})}"
-                               class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
-                                Ouvrir
-                                <span class="material-symbols-outlined text-[14px] ml-1">arrow_forward</span>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                    th:text="${p.statut.libelle}">
+                                </span>
+                                <span th:if="${p.statut.libelle == 'SOUMISE' and estValidateur}"
+                                    class="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[9px] font-bold uppercase">
+                                    <span class="material-symbols-outlined text-[10px]">priority_high</span>
+                                    À valider
+                                </span>
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <a th:href="@{/propositions/{id}(id=${p.idProposition})}"
+                                    class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                    Ouvrir
+                                    <span class="material-symbols-outlined text-[14px] ml-1">arrow_forward</span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+        <script th:inline="javascript">
+            const SELECTED_DEPARTEMENT_ID = /*[[${filter.idDepartement}]]*/ null;
+            const SELECTED_POSTE_ID = /*[[${filter.idPoste}]]*/ null;
 
-</main>
+            async function loadPostes(idDepartement, selectedIdPoste) {
+                const select = document.getElementById('idPoste');
+                select.innerHTML = '<option value="">Tous les postes</option>';
+
+                if (!idDepartement) return;
+
+                try {
+                    const res = await fetch('/postes/by-departement/' + idDepartement);
+                    if (!res.ok) return;
+                    const postes = await res.json();
+                    postes.forEach(function (p) {
+                        const opt = document.createElement('option');
+                        opt.value = p.id;
+                        opt.textContent = p.libelle;
+                        if (selectedIdPoste != null && String(p.id) === String(selectedIdPoste)) {
+                            opt.selected = true;
+                        }
+                        select.appendChild(opt);
+                    });
+                } catch (e) {
+                    console.error('Erreur chargement postes', e);
+                }
+            }
+
+            function onDepartementChange() {
+                const depId = document.getElementById('idDepartement').value;
+                loadPostes(depId, null);
+            }
+
+            if (SELECTED_DEPARTEMENT_ID) {
+                loadPostes(SELECTED_DEPARTEMENT_ID, SELECTED_POSTE_ID);
+            }
+        </script>
+    </main>
 </body>
+
 </html>

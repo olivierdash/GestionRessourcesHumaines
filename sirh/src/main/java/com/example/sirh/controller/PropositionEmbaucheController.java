@@ -1,13 +1,20 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.config.CustomUserDetails;
+import com.example.sirh.constants.ConstantSirh.Action;
+import com.example.sirh.constants.ConstantSirh.Role;
+import com.example.sirh.constants.ConstantSirh.Statut;
+import com.example.sirh.dto.PropositionEmbaucheFilter;
 import com.example.sirh.model.Candidature;
 import com.example.sirh.model.Poste;
 import com.example.sirh.model.PropositionEmbauche;
 import com.example.sirh.service.CandidatureService;
+import com.example.sirh.service.DepartementService;
 import com.example.sirh.service.EmbaucheService;
 import com.example.sirh.service.GrilleSalarialService;
+import com.example.sirh.service.PropositionMessageService;
 import com.example.sirh.service.PropositionService;
+import com.example.sirh.service.StatutPropositionService;
 import com.example.sirh.service.TypeContratService;
 import com.example.sirh.service.ValidationPropositionService;
 
@@ -17,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +34,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.List;
+
+import static com.example.sirh.constants.ConstantSirh.Action;
+import static com.example.sirh.constants.ConstantSirh.Role;
+import static com.example.sirh.constants.ConstantSirh.Statut;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,17 +48,27 @@ public class PropositionEmbaucheController {
     private final EmbaucheService embaucheService;
     private final CandidatureService candidatureService;
     private final ValidationPropositionService validationPropositionService;
-    private final TypeContratService typeContratService; // ← ajouté
-    private final GrilleSalarialService grilleSalarialService; // ← ajouté
+    private final TypeContratService typeContratService;
+    private final GrilleSalarialService grilleSalarialService;
+    private final StatutPropositionService statutPropositionService;
+    private final DepartementService departementService;
+    private final PropositionMessageService propositionMessageService;
 
-    /** Liste et suivi de toutes les propositions. */
     @GetMapping("/propositions")
-    public String liste(Model model) {
-        model.addAttribute("propositions", propositionService.liste());
+    public String liste(@ModelAttribute("filter") PropositionEmbaucheFilter filter,
+            Model model,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        model.addAttribute("propositions", propositionService.liste(filter));
+        model.addAttribute("statuts", statutPropositionService.getStatuts());
+        model.addAttribute("departements", departementService.getAllDepartements());
+
+        String role = userDetails.getUtilisateur().getRole().getLibelle();
+        model.addAttribute("estValidateur",
+                Role.DG.equals(role) || Role.FINANCE.equals(role));
+
         return "propositions/liste";
     }
 
-    /** Formulaire « Proposer » — charge les types de contrat + la grille. */
     @GetMapping("/candidatures/{idCandidature}/proposer")
     public String formProposer(@PathVariable("idCandidature") Integer idCandidature, Model model) {
         Candidature c = candidatureService.getCandidatureById(idCandidature);
@@ -80,7 +103,6 @@ public class PropositionEmbaucheController {
         }
     }
 
-    /** Écran de suivi d'une proposition : actions selon statut + rôle. */
     @GetMapping("/propositions/{id}")
     public String detail(@PathVariable("id") Integer id,
             Model model,
@@ -88,29 +110,28 @@ public class PropositionEmbaucheController {
         PropositionEmbauche p = propositionService.getProposition(id);
         String statut = p.getStatut().getLibelle();
 
-        // Flags booléens — le template ne connaît plus les libellés
         model.addAttribute("proposition", p);
-        model.addAttribute("estEnAttente", PropositionService.EN_ATTENTE.equals(statut));
-        model.addAttribute("estSoumise", PropositionService.SOUMISE.equals(statut));
-        model.addAttribute("estApprouvee", PropositionService.APPROUVEE.equals(statut));
-        model.addAttribute("estAcceptee", PropositionService.ACCEPTE.equals(statut));
-        model.addAttribute("estCloturee", PropositionService.REFUSE.equals(statut)
-                || PropositionService.EXPIREE.equals(statut));
+        model.addAttribute("estEnAttente", Statut.EN_ATTENTE.equals(statut));
+        model.addAttribute("estSoumise", Statut.SOUMISE.equals(statut));
+        model.addAttribute("estApprouvee", Statut.APPROUVEE.equals(statut));
+        model.addAttribute("estAcceptee", Statut.ACCEPTE.equals(statut));
+        model.addAttribute("estCloturee", Statut.REFUSE.equals(statut)
+                || Statut.EXPIREE.equals(statut));
 
-        // Rôle : détermine si le user peut valider
         String role = userDetails.getUtilisateur().getRole().getLibelle();
-        boolean peutValider = PropositionService.SOUMISE.equals(statut)
-                && ("DG".equals(role) || "FINANCE".equals(role));
+        boolean peutValider = Statut.SOUMISE.equals(statut)
+                && (Role.DG.equals(role) || Role.FINANCE.equals(role));
         model.addAttribute("peutValider", peutValider);
 
-        // Données annexes
         model.addAttribute("alerteGrille", propositionService.verifierGrille(p));
         model.addAttribute("validations", validationPropositionService.findByProposition(id));
         model.addAttribute("employe",
                 embaucheService.trouverEmploye(p.getCandidature().getIdCandidature()).orElse(null));
-
-        // Types de contrat pour le formulaire « Créer dossier »
         model.addAttribute("typesContrat", typeContratService.getAllTypes());
+
+        // ⚠️ LIGNES MANQUANTES
+        model.addAttribute("messages", propositionMessageService.lister(id));
+        model.addAttribute("attendReponseRh", propositionMessageService.attendReponseRh(id));
 
         return "propositions/show";
     }
@@ -146,7 +167,7 @@ public class PropositionEmbaucheController {
             Principal principal,
             RedirectAttributes ra) {
         try {
-            boolean approuve = "APPROUVER".equals(decision);
+            boolean approuve = Action.APPROUVER.equals(decision);
             propositionService.valider(id, principal.getName(), approuve, commentaire);
             ra.addFlashAttribute("succes", approuve
                     ? "Proposition approuvée. En attente de la réponse du candidat."
@@ -172,12 +193,11 @@ public class PropositionEmbaucheController {
 
     @PostMapping("/propositions/{id}/dossier")
     public String creerDossier(@PathVariable("id") Integer id,
-            @RequestParam("idTypeContrat") Integer idTypeContrat,
             @RequestParam("dateDebut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebut,
             @RequestParam(value = "dateFin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFin,
             RedirectAttributes ra) {
         try {
-            var employe = embaucheService.creerDossier(id, idTypeContrat, dateDebut, dateFin);
+            var employe = embaucheService.creerDossier(id, dateDebut, dateFin);
             ra.addFlashAttribute("succes", "Dossier créé. Matricule : " + employe.getMatricule());
             return "redirect:/employes/" + employe.getIdEmployer();
         } catch (RuntimeException ex) {

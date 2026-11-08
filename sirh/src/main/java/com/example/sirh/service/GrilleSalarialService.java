@@ -74,7 +74,6 @@ public class GrilleSalarialService {
         existing.setDepartement(grille.getDepartement());
         existing.setSalaireMin(grille.getSalaireMin());
         existing.setSalaireMax(grille.getSalaireMax());
-        existing.setSalaireMoyen(grille.getSalaireMoyen());
 
         return grilleRepository.save(existing);
     }
@@ -100,24 +99,12 @@ public class GrilleSalarialService {
             errors.put("salaireMax", "Le salaire maximum doit être positif ou nul.");
         }
 
-        if (grille.getSalaireMoyen() == null) {
-            errors.put("salaireMoyen", "Le salaire moyen est obligatoire.");
-        } else if (grille.getSalaireMoyen().signum() < 0) {
-            errors.put("salaireMoyen", "Le salaire moyen doit être positif ou nul.");
-        }
-
         // Cohérence des montants
         if (grille.getSalaireMin() != null && grille.getSalaireMax() != null 
                 && grille.getSalaireMax().compareTo(grille.getSalaireMin()) < 0) {
             errors.put("salaireMax", "Le salaire maximum doit être supérieur ou égal au minimum.");
         }
 
-        if (grille.getSalaireMin() != null && grille.getSalaireMax() != null && grille.getSalaireMoyen() != null) {
-            if (grille.getSalaireMoyen().compareTo(grille.getSalaireMin()) < 0 
-                    || grille.getSalaireMoyen().compareTo(grille.getSalaireMax()) > 0) {
-                errors.put("salaireMoyen", "Le salaire moyen doit être compris entre le minimum et le maximum.");
-            }
-        }
 
         if (!errors.isEmpty()) {
             throw new ValidationMetierException(errors);

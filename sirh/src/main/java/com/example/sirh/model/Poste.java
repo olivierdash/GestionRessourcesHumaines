@@ -17,7 +17,9 @@ public class Poste {
     private LocalDate dateEffet;
     @Column(nullable = false)
     private String intitule;
-    private String lieu;
+    @ManyToOne
+    @JoinColumn (name = "id_lieu",nullable = false)
+    private Lieu lieu;
     @Column(name = "duree_hebdo")
     private Integer dureeHebdo;
 }
