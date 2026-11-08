@@ -26,6 +26,4 @@ public class GrilleSalarial {
     private BigDecimal salaireMin;
     @Column(name = "salaire_max", nullable = false)
     private BigDecimal salaireMax;
-    @Column(name = "salaire_moyen", nullable = false)
-    private BigDecimal salaireMoyen;
 }

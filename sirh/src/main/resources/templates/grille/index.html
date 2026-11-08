@@ -38,7 +38,6 @@
                             <th scope="col">Poste</th>
                             <th scope="col">Département</th>
                             <th scope="col">Salaire minimum</th>
-                            <th scope="col">Salaire moyen</th>
                             <th scope="col">Salaire maximum</th>
                             <th scope="col" class="text-right">Actions</th>
                         </tr>
@@ -48,7 +47,6 @@
                             <td class="font-bold text-cobalt-900" th:text="${grille.poste.intitule}"></td>
                             <td class="text-slate-700" th:text="${grille.departement.titre}"></td>
                             <td class="font-mono font-semibold text-slate-700" th:text="${#numbers.formatDecimal(grille.salaireMin, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
-                            <td class="font-mono font-semibold text-slate-700" th:text="${#numbers.formatDecimal(grille.salaireMoyen, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
                             <td class="font-mono font-semibold text-slate-700" th:text="${#numbers.formatDecimal(grille.salaireMax, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
                             <td class="text-right whitespace-nowrap">
                                 <a th:href="@{/grilles/{id}(id=${grille.idGrille})}" 

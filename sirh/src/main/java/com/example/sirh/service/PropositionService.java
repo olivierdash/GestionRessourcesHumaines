@@ -1,14 +1,17 @@
 package com.example.sirh.service;
 
+import com.example.sirh.constants.ConstantSirh.Action;
+import com.example.sirh.constants.ConstantSirh.Decision;
+import com.example.sirh.constants.ConstantSirh.Role;
+import com.example.sirh.constants.ConstantSirh.Statut;
+import com.example.sirh.dto.PropositionEmbaucheFilter;
 import com.example.sirh.model.Candidature;
 import com.example.sirh.model.GrilleSalarial;
 import com.example.sirh.model.Poste;
 import com.example.sirh.model.PropositionEmbauche;
-import com.example.sirh.model.StatutProposition;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.model.ValidationProposition;
 import com.example.sirh.repository.PropositionEmbaucheRepository;
-import com.example.sirh.service.ValidationPropositionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,38 +21,35 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.sirh.constants.ConstantSirh.Action;
+import static com.example.sirh.constants.ConstantSirh.Role;
+import static com.example.sirh.constants.ConstantSirh.Statut;
+
 @Service
 @RequiredArgsConstructor
 public class PropositionService {
 
-    public static final String EN_ATTENTE = "EN_ATTENTE";
-    public static final String SOUMISE = "SOUMISE";
-    public static final String APPROUVEE = "APPROUVEE";
-    public static final String ACCEPTE = "ACCEPTE";
-    public static final String REFUSE = "REFUSE";
-    public static final String EXPIREE = "EXPIREE";
-
-    private static final List<String> STATUTS_ACTIFS = List.of(EN_ATTENTE, SOUMISE, APPROUVEE);
+    private static final List<String> STATUTS_ACTIFS = List.of(Statut.EN_ATTENTE, Statut.SOUMISE, Statut.APPROUVEE);
     private static final int JOURS_PATIENCE = 7;
 
     private final PropositionEmbaucheRepository propositionRepo;
-    // ValidationProposition est une entité enfant de PropositionEmbauche -> garde son repo
     private final ValidationPropositionService validationPropositionService;
-
     private final StatutPropositionService statutPropositionService;
     private final CandidatureService candidatureService;
     private final EmployeService employeService;
     private final GrilleSalarialService grilleSalarialService;
     private final UtilisateurService utilisateurService;
 
-    // ---------- Lecture ----------
-
     @Transactional(readOnly = true)
     public List<PropositionEmbauche> liste() {
         return propositionRepo.findAllByOrderByIdPropositionDesc();
     }
 
-    /** Charge une proposition et la passe en EXPIREE si la date limite est dépassée. */
+    @Transactional(readOnly = true)
+    public List<PropositionEmbauche> liste(PropositionEmbaucheFilter filter) {
+        return propositionRepo.findWithFilters(filter);
+    }
+
     @Transactional
     public PropositionEmbauche getProposition(Integer id) {
         PropositionEmbauche p = charger(id);
@@ -57,7 +57,21 @@ public class PropositionService {
         return p;
     }
 
-    /** Retourne un message d'alerte si le salaire est hors grille (ou sans grille), sinon null. */
+    @Transactional(readOnly = true)
+    public List<PropositionEmbauche> listerPourCandidat(Integer idCandidat) {
+        return propositionRepo
+                .findByCandidatureCandidatIdCandidatOrderByIdPropositionDesc(idCandidat);
+    }
+
+    @Transactional
+    public PropositionEmbauche getPourCandidat(Integer idProposition, Integer idCandidat) {
+        PropositionEmbauche p = propositionRepo
+                .findByIdPropositionAndCandidatureCandidatIdCandidat(idProposition, idCandidat)
+                .orElseThrow(() -> new IllegalArgumentException("Proposition introuvable."));
+        appliquerExpiration(p);
+        return p;
+    }
+
     @Transactional(readOnly = true)
     public String verifierGrille(PropositionEmbauche p) {
         Poste poste = p.getCandidature().getDemandeRecrutement().getPoste();
@@ -75,13 +89,11 @@ public class PropositionService {
         return null;
     }
 
-    // ---------- Étape « Proposition » ----------
-
     @Transactional
     public PropositionEmbauche proposer(Integer idCandidature, BigDecimal salaire, int joursValidite) {
         Candidature c = candidatureService.getCandidatureById(idCandidature);
 
-        if (!"RETENU".equals(c.getStatutCandidature().getLibelle())) {
+        if (!Statut.RETENU.equals(c.getStatutCandidature().getLibelle())) {
             throw new IllegalStateException(
                     "Seule une candidature RETENU peut recevoir une proposition.");
         }
@@ -103,7 +115,7 @@ public class PropositionService {
                 .candidature(c)
                 .salairePropose(salaire)
                 .dateExpiration(LocalDateTime.now().plusDays(joursValidite))
-                .statut(statutPropositionService.getByLibelle(EN_ATTENTE))
+                .statut(statutPropositionService.getByLibelle(Statut.EN_ATTENTE))
                 .build();
         return propositionRepo.save(p);
     }
@@ -111,28 +123,28 @@ public class PropositionService {
     @Transactional
     public void modifierSalaire(Integer id, BigDecimal salaire) {
         PropositionEmbauche p = charger(id);
-        exigerStatut(p, EN_ATTENTE, "modifier le salaire");
+        exigerStatutParmi(p, List.of(Statut.EN_ATTENTE, Statut.APPROUVEE),
+                "modifier le salaire");
         verifierSalaire(salaire);
+        verifierSalaireDansGrille(p, salaire);
         p.setSalairePropose(salaire);
     }
 
     @Transactional
     public void soumettre(Integer id) {
         PropositionEmbauche p = charger(id);
-        exigerStatut(p, EN_ATTENTE, "soumettre");
-        p.setStatut(statutPropositionService.getByLibelle(SOUMISE));
+        exigerStatut(p, Statut.EN_ATTENTE, "soumettre");
+        p.setStatut(statutPropositionService.getByLibelle(Statut.SOUMISE));
     }
-
-    // ---------- Étape « Valider » ----------
 
     @Transactional
     public void valider(Integer id, String emailValidateur, boolean approuve, String commentaire) {
         PropositionEmbauche p = charger(id);
-        exigerStatut(p, SOUMISE, "valider");
+        exigerStatut(p, Statut.SOUMISE, "valider");
 
         Utilisateur validateur = utilisateurService.getByEmail(emailValidateur);
         String role = validateur.getRole().getLibelle();
-        if (!"DG".equals(role) && !"FINANCE".equals(role)) {
+        if (!Role.DG.equals(role) && !Role.FINANCE.equals(role)) {
             throw new IllegalStateException(
                     "Seuls la Direction (DG) et la Finance peuvent valider une proposition.");
         }
@@ -145,17 +157,14 @@ public class PropositionService {
                 .proposition(p)
                 .validateur(validateur)
                 .departement(p.getCandidature().getDemandeRecrutement().getPoste().getDepartement())
-                .decision(approuve ? "APPROUVEE" : "REFUSEE")
+                .decision(approuve ? Decision.APPROUVEE : Decision.REFUSEE)
                 .commentaire(commentaire)
                 .build());
 
-        // Approuvée : on attend le candidat. Refusée : retour à la proposition pour correction.
-        p.setStatut(statutPropositionService.getByLibelle(approuve ? APPROUVEE : EN_ATTENTE));
+        p.setStatut(statutPropositionService.getByLibelle(
+                approuve ? Statut.APPROUVEE : Statut.EN_ATTENTE));
     }
 
-    // ---------- Étape « Réponse du candidat » ----------
-
-    /** reponse = ACCEPTER, REFUSER ou PATIENTER. Retourne le message à afficher. */
     @Transactional
     public String repondre(Integer id, String reponse, String remarque) {
         PropositionEmbauche p = charger(id);
@@ -163,36 +172,51 @@ public class PropositionService {
             return "La proposition a expiré : la réponse n'a pas été enregistrée. "
                     + "Une nouvelle proposition peut être créée.";
         }
-        exigerStatut(p, APPROUVEE, "enregistrer la réponse");
+        exigerStatut(p, Statut.APPROUVEE, "enregistrer la réponse");
+        return appliquerReponse(p, reponse, remarque);
+    }
+
+    @Transactional
+    public String repondreCandidat(Integer idProposition, Integer idCandidat,
+            String reponse, String remarque) {
+        PropositionEmbauche p = propositionRepo
+                .findByIdPropositionAndCandidatureCandidatIdCandidat(idProposition, idCandidat)
+                .orElseThrow(() -> new IllegalArgumentException("Proposition introuvable."));
+        if (appliquerExpiration(p)) {
+            throw new IllegalStateException(
+                    "Cette proposition a expiré. Vous ne pouvez plus y répondre.");
+        }
+        exigerStatut(p, Statut.APPROUVEE, "enregistrer la réponse");
+        return appliquerReponse(p, reponse, remarque);
+    }
+
+    private String appliquerReponse(PropositionEmbauche p, String reponse, String remarque) {
         if (reponse == null) {
             throw new IllegalArgumentException("Réponse manquante.");
         }
         if (remarque != null && !remarque.isBlank()) {
             p.setRemarque(remarque.trim());
         }
-        switch (reponse) {
-            case "ACCEPTER" -> {
-                p.setStatut(statutPropositionService.getByLibelle(ACCEPTE));
+        return switch (reponse) {
+            case Action.ACCEPTER -> {
+                p.setStatut(statutPropositionService.getByLibelle(Statut.ACCEPTE));
                 p.setSalaireFinal(p.getSalairePropose());
                 p.setDateDecision(LocalDateTime.now());
-                return "Proposition acceptée. Le dossier salarié peut être créé.";
+                yield "Proposition acceptée.";
             }
-            case "REFUSER" -> {
-                p.setStatut(statutPropositionService.getByLibelle(REFUSE));
+            case Action.REFUSER -> {
+                p.setStatut(statutPropositionService.getByLibelle(Statut.REFUSE));
                 p.setDateDecision(LocalDateTime.now());
-                return "Proposition refusée par le candidat. "
-                        + "Une nouvelle proposition peut être créée.";
+                yield "Proposition refusée par le candidat.";
             }
-            case "PATIENTER" -> {
+            case Action.PATIENTER -> {
                 p.setDateExpiration(p.getDateExpiration().plusDays(JOURS_PATIENCE));
-                return "Le candidat patiente : l'expiration est repoussée de "
+                yield "Le candidat patiente : l'expiration est repoussée de "
                         + JOURS_PATIENCE + " jours.";
             }
             default -> throw new IllegalArgumentException("Réponse inconnue : " + reponse);
-        }
+        };
     }
-
-    // ---------- Outils internes ----------
 
     private PropositionEmbauche charger(Integer id) {
         return propositionRepo.findById(id)
@@ -201,8 +225,12 @@ public class PropositionService {
     }
 
     private void exigerStatut(PropositionEmbauche p, String attendu, String action) {
+        exigerStatutParmi(p, List.of(attendu), action);
+    }
+
+    private void exigerStatutParmi(PropositionEmbauche p, List<String> attendus, String action) {
         String actuel = p.getStatut().getLibelle();
-        if (!attendu.equals(actuel)) {
+        if (!attendus.contains(actuel)) {
             throw new IllegalStateException(
                     "Impossible de " + action + " : la proposition est au statut " + actuel + ".");
         }
@@ -215,12 +243,25 @@ public class PropositionService {
         }
     }
 
-    /** Passe une proposition APPROUVEE dont la date limite est dépassée au statut EXPIREE. */
+    private void verifierSalaireDansGrille(PropositionEmbauche p, BigDecimal salaire) {
+        Poste poste = p.getCandidature().getDemandeRecrutement().getPoste();
+        grilleSalarialService.getGrillePourPosteEtDepartement(
+                poste.getIdPoste(), poste.getDepartement().getIdDepartement())
+                .ifPresent(g -> {
+                    if (salaire.compareTo(g.getSalaireMin()) < 0
+                            || salaire.compareTo(g.getSalaireMax()) > 0) {
+                        throw new IllegalArgumentException(
+                                "Le salaire doit être compris dans la grille : "
+                                        + g.getSalaireMin() + " – " + g.getSalaireMax() + " €.");
+                    }
+                });
+    }
+
     private boolean appliquerExpiration(PropositionEmbauche p) {
-        boolean echue = APPROUVEE.equals(p.getStatut().getLibelle())
+        boolean echue = Statut.APPROUVEE.equals(p.getStatut().getLibelle())
                 && p.getDateExpiration().isBefore(LocalDateTime.now());
         if (echue) {
-            p.setStatut(statutPropositionService.getByLibelle(EXPIREE));
+            p.setStatut(statutPropositionService.getByLibelle(Statut.EXPIREE));
             p.setDateDecision(LocalDateTime.now());
         }
         return echue;

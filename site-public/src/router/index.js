@@ -22,6 +22,19 @@ const routes = [
     props: true,
     meta: { layout: 'public', requiresCandidateAuth: true },
   },
+  {
+    path: '/mes-propositions',
+    name: 'my-propositions',
+    component: () => import('@/modules/candidate-space/MyPropositionsView.vue'),
+    meta: { layout: 'public', requiresCandidateAuth: true },
+  },
+  {
+    path: '/mes-propositions/:id',
+    name: 'proposition-detail',
+    component: () => import('@/modules/candidate-space/PropositionDetailView.vue'),
+    props: true,
+    meta: { layout: 'public', requiresCandidateAuth: true },
+  },
 
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/modules/home/HomeView.vue'), meta: { layout: 'public' } },
 ]

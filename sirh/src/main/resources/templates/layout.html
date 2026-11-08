@@ -39,19 +39,40 @@
     <script th:src="@{/js/custom-select.js}"></script>
 
     <link rel="stylesheet" th:href="@{/css/styles.css}">
-    
+
     <style>
         /* --- Règles pour la Sidebar Rétractable --- */
-        #sidebar { transition: width 0.3s ease; overflow: hidden; }
-        #main-content { transition: margin-left 0.3s ease; }
-        
-        body.sidebar-collapsed #sidebar { width: 4.5rem; }
-        body.sidebar-collapsed #main-content { margin-left: 4.5rem; }
-        
-        body.sidebar-collapsed .sidebar-text { display: none; }
-        body.sidebar-collapsed .sidebar-header-text { display: none; }
-        body.sidebar-collapsed #sidebar-toggle { justify-content: center; padding-left: 0; padding-right: 0; }
-        
+        #sidebar {
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+
+        #main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-collapsed #sidebar {
+            width: 4.5rem;
+        }
+
+        body.sidebar-collapsed #main-content {
+            margin-left: 4.5rem;
+        }
+
+        body.sidebar-collapsed .sidebar-text {
+            display: none;
+        }
+
+        body.sidebar-collapsed .sidebar-header-text {
+            display: none;
+        }
+
+        body.sidebar-collapsed #sidebar-toggle {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
         body.sidebar-collapsed .sidebar-nav-link {
             justify-content: center;
             padding-left: 0;
@@ -61,19 +82,31 @@
         }
 
         body.sidebar-collapsed .sidebar-profile-text,
-        body.sidebar-collapsed .sidebar-logout-btn { display: none; }
-        body.sidebar-collapsed .sidebar-profile-container { padding: 0.5rem; justify-content: center; }
+        body.sidebar-collapsed .sidebar-logout-btn {
+            display: none;
+        }
+
+        body.sidebar-collapsed .sidebar-profile-container {
+            padding: 0.5rem;
+            justify-content: center;
+        }
 
         /* --- Règle pour l'état actif (JS) --- */
         /* Utilisation de !important pour écraser les classes de base de Tailwind */
         .nav-link-active {
-            background-color: #f1f5f9 !important; /* bg-slate-100 */
-            color: #1e3a8a !important;            /* text-cobalt-900 */
-            font-weight: 600 !important;          /* font-semibold */
-            border-left-color: #1e40af !important; /* border-cobalt-800 */
+            background-color: #f1f5f9 !important;
+            /* bg-slate-100 */
+            color: #1e3a8a !important;
+            /* text-cobalt-900 */
+            font-weight: 600 !important;
+            /* font-semibold */
+            border-left-color: #1e40af !important;
+            /* border-cobalt-800 */
         }
+
         .nav-link-active .material-symbols-outlined {
-            color: #1e40af !important; /* text-cobalt-800 */
+            color: #1e40af !important;
+            /* text-cobalt-800 */
         }
     </style>
 </head>
@@ -81,150 +114,24 @@
 <body class="bg-surface-bg font-sans text-sm text-body-text antialiased h-screen overflow-hidden">
 
     <!-- SIDEBAR -->
-    <aside id="sidebar"
-        class="fixed left-0 top-0 h-screen w-64 bg-surface-card border-r border-neutral-border z-50 flex flex-col justify-between">
-
-        <div class="flex flex-col h-full min-h-0">
-
-            <!-- Logo / Bouton de bascule -->
-            <div class="h-14 shrink-0 border-b border-neutral-border flex items-center">
-                <button id="sidebar-toggle" type="button" 
-                        class="flex items-center gap-3 px-4 w-full h-full hover:bg-slate-50 transition-colors focus:outline-none" 
-                        title="Rétracter/Déployer le menu">
-                    <div class="w-8 h-8 rounded bg-cobalt-800 flex items-center justify-center text-white font-bold text-base shadow-sm shrink-0">
-                        <span class="tracking-tight">S</span>
-                    </div>
-                    <div class="flex flex-col sidebar-header-text text-left">
-                        <span class="font-bold text-base text-cobalt-900 tracking-tight leading-tight whitespace-nowrap">SIRH Pro</span>
-                        <span class="text-[10px] font-semibold text-cobalt-700 uppercase tracking-widest leading-none">Enterprise</span>
-                    </div>
-                </button>
-            </div>
-
-            <!-- Menu -->
-            <nav class="px-2 pt-4 flex flex-col gap-1 overflow-y-auto flex-1">
-
-                <!-- Tableau de bord -->
-                <a sec:authorize="!hasRole('ADMIN')" th:href="@{/utilisateur}"
-                    data-path="/utilisateur"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Tableau de bord">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">grid_view</span>
-                    <span class="sidebar-text whitespace-nowrap">Tableau de bord</span>
-                </a>
-
-                <!-- Utilisateurs -->
-                <a sec:authorize="hasAnyRole('ADMIN')" th:href="@{/admin}"
-                    data-path="/admin"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Utilisateurs">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">manage_accounts</span>
-                    <span class="sidebar-text whitespace-nowrap">Utilisateurs</span>
-                </a>
-
-                <!-- Demandes -->
-                <a sec:authorize="hasAnyRole('MANAGER', 'RH')" th:href="@{/demandes}"
-                    data-path="/demandes"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Demandes">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">assignment</span>
-                    <span class="sidebar-text whitespace-nowrap">Demandes</span>
-                </a>
-
-                <!-- Employés -->
-                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/employes}"
-                    data-path="/employes"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Employés">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">group</span>
-                    <span class="sidebar-text whitespace-nowrap">Employés</span>
-                </a>
-
-                <!-- Départements -->
-                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/departements}"
-                    data-path="/departements"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Départements">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">domain</span>
-                    <span class="sidebar-text whitespace-nowrap">Départements</span>
-                </a>
-
-                <!-- Postes -->
-                <a sec:authorize="hasAnyRole('RH', 'FINANCE', 'DG')" th:href="@{/postes}"
-                    data-path="/postes"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Postes">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">work</span>
-                    <span class="sidebar-text whitespace-nowrap">Postes</span>
-                </a>
-
-                <!-- Grilles -->
-                <a sec:authorize="hasAnyRole('RH', 'FINANCE', 'DG')" th:href="@{/grilles}"
-                    data-path="/grilles"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Grilles">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">payments</span>
-                    <span class="sidebar-text whitespace-nowrap">Grilles</span>
-                </a>
-
-                <!-- Offres -->
-                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/offres}"
-                    data-path="/offres"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Offres">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">campaign</span>
-                    <span class="sidebar-text whitespace-nowrap">Offres</span>
-                </a>
-
-                <!-- Validations -->
-                <a sec:authorize="hasAnyRole('FINANCE', 'DG', 'RH')" th:href="@{/demandes/validations}"
-                    data-path="/demandes/validations"
-                    class="sidebar-nav-link flex items-center justify-between px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Validations">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">fact_check</span>
-                        <span class="sidebar-text whitespace-nowrap">Validations</span>
-                    </div>
-                    <span th:if="${validationsEnAttenteCount > 0}"
-                        class="bg-cobalt-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full sidebar-text">
-                        <span th:text="${validationsEnAttenteCount}"></span>
-                    </span>
-                </a>
-            </nav>
-        </div>
-
-        <!-- Profil Utilisateur -->
-        <div class="p-3 border-t border-neutral-border bg-surface-card shrink-0 sidebar-profile-container">
-            <div class="flex items-center gap-3 p-2 hover:bg-slate-50 transition-colors cursor-pointer border border-transparent hover:border-neutral-border rounded">
-                <div class="w-8 h-8 rounded bg-cobalt-900 flex items-center justify-center shrink-0 text-white font-bold text-xs"
-                    th:text="${#strings.substring(#authentication.principal.utilisateur.nom, 0, 2)}"></div>
-                <div class="flex flex-col min-w-0 flex-1 sidebar-profile-text">
-                    <span class="font-semibold text-xs text-cobalt-900 truncate"
-                        th:text="${#authentication.principal.utilisateur.nom}"></span>
-                    <span class="text-[11px] text-muted-text truncate font-medium"
-                        th:text="${#authentication.principal.utilisateur.role.libelle}"></span>
-                </div>
-                <form th:action="@{/logout}" method="post" class="m-0 flex items-center sidebar-logout-btn">
-                    <button type="submit"
-                        class="material-symbols-outlined text-slate-400 text-[18px] hover:text-red-600 transition-colors"
-                        title="Déconnexion">logout</button>
-                </form>
-            </div>
-        </div>
-    </aside>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <!-- CONTENU PRINCIPAL -->
     <div id="main-content" class="ml-64 flex flex-col h-screen min-h-0">
 
         <!-- TOPBAR -->
-        <header class="h-14 shrink-0 bg-surface-card border-b border-neutral-border z-40 px-4 flex items-center justify-end">
+        <header
+            class="h-14 shrink-0 bg-surface-card border-b border-neutral-border z-40 px-4 flex items-center justify-end">
             <div class="flex items-center gap-4">
-                <button class="w-9 h-9 flex items-center justify-center border border-neutral-border rounded text-slate-700 hover:bg-slate-50 hover:text-cobalt-900 transition-colors relative" type="button">
+                <button
+                    class="w-9 h-9 flex items-center justify-center border border-neutral-border rounded text-slate-700 hover:bg-slate-50 hover:text-cobalt-900 transition-colors relative"
+                    type="button">
                     <span class="material-symbols-outlined text-[20px]">notifications</span>
                     <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-600 ring-2 ring-white"></span>
                 </button>
                 <div class="h-5 w-px bg-neutral-border"></div>
-                <div class="w-8 h-8 bg-cobalt-900 text-white flex items-center justify-center rounded border border-cobalt-950 font-semibold">
+                <div
+                    class="w-8 h-8 bg-cobalt-900 text-white flex items-center justify-center rounded border border-cobalt-950 font-semibold">
                     <span class="material-symbols-outlined text-[18px]">person</span>
                 </div>
             </div>
@@ -245,7 +152,7 @@
     <!-- SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
+
             // --- 1. Gestion de la Sidebar Rétractable ---
             const toggleBtn = document.getElementById('sidebar-toggle');
             const body = document.body;

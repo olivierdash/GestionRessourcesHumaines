@@ -7,7 +7,8 @@ public record DemandeRecrutementLib(
     Integer idDemandeRecrutement,
     LocalDateTime dateCreation,
     Integer effectif,
-    MotifDemande motif,          // <-- entité directement
+    String typeContratLibelle,
+    String motifLibelle,
     String managerNom,
     String posteIntitule,
     String departementTitre

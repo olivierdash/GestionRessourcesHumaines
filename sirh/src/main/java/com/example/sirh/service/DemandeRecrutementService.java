@@ -23,10 +23,15 @@ import com.example.sirh.model.GrilleSalarial;
 import com.example.sirh.model.HistoriqueDemandeRecrutement;
 import com.example.sirh.model.MotifDemande;
 import com.example.sirh.model.Poste;
+import com.example.sirh.model.TypeContrat;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.DemandeRecrutementRepository;
 
 import lombok.AllArgsConstructor;
+
+import static com.example.sirh.constants.ConstantSirh.Action;
+import static com.example.sirh.constants.ConstantSirh.Role;
+import static com.example.sirh.constants.ConstantSirh.Statut;
 
 @Service
 @AllArgsConstructor
@@ -35,21 +40,21 @@ public class DemandeRecrutementService {
     private final UtilisateurService utilisateurService;
     private final PosteService posteService;
     private final MotifDemandeService motifDemandeService;
+    private final TypeContratService typeContratService;
     private final DemandeRecrutementRepository demandeRepository;
     private final EtatDemandeService etatDemandeService;
     private final HistoriqueDemandeRecrutementService historiqueService;
     private final GrilleSalarialService grilleSalarialService;
 
-    // =========================================================
-    // MÉTHODES DE VALIDATION PRIVÉES
-    // =========================================================
-
     private void validerChampsObligatoires(DemandeRecrutementDTO dto, Map<String, String> errors) {
         if (dto.getIdManager() == null) {
-            throw new RuntimeException("Le manager est obligatoire pour créer une demande.");
+            errors.put("idManager", "Le manager est obligatoire pour créer une demande.");
         }
         if (dto.getIdPoste() == null) {
             errors.put("idPoste", "Le poste concerné est obligatoire.");
+        }
+        if (dto.getIdTypeContrat() == null) {
+            errors.put("idTypeContrat", "Le type de contrat est obligatoire.");
         }
         if (dto.getMotif() == null || dto.getMotif().getIdMotifDemande() == null) {
             errors.put("motif", "Le motif de la demande est obligatoire.");
@@ -57,11 +62,10 @@ public class DemandeRecrutementService {
     }
 
     private void validerReglesMetier(DemandeRecrutementDTO dto, Map<String, String> errors, Poste poste) {
-         // Doublon actif (Poste OR Date+Département)
-        if (poste != null && dto.getDateSouhaitee() != null 
+        if (poste != null && dto.getDateSouhaitee() != null
                 && !errors.containsKey("idPoste") && !errors.containsKey("dateSouhaitee")) {
-            
-            List<String> etatsFinaux = List.of("Valide", "Refuse");
+
+            List<String> etatsFinaux = List.of(Statut.VALIDE, Statut.REFUSE_DEMANDE);
             boolean existeDeja = demandeRepository.existsDemandeActive(
                     poste.getIdPoste(),
                     etatsFinaux);
@@ -70,61 +74,51 @@ public class DemandeRecrutementService {
                 errors.put("idPoste", "Une demande active existe déjà pour ce poste, ou pour cette date dans ce département.");
             }
         }
-        
+
         if (dto.getDateSouhaitee() == null) {
             errors.put("dateSouhaitee", "La date d'entrée est obligatoire.");
         } else if (dto.getDateSouhaitee().isBefore(LocalDate.now())) {
             errors.put("dateSouhaitee", "La date doit être aujourd'hui ou dans le futur.");
         }
 
-        // Effectif
         if (dto.getEffectif() == null || dto.getEffectif() <= 0) {
             errors.put("effectif", "L'effectif doit être un nombre positif.");
         }
-
-       
     }
-
-    // =========================================================
-    // CREATE
-    // =========================================================
 
     @Transactional
     public DemandeRecrutement createDemande(DemandeRecrutementDTO dto, String action) {
         Map<String, String> errors = new LinkedHashMap<>();
 
-        // 1. Validations toujours exécutées (Champs obligatoires en BDD)
         validerChampsObligatoires(dto, errors);
 
-        // 2. Validations métier (Uniquement si on soumet)
         Poste poste = null;
         if (dto.getIdPoste() != null && !errors.containsKey("idPoste")) {
             poste = posteService.getById(dto.getIdPoste());
         }
 
-        if ("submit".equals(action)) {
+        if (Action.SUBMIT.equals(action)) {
             validerReglesMetier(dto, errors, poste);
         }
 
-        // 3. Lancement de l'exception si erreurs
         if (!errors.isEmpty()) {
             throw new ValidationMetierException(errors);
         }
 
-        // 4. Enregistrement
         Utilisateur manager = utilisateurService.getById(dto.getIdManager());
         if (poste == null) {
             poste = posteService.getById(dto.getIdPoste());
         }
         MotifDemande motif = motifDemandeService.getById(dto.getMotif().getIdMotifDemande());
-        
-        // Détermination de l'état
-        String intituleEtat = "submit".equals(action) ? "Cree" : "Brouillon";
+        TypeContrat typeContrat = typeContratService.getById(dto.getIdTypeContrat());
+
+        String intituleEtat = Action.SUBMIT.equals(action) ? Statut.CREE : Statut.BROUILLON_DEMANDE;
         EtatDemande etatCible = etatDemandeService.getByIntitule(intituleEtat);
 
         DemandeRecrutement demande = DemandeRecrutement.builder()
                 .manager(manager)
                 .poste(poste)
+                .typeContrat(typeContrat)
                 .dateSouhaitee(dto.getDateSouhaitee())
                 .effectif(dto.getEffectif())
                 .motif(motif)
@@ -135,26 +129,20 @@ public class DemandeRecrutementService {
         return demandeRepository.save(demande);
     }
 
-    // =========================================================
-    // UPDATE
-    // =========================================================
-
     @Transactional
     public DemandeRecrutement updateDemande(DemandeRecrutementDTO dto, Utilisateur validateur, String action) {
         DemandeRecrutement demande = getById(dto.getIdDemandeRecrutement());
         Map<String, String> errors = new LinkedHashMap<>();
 
-        // 1. Vérification de sécurité (convertie en ValidationMetierException)
-        EtatDemande etatActuel = demande.getEtatDemande();
-        String etatIntitule = etatActuel.getIntitule().toLowerCase().trim();
-        String role = validateur.getRole().getLibelle().toLowerCase().trim();
+        String etatActuel = demande.getEtatDemande().getIntitule();
+        String role = validateur.getRole().getLibelle();
 
-        if (!"brouillon".equals(etatIntitule) || !"manager".equals(role)) {
+        if (!Statut.BROUILLON_DEMANDE.equalsIgnoreCase(etatActuel)
+                || !Role.MANAGER.equalsIgnoreCase(role)) {
             errors.put("global", "Modification Impossible : seul le manager peut modifier un brouillon.");
             throw new ValidationMetierException(errors);
         }
 
-        // 2. Validations
         validerChampsObligatoires(dto, errors);
 
         Poste poste = null;
@@ -162,7 +150,7 @@ public class DemandeRecrutementService {
             poste = posteService.getById(dto.getIdPoste());
         }
 
-        if ("submit".equals(action)) {
+        if (Action.SUBMIT.equals(action)) {
             validerReglesMetier(dto, errors, poste);
         }
 
@@ -170,23 +158,23 @@ public class DemandeRecrutementService {
             throw new ValidationMetierException(errors);
         }
 
-        // 3. Mise à jour des champs
         Utilisateur manager = utilisateurService.getById(dto.getIdManager());
         if (poste == null) {
             poste = posteService.getById(dto.getIdPoste());
         }
         MotifDemande motif = motifDemandeService.getById(dto.getMotif().getIdMotifDemande());
+        TypeContrat typeContrat = typeContratService.getById(dto.getIdTypeContrat());
 
         demande.setManager(manager);
         demande.setPoste(poste);
+        demande.setTypeContrat(typeContrat);
         demande.setDateSouhaitee(dto.getDateSouhaitee());
         demande.setEffectif(dto.getEffectif());
         demande.setMotif(motif);
         demande.setCommentaires(dto.getRemarque());
 
-        // 4. Gestion de l'état et historique
-        if ("submit".equals(action)) {
-            EtatDemande nouvelEtat = etatDemandeService.getByIntitule("Cree");
+        if (Action.SUBMIT.equals(action)) {
+            EtatDemande nouvelEtat = etatDemandeService.getByIntitule(Statut.CREE);
             demande.setEtatDemande(nouvelEtat);
             demandeRepository.save(demande);
             saveHistorique(demande, validateur);
@@ -196,10 +184,6 @@ public class DemandeRecrutementService {
 
         return demande;
     }
-
-    // =========================================================
-    // AUTRES MÉTHODES (inchangées)
-    // =========================================================
 
     public DemandeRecrutement getById(Integer id) {
         return demandeRepository.findById(id)
@@ -215,25 +199,26 @@ public class DemandeRecrutementService {
         DemandeRecrutement demande = getById(idDemande);
         demande.setCommentaires(remarque);
 
-        EtatDemande etatActuel = demande.getEtatDemande();
-        String etatIntitule = etatActuel.getIntitule().toLowerCase().trim();
-        String role = validateur.getRole().getLibelle().toLowerCase().trim();
+        String etatActuel = demande.getEtatDemande().getIntitule();
+        String role = validateur.getRole().getLibelle();
 
         EtatDemande nouvelEtat = null;
 
-        if ("refuser".equals(action)) {
-            if ("rh".equals(role) || "finance".equals(role) || "dg".equals(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule("Refuse");
+        if (Action.REFUSER.equals(action)) {
+            if (Role.RH.equalsIgnoreCase(role)
+                    || Role.FINANCE.equalsIgnoreCase(role)
+                    || Role.DG.equalsIgnoreCase(role)) {
+                nouvelEtat = etatDemandeService.getByIntitule(Statut.REFUSE_DEMANDE);
             } else {
                 throw new RuntimeException("Seul un validateur peut refuser une demande.");
             }
         } else {
-            if ("cree".equalsIgnoreCase(etatIntitule) && "rh".equals(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule("ValideRH");
-            } else if ("validerh".equalsIgnoreCase(etatIntitule) && "finance".equals(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule("ValideFinance");
-            } else if ("validefinance".equalsIgnoreCase(etatIntitule) && "dg".equals(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule("Valide");
+            if (Statut.CREE.equalsIgnoreCase(etatActuel) && Role.RH.equalsIgnoreCase(role)) {
+                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE_RH);
+            } else if (Statut.VALIDE_RH.equalsIgnoreCase(etatActuel) && Role.FINANCE.equalsIgnoreCase(role)) {
+                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE_FINANCE);
+            } else if (Statut.VALIDE_FINANCE.equalsIgnoreCase(etatActuel) && Role.DG.equalsIgnoreCase(role)) {
+                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE);
             }
         }
 
@@ -255,7 +240,7 @@ public class DemandeRecrutementService {
 
     public DemandeRecrutementDTO getDtoForEdit(Integer id) {
         DemandeRecrutement demande = getById(id);
-        if (!"Brouillon".equalsIgnoreCase(demande.getEtatDemande().getIntitule())) {
+        if (!Statut.BROUILLON_DEMANDE.equalsIgnoreCase(demande.getEtatDemande().getIntitule())) {
             throw new RuntimeException("Cette demande n'est plus modifiable.");
         }
         return toDto(demande);
@@ -267,6 +252,7 @@ public class DemandeRecrutementService {
         dto.setIdDemandeRecrutement(demande.getIdDemandeRecrutement());
         if (demande.getManager() != null) dto.setIdManager(demande.getManager().getIdUtilisateur());
         if (demande.getPoste() != null) dto.setIdPoste(demande.getPoste().getIdPoste());
+        if (demande.getTypeContrat() != null) dto.setIdTypeContrat(demande.getTypeContrat().getId());
         dto.setDateSouhaitee(demande.getDateSouhaitee());
         dto.setEffectif(demande.getEffectif());
         if (demande.getMotif() != null) dto.setMotif(demande.getMotif());
@@ -279,17 +265,17 @@ public class DemandeRecrutementService {
     }
 
     public boolean canValidate(String etat, String role) {
-        return ("cree".equals(etat) && "rh".equals(role)) ||
-               ("validerh".equals(etat) && "finance".equals(role)) ||
-               ("validefinance".equals(etat) && "dg".equals(role));
+        return (Statut.CREE.equalsIgnoreCase(etat) && Role.RH.equalsIgnoreCase(role))
+                || (Statut.VALIDE_RH.equalsIgnoreCase(etat) && Role.FINANCE.equalsIgnoreCase(role))
+                || (Statut.VALIDE_FINANCE.equalsIgnoreCase(etat) && Role.DG.equalsIgnoreCase(role));
     }
 
     @Transactional(readOnly = true)
     public ValidationPageData getValidationPageData(String role) {
         String etatRequis = switch (role) {
-            case "RH" -> "Cree";
-            case "FINANCE" -> "ValideRH";
-            case "DG" -> "ValideFinance";
+            case Role.RH -> Statut.CREE;
+            case Role.FINANCE -> Statut.VALIDE_RH;
+            case Role.DG -> Statut.VALIDE_FINANCE;
             default -> null;
         };
 
@@ -299,7 +285,7 @@ public class DemandeRecrutementService {
 
         Map<Integer, GrilleSalarial> grilles = new HashMap<>();
 
-        if ("FINANCE".equals(role)) {
+        if (Role.FINANCE.equals(role)) {
             for (DemandeRecrutement d : demandes) {
                 grilleSalarialService.getGrillePourPosteEtDepartement(
                         d.getPoste().getIdPoste(),

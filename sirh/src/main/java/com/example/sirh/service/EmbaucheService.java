@@ -13,8 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+
+import static com.example.sirh.constants.ConstantSirh.Statut;
 
 @Service
 @RequiredArgsConstructor
@@ -23,22 +24,15 @@ public class EmbaucheService {
     private final PropositionService propositionService;
     private final EmployeService employeService;
     private final ContratService contratService;
-    private final TypeContratService typeContratService;
     private final AffectationService affectationService;
     private final StatutEmployeService statutEmployeService;
+    private final OnboardingService onboardingService;
 
-    /**
-     * Bouton « Créer dossier » : matricule + employé + contrat + affectation en UNE transaction.
-     * Le contrat passe par ContratService.creer(...) -> validation chevauchement + grille.
-     * Si une étape échoue, tout est annulé (transaction).
-     */
     @Transactional
-    public Employe creerDossier(Integer idProposition, Integer idTypeContrat,
-            LocalDate dateDebut, LocalDate dateFin) {
-
+    public Employe creerDossier(Integer idProposition, LocalDate dateDebut, LocalDate dateFin) {
         PropositionEmbauche p = propositionService.getProposition(idProposition);
 
-        if (!PropositionService.ACCEPTE.equals(p.getStatut().getLibelle())) {
+        if (!Statut.ACCEPTE.equals(p.getStatut().getLibelle())) {
             throw new IllegalStateException(
                     "Le dossier ne peut être créé qu'après acceptation du candidat.");
         }
@@ -49,6 +43,13 @@ public class EmbaucheService {
             throw new IllegalStateException(
                     "Le dossier salarié existe déjà pour cette candidature.");
         }
+
+        TypeContrat type = candidature.getDemandeRecrutement().getTypeContrat();
+        if (type == null) {
+            throw new IllegalStateException(
+                    "Le type de contrat de la demande est manquant. Corrigez la demande avant de créer le dossier.");
+        }
+
         if (dateDebut == null) {
             throw new IllegalArgumentException("La date de début est obligatoire.");
         }
@@ -56,8 +57,6 @@ public class EmbaucheService {
             throw new IllegalArgumentException(
                     "La date de fin ne peut pas précéder la date de début.");
         }
-
-        TypeContrat type = typeContratService.getById(idTypeContrat);
 
         Poste poste = candidature.getDemandeRecrutement().getPoste();
         BigDecimal salaire = p.getSalaireFinal() != null
@@ -67,10 +66,9 @@ public class EmbaucheService {
         Employe employe = employeService.save(Employe.builder()
                 .candidature(candidature)
                 .hiringDate(dateDebut)
-                .statusEmploye(statutEmployeService.getByLibelle("ACTIF")) 
+                .statusEmploye(statutEmployeService.getByLibelle(Statut.EN_ONBOARDING))
                 .build());
 
-        // Délègue la validation complète (CDD, grille, chevauchement) à ContratService
         contratService.creer(Contrat.builder()
                 .employe(employe)
                 .poste(poste)
@@ -85,6 +83,8 @@ public class EmbaucheService {
                 .poste(poste)
                 .dateDebut(dateDebut)
                 .build());
+
+        onboardingService.creer(employe);
 
         return employe;
     }
