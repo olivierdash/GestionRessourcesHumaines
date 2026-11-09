@@ -156,7 +156,9 @@ public class TempsTravailService {
         pointage.setHeureSortie(heureSortie);
         pointage.setCommentaire(commentaire);
 
-        int minutesTravaillees = minutesEntre(heureEntree, heureSortie);
+        int minutesPresence = minutesEntre(heureEntree, heureSortie);
+        int minutesPause = 0;
+        int minutesTravaillees = minutesPresence;
         int minutesRetard = 0;
         int minutesSupplementaires = 0;
         List<AffectationPlanning> affectations = affectationRepository.findActivesForDate(employeId, datePointage);
@@ -166,16 +168,19 @@ public class TempsTravailService {
                     .filter(item -> item.getJourSemaine() == datePointage.getDayOfWeek())
                     .findFirst().orElse(null);
             if (horaire != null) {
+                minutesPause = Math.max(0, horaire.getPauseMinutes());
                 if (heureEntree != null && horaire.getHeureDebut() != null
                         && heureEntree.isAfter(horaire.getHeureDebut())) {
                     minutesRetard = (int) Duration.between(horaire.getHeureDebut(), heureEntree).toMinutes();
                 }
                 int minutesPrevues = minutesEntre(horaire.getHeureDebut(), horaire.getHeureFin())
-                        - horaire.getPauseMinutes();
+                        - minutesPause;
+                minutesTravaillees = Math.max(0, minutesPresence - Math.min(minutesPause, minutesPresence));
                 minutesSupplementaires = Math.max(0, minutesTravaillees - Math.max(0, minutesPrevues));
             }
         }
         pointage.setMinutesTravaillees(minutesTravaillees);
+        pointage.setMinutesPause(minutesPause);
         pointage.setMinutesRetard(minutesRetard);
         pointage.setMinutesSupplementaires(minutesSupplementaires);
         return pointageRepository.save(pointage);
