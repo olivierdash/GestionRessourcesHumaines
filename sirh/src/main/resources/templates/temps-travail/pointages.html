@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900">Pointages</h1>
+            <p class="text-sm text-slate-600 mt-1">Suivez les entrées, sorties, retards et heures supplémentaires.</p>
+        </div>
+        <a th:href="@{/temps-travail/pointages/nouveau}" class="h-9 px-4 rounded bg-cobalt-700 text-white text-xs font-semibold flex items-center">Nouveau pointage</a>
+    </div>
+    <div th:if="${succes}" class="p-3 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-3 rounded bg-red-50 text-red-700 border border-red-200 text-sm" th:text="${erreur}"></div>
+    <form method="get" th:action="@{/temps-travail/pointages}" class="bg-surface-card p-4 rounded-lg border border-neutral-border grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Du</label><input required type="date" name="dateDebut" th:value="${dateDebut}" class="w-full h-9 border border-neutral-border rounded px-2"></div>
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Au</label><input required type="date" name="dateFin" th:value="${dateFin}" class="w-full h-9 border border-neutral-border rounded px-2"></div>
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Salarié</label><select name="employeId" class="w-full h-9 border border-neutral-border rounded px-2"><option value="">Tous les salariés</option><option th:each="employe : ${employes}" th:value="${employe.idEmployer}" th:selected="${employe.idEmployer == employeId}" th:text="${employe.matricule + ' - #' + employe.idEmployer}"></option></select></div>
+        <button class="h-9 rounded bg-slate-800 text-white text-xs font-semibold">Filtrer</button>
+    </form>
+    <div class="bg-surface-card rounded-lg border border-neutral-border overflow-hidden">
+        <table class="sirh-table">
+            <thead><tr><th>Date</th><th>Salarié</th><th>Entrée</th><th>Sortie</th><th>Temps travaillé</th><th>Retard</th><th>Supplémentaire</th><th></th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(pointages)}"><td colspan="8" class="td-empty text-center py-8">Aucun pointage pour cette période.</td></tr>
+            <tr th:each="pointage : ${pointages}">
+                <td class="whitespace-nowrap" th:text="${#temporals.format(pointage.datePointage, 'dd/MM/yyyy')}"></td>
+                <td class="font-bold text-cobalt-900" th:text="${pointage.employe.matricule}"></td>
+                <td th:text="${pointage.heureEntree == null ? '-' : #temporals.format(pointage.heureEntree, 'HH:mm')}"></td>
+                <td th:text="${pointage.heureSortie == null ? '-' : #temporals.format(pointage.heureSortie, 'HH:mm')}"></td>
+                <td th:text="${pointage.minutesTravaillees + ' min'}"></td>
+                <td><span th:class="${pointage.minutesRetard > 0 ? 'text-red-600 font-bold' : 'text-slate-600'}" th:text="${pointage.minutesRetard + ' min'}"></span></td>
+                <td><span th:class="${pointage.minutesSupplementaires > 0 ? 'text-emerald-700 font-bold' : 'text-slate-600'}" th:text="${pointage.minutesSupplementaires + ' min'}"></span></td>
+                <td class="text-right"><a th:href="@{/temps-travail/pointages/{id}/edit(id=${pointage.id})}" class="text-cobalt-700 text-xs font-semibold">Modifier</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

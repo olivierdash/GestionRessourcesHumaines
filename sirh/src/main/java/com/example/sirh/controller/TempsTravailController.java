@@ -1,6 +1,7 @@
 package com.example.sirh.controller;
 
 import com.example.sirh.model.RegimeTravail;
+import com.example.sirh.model.Pointage;
 import com.example.sirh.service.EmployeService;
 import com.example.sirh.service.TempsTravailService;
 import lombok.RequiredArgsConstructor;
@@ -126,5 +127,56 @@ public class TempsTravailController {
             ra.addFlashAttribute("erreur", e.getMessage());
         }
         return "redirect:/temps-travail/plannings/" + id;
+    }
+
+    @GetMapping("/pointages")
+    public String pointages(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebut,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFin,
+            @RequestParam(required = false) Integer employeId,
+            Model model) {
+        LocalDate debut = dateDebut == null ? LocalDate.now().withDayOfMonth(1) : dateDebut;
+        LocalDate fin = dateFin == null ? debut.withDayOfMonth(debut.lengthOfMonth()) : dateFin;
+        if (fin.isBefore(debut)) {
+            throw new IllegalArgumentException("La date de fin doit être postérieure à la date de début.");
+        }
+        model.addAttribute("pointages", service.pointages(debut, fin, employeId));
+        model.addAttribute("employes", employeService.getAllEmployesList());
+        model.addAttribute("dateDebut", debut);
+        model.addAttribute("dateFin", fin);
+        model.addAttribute("employeId", employeId);
+        return "temps-travail/pointages";
+    }
+
+    @GetMapping("/pointages/nouveau")
+    public String nouveauPointage(Model model) {
+        model.addAttribute("pointage", Pointage.builder().datePointage(LocalDate.now()).build());
+        model.addAttribute("employes", employeService.getAllEmployesList());
+        return "temps-travail/pointage-form";
+    }
+
+    @GetMapping("/pointages/{id}/edit")
+    public String modifierPointage(@PathVariable Integer id, Model model) {
+        model.addAttribute("pointage", service.pointage(id));
+        model.addAttribute("employes", employeService.getAllEmployesList());
+        return "temps-travail/pointage-form";
+    }
+
+    @PostMapping("/pointages")
+    public String enregistrerPointage(
+            @RequestParam(required = false) Integer id,
+            @RequestParam Integer employeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate datePointage,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureEntree,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureSortie,
+            @RequestParam(required = false) String commentaire,
+            RedirectAttributes ra) {
+        try {
+            service.enregistrerPointage(id, employeId, datePointage, heureEntree, heureSortie, commentaire);
+            ra.addFlashAttribute("succes", "Pointage enregistré et calculé.");
+        } catch (RuntimeException e) {
+            ra.addFlashAttribute("erreur", e.getMessage());
+        }
+        return "redirect:/temps-travail/pointages";
     }
 }
