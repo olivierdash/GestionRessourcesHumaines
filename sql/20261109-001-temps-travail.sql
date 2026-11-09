@@ -38,3 +38,21 @@ CREATE TABLE IF NOT EXISTS affectation_planning (
 
 CREATE INDEX IF NOT EXISTS idx_affectation_planning_employe
     ON affectation_planning(id_employer, date_debut);
+
+CREATE TABLE IF NOT EXISTS pointage (
+    id_pointage SERIAL PRIMARY KEY,
+    id_employer INTEGER NOT NULL REFERENCES employer(id_employer),
+    date_pointage DATE NOT NULL,
+    heure_entree TIME,
+    heure_sortie TIME,
+    minutes_travaillees INTEGER NOT NULL DEFAULT 0 CHECK (minutes_travaillees >= 0),
+    minutes_retard INTEGER NOT NULL DEFAULT 0 CHECK (minutes_retard >= 0),
+    minutes_supplementaires INTEGER NOT NULL DEFAULT 0 CHECK (minutes_supplementaires >= 0),
+    commentaire VARCHAR(500),
+    CONSTRAINT uq_pointage_employe_date UNIQUE (id_employer, date_pointage),
+    CONSTRAINT ck_pointage_heures CHECK (
+        heure_entree IS NULL OR heure_sortie IS NULL OR heure_sortie > heure_entree
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_pointage_date ON pointage(date_pointage);

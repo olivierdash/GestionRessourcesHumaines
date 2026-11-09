@@ -28,6 +28,8 @@ Le dossier poste dans templates
  show.html
 
  ## BLOC 6
+ Definir horaires,planning et régime de travail .
+
  A creer:
  Dans modele: -Regimetravail.java
  -HoraireTravail.java
@@ -64,4 +66,18 @@ Le dossier poste dans templates
 
 Creation de base sql:
  20261109-001-temps-travail.sql.
+
+
+ Gestion de pointage
+ A creer:
+ Dans model: Pointage.java
+ Dans repository: PointageRepository.java
+ Dans le dossier temps-travail:pointage-form.html
+ pointages.html
+
+ Routes ajouter dans TempsTravailController.java
+ Base creer:ajout de la table pointage
+
+ Un lien pointage ajouter dans le sidebar.html
+
  
