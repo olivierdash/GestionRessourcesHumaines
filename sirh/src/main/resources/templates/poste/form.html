@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <div>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight"
+                th:text="${poste.idPoste == null ? 'Nouveau poste' : 'Modifier le poste'}">
+            </h2>
+        </div>
+
+        <div th:if="${error}"
+            class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm"
+            th:text="${error}"></div>
+
+        <div th:if="${errorMessage}"
+            class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm"
+            th:text="${errorMessage}"></div>
+
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="p-6 md:p-8">
+                <form method="post"
+                    th:action="${poste.idPoste == null} ? @{/postes} : @{/postes/{id}(id=${poste.idPoste})}"
+                    th:object="${poste}" class="flex flex-col gap-5">
+
+                    <div>
+                        <label for="intitule"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Intitulé du poste <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="intitule" th:field="*{intitule}" required maxlength="255"
+                            class="w-full h-11 px-3 bg-white border rounded text-sm focus:outline-none focus:ring-1 transition-colors"
+                            th:classappend="${errors != null and errors['intitule'] != null ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-cobalt-700'}">
+                        <p th:if="${errors != null and errors['intitule'] != null}"
+                            class="mt-1 text-xs text-red-600 font-semibold" th:text="${errors['intitule']}"></p>
+                    </div>
+
+                    <div>
+                        <label for="departement.idDepartement"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Département <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select id="departement.idDepartement" th:field="*{departement.idDepartement}" required
+                                class="w-full h-11 pl-3 pr-10 bg-white border rounded text-sm focus:outline-none focus:ring-1 transition-colors appearance-none cursor-pointer"
+                                th:classappend="${errors != null and errors['departement.idDepartement'] != null ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-cobalt-700'}">
+                                <option value="">Sélectionner un département</option>
+                                <option th:each="d : ${departements}" th:value="${d.idDepartement}"
+                                    th:text="${d.titre}"></option>
+                            </select>
+                            <p th:if="${errors != null and errors['departement.idDepartement'] != null}"
+                                class="mt-1 text-xs text-red-600 font-semibold"
+                                th:text="${errors['departement.idDepartement']}"></p>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="dateEffet"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Date d'effet
+                        </label>
+                        <input type="date" id="dateEffet" th:field="*{dateEffet}"
+                            class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                    </div>
+
+                    <div>
+                        <label for="lieu.idLieu"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Lieu
+                        </label>
+                        <div class="relative">
+                            <select id="lieu.idLieu" th:field="*{lieu.idLieu}"
+                                class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option value="">— Aucun lieu —</option>
+                                <option th:each="l : ${lieux}" th:value="${l.idLieu}" th:text="${l.libelle}"></option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="dureeHebdo"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Durée hebdomadaire
+                        </label>
+                        <input type="number" id="dureeHebdo" th:field="*{dureeHebdo}" min="1" max="168"
+                            class="w-full h-11 px-3 bg-white border rounded text-sm focus:outline-none focus:ring-1 transition-colors"
+                            th:classappend="${errors != null and errors['dureeHebdo'] != null ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-cobalt-700'}">
+                        <p th:if="${errors != null and errors['dureeHebdo'] != null}"
+                            class="mt-1 text-xs text-red-600 font-semibold" th:text="${errors['dureeHebdo']}"></p>
+                        <div class="mt-1 text-xs text-slate-500 font-medium">Durée en heures par semaine.</div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border mt-2">
+                        <a th:href="@{/postes}"
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
+                            Annuler
+                        </a>
+                        <button type="submit"
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</body>
+
+</html>

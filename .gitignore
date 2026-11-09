@@ -1,4 +1,14 @@
+# ===========================================
+# Divers / OS
+# ===========================================
 HELP.md
+.DS_Store
+Thumbs.db
+*.log
+
+# ===========================================
+# Spring Boot / Maven / Java
+# ===========================================
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -32,12 +42,37 @@ build/
 ### VS Code ###
 .vscode/
 
-### mon environnement de développement ###
+# ===========================================
+# Vue.js / Node
+# ===========================================
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+### Logs npm / yarn / pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+sirh/uploads
+
+
+.env
+
+### Configuration Spring — connexion base de données locale
+
+# ===========================================
+# Environnement de développement personnel
+# ===========================================
 docker-compose.yml
 .devcontainer/**/*
 Dockerfile
 *.sh
 
-### connexion en base de donnée :
-src/main/resources/application.properties
-*.properties
+
+site-public/vite.config.js
+config/*
+uploads/*

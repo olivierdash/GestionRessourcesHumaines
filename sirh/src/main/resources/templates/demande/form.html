@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div>
+        <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight"
+            th:text="${isBrouillon != null} ? 'Modifier la demande' : 'Nouvelle demande'">
+        </h2>
+    </div>
+
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+
+        <div th:if="${errorMessage}"
+             class="p-4 m-6 mb-0 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">error</span>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <div class="p-6 md:p-8">
+            <form th:action="${isBrouillon != null} ? @{/demandes/update} : @{/demandes/create}"
+                  method="post" th:object="${demandeRecrutementForm}"
+                  id="demandeForm" novalidate>
+
+                <input type="hidden" th:field="*{idDemandeRecrutement}" />
+
+                <!-- Poste -->
+                <div class="mb-6">
+                    <label for="posteSearch"
+                           class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                        Poste concerné <span class="text-red-500">*</span>
+                    </label>
+                    <div class="custom-select-wrapper relative">
+                        <input type="text" id="posteSearch"
+                               class="custom-select-search w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                               th:classappend="${errors != null and errors['idPoste'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'"
+                               placeholder="Rechercher..." autocomplete="off" required>
+
+                        <div class="custom-dropdown absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-border rounded shadow-lg z-50 max-h-60 overflow-y-auto"></div>
+
+                        <select class="custom-select-hidden hidden" id="posteSelect" th:field="*{idPoste}" required>
+                            <option value=""></option>
+                            <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
+                                    th:text="${poste.intitule}"></option>
+                        </select>
+                    </div>
+                    <p th:if="${errors != null and errors['idPoste'] != null}"
+                       th:text="${errors['idPoste']}"
+                       class="mt-1 text-xs text-red-500 font-semibold"></p>
+                </div>
+
+                <!-- Grille : Type contrat / Date / Effectif -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+                    <!-- Type de contrat -->
+                    <div>
+                        <label for="idTypeContrat"
+                               class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Type de contrat <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select id="idTypeContrat" th:field="*{idTypeContrat}" required
+                                    class="w-full h-11 pl-3 pr-10 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors appearance-none cursor-pointer"
+                                    th:classappend="${errors != null and errors['idTypeContrat'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                                <option value="">Sélectionner...</option>
+                                <option th:each="tc : ${typesContrats}"
+                                        th:value="${tc.id}"
+                                        th:text="${tc.libelle}"></option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                        <p th:if="${errors != null and errors['idTypeContrat'] != null}"
+                           th:text="${errors['idTypeContrat']}"
+                           class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Date d'entrée -->
+                    <div>
+                        <label for="dateSouhaitee"
+                               class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Date d'entrée <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="dateSouhaitee" th:field="*{dateSouhaitee}" required
+                               th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                               class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                               th:classappend="${errors != null and errors['dateSouhaitee'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                        <p th:if="${errors != null and errors['dateSouhaitee'] != null}"
+                           th:text="${errors['dateSouhaitee']}"
+                           class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Effectif -->
+                    <div>
+                        <label for="effectif"
+                               class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Effectif requis <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" id="effectif" th:field="*{effectif}" min="1" required
+                               class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                               th:classappend="${errors != null and errors['effectif'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                        <p th:if="${errors != null and errors['effectif'] != null}"
+                           th:text="${errors['effectif']}"
+                           class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+                </div>
+
+                <!-- Motif -->
+                <div class="mb-8">
+                    <label for="idMotif"
+                           class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                        Motif de la demande <span class="text-red-500">*</span>
+                    </label>
+                    <select id="idMotif" th:field="*{motif.idMotifDemande}" required
+                            class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors cursor-pointer"
+                            th:classappend="${errors != null and errors['motif'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                        <option value="" disabled>Sélectionnez un motif...</option>
+                        <option th:each="motif : ${motifs}"
+                                th:value="${motif.idMotifDemande}"
+                                th:text="${motif.libelle}"></option>
+                    </select>
+                    <p th:if="${errors != null and errors['motif'] != null}"
+                       th:text="${errors['motif']}"
+                       class="mt-1 text-xs text-red-500 font-semibold"></p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border">
+                    <button type="submit" name="action" value="save"
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm">
+                        Enregistrer le brouillon
+                    </button>
+                    <button type="submit" name="action" value="submit"
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm"
+                            th:text="${isBrouillon != null} ? 'Mettre à jour et Soumettre' : 'Soumettre la demande'">
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById('posteSearch');
+            const hiddenSelect = document.getElementById('posteSelect');
+            const effectifInput = document.getElementById('effectif');
+            const dateInput = document.getElementById('dateSouhaitee');
+            const typeContratSelect = document.getElementById('idTypeContrat');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    if (hiddenSelect.value !== "") {
+                        searchInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                    }
+                });
+            }
+
+            if (effectifInput) {
+                effectifInput.addEventListener('input', () => {
+                    if (parseInt(effectifInput.value, 10) > 0) {
+                        effectifInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                    }
+                });
+            }
+
+            if (dateInput) {
+                dateInput.addEventListener('input', () => {
+                    if (dateInput.value) {
+                        dateInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                    }
+                });
+            }
+
+            if (typeContratSelect) {
+                typeContratSelect.addEventListener('change', () => {
+                    if (typeContratSelect.value !== '') {
+                        typeContratSelect.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                    }
+                });
+            }
+        });
+    </script>
+
+</main>
+</body>
+</html>

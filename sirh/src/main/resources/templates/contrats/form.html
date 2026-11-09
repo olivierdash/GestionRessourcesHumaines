@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <!-- Titre -->
+        <div>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight" 
+                th:text="${ancien != null ? 'Renouveler le contrat' : 'Nouveau contrat'}">
+            </h2>
+        </div>
+
+        <!-- Message d'erreur -->
+        <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+
+        <!-- Formulaire -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="p-6 md:p-8">
+                <form  th:action="${ancien != null}
+                                ? @{/contrats/{idc}/renouveler(idc=${ancien.idContract})}
+                                : @{/contrats/employe/{id}(id=${idEmploye})}"
+                      method="post" class="flex flex-col gap-5">
+
+                    <!-- Type de contrat -->
+                    <div>
+                        <label for="idTypeContrat" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Type de contrat</label>
+                        <div class="relative">
+                            <select name="idTypeContrat" id="idTypeContrat" required
+                                    class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option th:each="t : ${types}"
+                                        th:value="${t.idTypeContrat}"
+                                        th:text="${t.libelle}"
+                                        th:selected="${ancien != null and ancien.typeContrat.idTypeContrat == t.idTypeContrat}">
+                                </option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+
+                    <!-- Poste -->
+                    <div>
+                        <label for="idPoste" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Poste</label>
+                        <div class="relative">
+                            <select name="idPoste" id="idPoste" required
+                                    class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option th:each="p : ${postes}"
+                                        th:value="${p.idPoste}"
+                                        th:text="${p.intitule}"
+                                        th:selected="${ancien != null and ancien.poste.idPoste == p.idPoste}">
+                                </option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label for="dateDebut" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Date de début</label>
+                            <input type="date" id="dateDebut" name="dateDebut" required
+                                   class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                        </div>
+                        <div>
+                            <label for="dateFin" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Date de fin (CDD)</label>
+                            <input type="date" id="dateFin" name="dateFin"
+                                   class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                        </div>
+                    </div>
+
+                    <!-- Salaire -->
+                    <div>
+                        <label for="salaireMensuel" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire mensuel (€)</label>
+                        <input type="number" step="0.01" id="salaireMensuel" name="salaireMensuel" required
+                               th:value="${ancien != null ? ancien.salaireMensuel : ''}"
+                               class="w-full h-11 px-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors placeholder:text-slate-400">
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border mt-2">
+                        <a th:href="@{/contrats/employe/{id}(id=${idEmploye})}" 
+                           class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
+                            Annuler
+                        </a>
+                        <button type="submit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRH Pro - Connexion sécurisée</title>
+
+    <!-- 1. Tailwind CSS -->
+    <script th:src="@{/js/tailwind.js}"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cobalt: {
+                            950: "#0f172a", 900: "#1e3a8a", 800: "#1e40af",
+                            700: "#1d4ed8", 600: "#2563eb", 500: "#3b82f6", 50: "#eff6ff"
+                        },
+                        "neutral-border": "#e2e8f0",
+                        "surface-bg": "#f8fafc",
+                        "surface-card": "#ffffff",
+                        "body-text": "#1e293b",
+                        "muted-text": "#64748b"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.125rem",
+                        lg: "0.25rem",
+                        xl: "0.375rem",
+                        full: "0.5rem"
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+
+</head>
+
+<body class="bg-surface-bg h-full font-sans antialiased text-body-text">
+
+    <!-- Conteneur des messages Spring Security (flottants) -->
+    <div class="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-md z-50 pointer-events-none px-4">
+        <div th:if="${param.error}"
+            class="bg-red-50 border border-red-200 text-red-800 rounded p-3 text-center text-sm font-semibold shadow-sm alert-floating auto-dismiss-alert">
+            Email ou mot de passe incorrect.
+        </div>
+        <div th:if="${param.logout}"
+            class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded p-3 text-center text-sm font-semibold shadow-sm alert-floating auto-dismiss-alert">
+            Vous avez été déconnecté avec succès.
+        </div>
+    </div>
+
+    <!-- WRAPPER DE CENTRAGE -->
+    <div class="flex justify-center items-center min-h-screen w-full p-4">
+
+        <!-- La Carte (Card) du formulaire -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border w-full max-w-md p-8">
+
+            <!-- En-tête -->
+            <div class="mb-8 text-center">
+                <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight mb-2">Connexion</h1>
+                <p class="text-sm text-slate-600">Accédez à votre espace RH sécurisé.</p>
+            </div>
+
+            <!-- Formulaire -->
+            <form th:action="@{/login}" method="post" id="loginForm" class="space-y-5">
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                        Adresse email <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">mail</span>
+                        <input type="email" id="email" name="email" required autofocus
+                            class="w-full h-11 pl-10 pr-4 bg-white border border-slate-300 rounded text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors"
+                            placeholder="prenom.nom@entreprise.com" value="rh@sirh.com">
+                    </div>
+                </div>
+
+                <!-- Mot de passe -->
+                <!-- Mot de passe -->
+                <div>
+                    <label for="motDePasse"
+                        class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                        Mot de passe <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">lock</span>
+                        <input type="password" id="motDePasse" name="motDePasse" required
+                            class="w-full h-11 pl-10 pr-11 bg-white border border-slate-300 rounded text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors"
+                            placeholder="••••••••••••" value="password123">
+                        <button type="button" id="togglePassword" title="Afficher le mot de passe"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-slate-400 hover:text-cobalt-800 transition-colors">
+                            <span id="togglePasswordIcon"
+                                class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bouton -->
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full h-11 bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs rounded flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        Se connecter
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT : Disparition des alertes -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const alerts = document.querySelectorAll('.auto-dismiss-alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.add('alert-fade-out');
+                    setTimeout(() => { alert.remove(); }, 500);
+                }, 3500);
+            });
+            const input = document.getElementById('motDePasse');
+            const btn = document.getElementById('togglePassword');
+            const icon = document.getElementById('togglePasswordIcon');
+
+            btn.addEventListener('click', function () {
+                const visible = input.type === 'text';
+                input.type = visible ? 'password' : 'text';
+                icon.textContent = visible ? 'visibility' : 'visibility_off';
+                btn.title = visible ? 'Afficher le mot de passe' : 'Masquer le mot de passe';
+            });
+        });
+    </script>
+
+</body>
+
+</html>

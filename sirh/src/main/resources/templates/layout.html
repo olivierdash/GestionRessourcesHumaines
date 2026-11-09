@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr"
+    th:fragment="layout(content)">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SIRH Pro</title>
+
+    <script th:src="@{/js/tailwind.js}"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cobalt: {
+                            950: "#0f172a", 900: "#1e3a8a", 800: "#1e40af",
+                            700: "#1d4ed8", 600: "#2563eb", 500: "#3b82f6", 50: "#eff6ff"
+                        },
+                        "neutral-border": "#e2e8f0",
+                        "surface-bg": "#f8fafc",
+                        "surface-card": "#ffffff",
+                        "body-text": "#1e293b",
+                        "muted-text": "#64748b"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.125rem",
+                        lg: "0.25rem",
+                        xl: "0.375rem",
+                        full: "0.5rem"
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script th:src="@{/js/custom-select.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+
+    <style>
+        #sidebar {
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+
+        #main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-collapsed #sidebar {
+            width: 4.5rem;
+        }
+
+        body.sidebar-collapsed #main-content {
+            margin-left: 4.5rem;
+        }
+
+        body.sidebar-collapsed .sidebar-text {
+            display: none;
+        }
+
+        body.sidebar-collapsed .sidebar-header-text {
+            display: none;
+        }
+
+        body.sidebar-collapsed #sidebar-toggle {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        body.sidebar-collapsed .sidebar-nav-link {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+            border-left-width: 0;
+            margin: 0 0.5rem;
+        }
+
+        body.sidebar-collapsed .sidebar-profile-text,
+        body.sidebar-collapsed .sidebar-logout-btn {
+            display: none;
+        }
+
+        body.sidebar-collapsed .sidebar-profile-container {
+            padding: 0.5rem;
+            justify-content: center;
+        }
+
+        .nav-link-active {
+            background-color: #f1f5f9 !important;
+            color: #1e3a8a !important;
+            font-weight: 600 !important;
+            border-left-color: #1e40af !important;
+        }
+
+        .nav-link-active .material-symbols-outlined {
+            color: #1e40af !important;
+        }
+
+        .submenu-toggle.submenu-open .submenu-chevron {
+            transform: rotate(180deg);
+        }
+
+        body.sidebar-collapsed [data-submenu] {
+            display: none !important;
+        }
+
+        body.sidebar-collapsed .submenu-chevron {
+            display: none !important;
+        }
+
+        body.sidebar-collapsed .submenu-toggle {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+            border-left-width: 0;
+            margin: 0 0.5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-surface-bg font-sans text-sm text-body-text antialiased h-screen overflow-hidden">
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div id="main-content" class="ml-64 flex flex-col h-screen min-h-0">
+
+        <header
+            class="h-14 shrink-0 bg-surface-card border-b border-neutral-border z-40 px-4 flex items-center justify-end">
+            <div class="flex items-center gap-4">
+                <button
+                    class="w-9 h-9 flex items-center justify-center border border-neutral-border rounded text-slate-700 hover:bg-slate-50 hover:text-cobalt-900 transition-colors relative"
+                    type="button">
+                    <span class="material-symbols-outlined text-[20px]">notifications</span>
+                    <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-600 ring-2 ring-white"></span>
+                </button>
+                <div class="h-5 w-px bg-neutral-border"></div>
+                <div
+                    class="w-8 h-8 bg-cobalt-900 text-white flex items-center justify-center rounded border border-cobalt-950 font-semibold">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 min-h-0 overflow-y-auto bg-surface-bg">
+            <div class="max-w-7xl mx-auto w-full p-4 md:p-6 flex flex-col gap-6">
+                <div th:replace="~{fragments/breadcrumb :: breadcrumb}"></div>
+                <div th:replace="${content}"></div>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const body = document.body;
+
+            if (localStorage.getItem('sidebarState') === 'collapsed') {
+                body.classList.add('sidebar-collapsed');
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                body.classList.toggle('sidebar-collapsed');
+                if (body.classList.contains('sidebar-collapsed')) {
+                    localStorage.setItem('sidebarState', 'collapsed');
+                } else {
+                    localStorage.setItem('sidebarState', 'expanded');
+                }
+            });
+
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('.sidebar-nav-link');
+
+            links.forEach(link => {
+                const path = link.getAttribute('data-path');
+                if (!path) return;
+
+                let isActive = false;
+
+                if (currentPath === '/' && path === '/utilisateur') {
+                    isActive = true;
+                }
+                else if (path === '/demandes' && currentPath.startsWith('/demandes/validations')) {
+                    isActive = false;
+                }
+                else if (currentPath.startsWith(path)) {
+                    isActive = true;
+                }
+
+                if (isActive) {
+                    link.classList.add('nav-link-active');
+                }
+            });
+
+            (function autoOpenSubmenu() {
+                const currentPath = window.location.pathname;
+
+                document.querySelectorAll('[data-submenu]').forEach(function (submenu) {
+                    const subLinks = submenu.querySelectorAll('.sidebar-nav-link[data-path]');
+                    let shouldOpen = false;
+
+                    subLinks.forEach(function (link) {
+                        const path = link.getAttribute('data-path');
+                        if (path && currentPath.startsWith(path)) {
+                            shouldOpen = true;
+                        }
+                    });
+
+                    if (shouldOpen) {
+                        submenu.classList.remove('hidden');
+                        const toggle = document.querySelector(
+                            '[data-submenu-target="' + submenu.dataset.submenu + '"]'
+                        );
+                        if (toggle) toggle.classList.add('submenu-open');
+                    }
+                });
+            })();
+
+            document.querySelectorAll('[data-submenu-target]').forEach(function (toggle) {
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.dataset.submenuTarget;
+                    const items = document.querySelector('[data-submenu="' + targetId + '"]');
+                    if (!items) return;
+
+                    if (document.body.classList.contains('sidebar-collapsed')) {
+                        document.body.classList.remove('sidebar-collapsed');
+                        localStorage.setItem('sidebarState', 'expanded');
+                        this.classList.add('submenu-open');
+                        items.classList.remove('hidden');
+                        return;
+                    }
+
+                    const isOpen = this.classList.toggle('submenu-open');
+                    items.classList.toggle('hidden', !isOpen);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <!-- En-tête -->
+        <div>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Mes validations en attente</h2>
+            <p class="text-sm text-slate-600 mt-1">
+                Demandes de recrutement nécessitant votre approbation en tant que <strong th:text="${role}"
+                    class="text-cobalt-800"></strong>.
+            </p>
+        </div>
+
+        <!-- Tableau -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Réf.</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Département</th>
+                            <th scope="col">Manager</th>
+                            <th scope="col" class="text-center">Effectif</th>
+                            <th th:if="${role == 'FINANCE'}" scope="col">Faisabilité (Grille)</th>
+                            <th scope="col" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ligne vide -->
+                        <tr th:if="${demandes.isEmpty()}">
+                            <td colspan="8" class="py-12 text-center text-slate-500">
+                                <span class="material-symbols-outlined text-[48px] text-emerald-500 mb-2 block">check_circle</span>
+                                <p class="m-0 font-medium">Aucune demande en attente. Vous êtes à jour !</p>
+                            </td>
+                        </tr>
+
+                        <!-- Boucle -->
+                        <tr th:each="demande : ${demandes}">
+                            <td class="whitespace-nowrap">
+                                <a th:href="@{/demandes/{id}(id=${demande.idDemandeRecrutement})}"
+                                    class="font-mono font-bold text-cobalt-800 hover:underline">
+                                    #<span th:text="${demande.idDemandeRecrutement}"></span>
+                                </a>
+                            </td>
+                            <td class="text-slate-600 font-mono whitespace-nowrap"
+                                th:text="${#temporals.format(demande.dateCreation, 'dd/MM/yyyy')}"></td>
+                            <td class="font-bold text-cobalt-900" th:text="${demande.poste.intitule}"></td>
+                            <td class="text-slate-600" th:text="${demande.poste.departement.titre}"></td>
+                            <td class="text-slate-600" th:text="${demande.manager.nom}"></td>
+                            <td class="text-center whitespace-nowrap">
+                                <span class="px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-full"
+                                    th:text="${demande.effectif} + ' poste(s)'"></span>
+                            </td>
+
+                            <!-- Finance -->
+                            <td th:if="${role == 'FINANCE'}">
+                                <div th:with="grille=${grilles.get(demande.idDemandeRecrutement)}">
+                                    <div th:if="${grille != null}" class="flex flex-col items-start gap-1">
+                                        <span class="px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded">Budget prévu</span>
+                                        <small class="text-slate-500 text-xs">
+                                            Entre <strong th:text="${#numbers.formatDecimal(grille.salaireMin, 0, 'COMMA', 2, 'POINT')}"></strong>
+                                            et <strong th:text="${#numbers.formatDecimal(grille.salaireMax, 0, 'COMMA', 2, 'POINT')}"></strong> €
+                                        </small>
+                                    </div>
+                                    <div th:if="${grille == null}">
+                                        <span class="px-2 py-0.5 bg-red-50 border border-red-200 text-red-700 text-[10px] font-bold uppercase tracking-wider rounded flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[14px]">warning</span> Grille introuvable
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="text-right whitespace-nowrap">
+                                <div class="flex justify-end items-center gap-2">
+                                    <button type="button"
+                                        th:onclick="|openDecisionModal(${demande.idDemandeRecrutement}, 'refuser')|"
+                                        class="h-7 px-3 rounded bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 font-semibold text-xs transition-colors flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">close</span> Refuser
+                                    </button>
+                                    <button type="button"
+                                        th:onclick="|openDecisionModal(${demande.idDemandeRecrutement}, 'valider')|"
+                                        class="h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors flex items-center gap-1 shadow-sm">
+                                        <span class="material-symbols-outlined text-[14px]">check</span> Valider
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODAL DE DÉCISION -->
+        <div id="decisionModal"
+            class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all">
+            <div class="bg-surface-card w-full max-w-lg rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col transform transition-transform scale-95"
+                id="modalContent">
+
+                <div class="px-5 py-3 border-b border-neutral-border flex items-center justify-between bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider" id="decisionModalLabel">Confirmer la décision</h3>
+                    <button type="button" onclick="closeDecisionModal()"
+                        class="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+
+                <form id="decisionForm" method="post" th:action="@{/demandes/update}" class="p-5 flex flex-col gap-4">
+                    <p id="modalMessage" class="font-bold text-sm text-slate-800"></p>
+
+                    <div>
+                        <label for="modalRemarque" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Remarque <span class="text-red-500">*</span></label>
+                        <textarea name="remarque" id="modalRemarque" rows="3" required
+                            placeholder="Précisez la raison de votre décision..."
+                            class="w-full p-3 rounded bg-white border border-neutral-border text-slate-800 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors"></textarea>
+                    </div>
+
+                    <input type="hidden" name="action" id="modalAction" value="">
+
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeDecisionModal()"
+                            class="h-9 px-4 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors">
+                            Annuler
+                        </button>
+                        <button type="submit" id="modalSubmitBtn"
+                            class="h-9 px-4 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors shadow-sm">
+                            Confirmer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SCRIPT JS POUR LE MODAL -->
+        <script>
+            const modal = document.getElementById('decisionModal');
+            const modalContent = document.getElementById('modalContent');
+            const form = document.getElementById('decisionForm');
+            const title = document.getElementById('decisionModalLabel');
+            const message = document.getElementById('modalMessage');
+            const actionInput = document.getElementById('modalAction');
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            const remarqueInput = document.getElementById('modalRemarque');
+
+            function openDecisionModal(idDemande, action) {
+                form.action = '/demandes/update/' + idDemande;
+                actionInput.value = action;
+                remarqueInput.value = '';
+
+                if (action === 'valider') {
+                    title.textContent = 'Valider la demande #' + idDemande;
+                    message.className = 'font-bold text-sm text-emerald-600';
+                    message.textContent = 'Vous êtes sur le point de valider cette demande.';
+                    submitBtn.className = 'h-9 px-4 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors shadow-sm';
+                    submitBtn.textContent = 'Confirmer la validation';
+                } else if (action === 'refuser') {
+                    title.textContent = 'Refuser la demande #' + idDemande;
+                    message.textContent = 'Vous êtes sur le point de refuser cette demande.';
+                    message.className = 'font-bold text-sm text-red-600';
+                    submitBtn.className = 'h-9 px-4 rounded bg-red-600 text-white hover:bg-red-700 font-semibold text-xs transition-colors shadow-sm';
+                    submitBtn.textContent = 'Confirmer le refus';
+                }
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95');
+                    modalContent.classList.add('scale-100');
+                }, 10);
+            }
+
+            function closeDecisionModal() {
+                modalContent.classList.remove('scale-100');
+                modalContent.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 150);
+            }
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeDecisionModal();
+            });
+        </script>
+
+    </main>
+</body>
+</html>

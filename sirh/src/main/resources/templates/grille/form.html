@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <!-- En-tête -->
+        <div>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight"
+                th:text="${grille.idGrille == null ? 'Nouvelle grille salariale' : 'Modifier la grille salariale'}">
+            </h2>
+        </div>
+
+        <!-- Bandeau d'erreur global -->
+        <div th:if="${errorMessage}"
+            class="p-4 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">error</span>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="p-6 md:p-8">
+                <form method="post"
+                    th:action="${grille.idGrille == null} ? @{/grilles} : @{/grilles/{id}(id=${grille.idGrille})}"
+                    th:object="${grille}" class="flex flex-col gap-5">
+
+                    <!-- Poste -->
+                    <div>
+                        <label for="poste"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Poste <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select th:field="*{poste.idPoste}" id="poste" required
+                                class="w-full h-11 pl-3 pr-10 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors appearance-none cursor-pointer"
+                                th:classappend="${errors != null and errors['poste.idPoste'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                                <option value="">Sélectionner un poste</option>
+                                <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
+                                    th:text="${poste.intitule + ' (' + poste.departement.titre + ')'}">
+                                </option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                        <p th:if="${errors != null and errors['poste.idPoste'] != null}"
+                            th:text="${errors['poste.idPoste']}" class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Salaire Min -->
+                    <div>
+                        <label for="salaireMin"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire
+                            minimum (€) <span class="text-red-500">*</span></label>
+                        <input type="number" th:field="*{salaireMin}" id="salaireMin" step="0.01" min="0" required
+                            class="w-full h-11 px-3 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors placeholder:text-slate-400"
+                            th:classappend="${errors != null and errors['salaireMin'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                        <p th:if="${errors != null and errors['salaireMin'] != null}" th:text="${errors['salaireMin']}"
+                            class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Salaire Max -->
+                    <div>
+                        <label for="salaireMax"
+                            class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire
+                            maximum (€) <span class="text-red-500">*</span></label>
+                        <input type="number" th:field="*{salaireMax}" id="salaireMax" step="0.01" min="0" required
+                            class="w-full h-11 px-3 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors placeholder:text-slate-400"
+                            th:classappend="${errors != null and errors['salaireMax'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                        <p th:if="${errors != null and errors['salaireMax'] != null}" th:text="${errors['salaireMax']}"
+                            class="mt-1 text-xs text-red-500 font-semibold"></p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border mt-2">
+                        <a th:href="@{/grilles}"
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
+                            Annuler
+                        </a>
+                        <button type="submit"
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</body>
+
+</html>
