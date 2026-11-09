@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS roles CASCADE;
 DROP TABLE IF EXISTS candidat CASCADE;
 DROP TABLE IF EXISTS etat_demande CASCADE;
 DROP TABLE IF EXISTS motif_demande CASCADE;
+DROP TABLE IF EXISTS statut_demande_recrutement CASCADE;
 DROP TABLE IF EXISTS statut_offre_emploie CASCADE;
 DROP TABLE IF EXISTS statut_candidature CASCADE;
 DROP TABLE IF EXISTS statut_proposition CASCADE;
@@ -35,7 +36,7 @@ DROP TABLE IF EXISTS type_notification CASCADE;
 DROP TABLE IF EXISTS type_document CASCADE;
 
 -- ============================================================
--- 2. TABLES DE RÉFÉRENCE (STATUTS & TYPES)
+-- 2. TABLES DE RÉFÉRENCE
 -- ============================================================
 CREATE TABLE type_notification (id_type_notification SERIAL PRIMARY KEY, libelle VARCHAR(50) NOT NULL UNIQUE);
 CREATE TABLE type_evaluation (id_type_evaluation SERIAL PRIMARY KEY, libelle VARCHAR(50) NOT NULL UNIQUE);
@@ -45,6 +46,7 @@ CREATE TABLE statut_proposition (id_statut_proposition SERIAL PRIMARY KEY, libel
 CREATE TABLE statut_offre_emploie (id_statut_offre_emploie SERIAL PRIMARY KEY, libelle VARCHAR(50) NOT NULL UNIQUE);
 CREATE TABLE etat_demande (id_etat_demande SERIAL PRIMARY KEY, intitule VARCHAR(100) NOT NULL UNIQUE);
 CREATE TABLE motif_demande (id_motif_demande SERIAL PRIMARY KEY, libelle VARCHAR(100) NOT NULL UNIQUE);
+CREATE TABLE statut_demande_recrutement (id_statut_demande_recrutement SERIAL PRIMARY KEY, libelle VARCHAR(50) NOT NULL UNIQUE);
 CREATE TABLE statut_contrat (id_statut_contrat SERIAL PRIMARY KEY, libelle VARCHAR(50) NOT NULL UNIQUE);
 CREATE TABLE statut_tache_onboarding (id_statut_tache_onboarding SERIAL PRIMARY KEY, libelle VARCHAR(50) NOT NULL UNIQUE);
 CREATE TABLE type_document (id_type_document SERIAL PRIMARY KEY, libelle VARCHAR(50) NOT NULL UNIQUE);
@@ -99,7 +101,7 @@ CREATE TABLE grille_salarial (
 );
 
 -- ============================================================
--- 4. BLOC 1 : DEMANDE ET WORKFLOW (MIS À JOUR)
+-- 4. BLOC 1 : DEMANDE ET WORKFLOW
 -- ============================================================
 CREATE TABLE demande_recrutement (
     id_demande_recrutement SERIAL PRIMARY KEY,
@@ -108,13 +110,15 @@ CREATE TABLE demande_recrutement (
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_souhaitee DATE,
     effectif INTEGER NOT NULL,
-    id_etat_demande INTEGER NOT NULL, -- Remplacé par le coéquipier
-    id_motif_demande INTEGER NOT NULL, -- Remplacé par le coéquipier
+    id_etat_demande INTEGER NOT NULL,
+    id_motif_demande INTEGER NOT NULL,
+    id_statut_demande_recrutement INTEGER NOT NULL, -- Doublon gardé pour la sécurité
     commentaires TEXT,
     FOREIGN KEY (id_manager) REFERENCES utilisateur(id_utilisateur),
     FOREIGN KEY (id_poste) REFERENCES poste(id_poste),
     FOREIGN KEY (id_etat_demande) REFERENCES etat_demande(id_etat_demande),
-    FOREIGN KEY (id_motif_demande) REFERENCES motif_demande(id_motif_demande)
+    FOREIGN KEY (id_motif_demande) REFERENCES motif_demande(id_motif_demande),
+    FOREIGN KEY (id_statut_demande_recrutement) REFERENCES statut_demande_recrutement(id_statut_demande_recrutement)
 );
 
 CREATE TABLE historique_demande_recrutement (
@@ -138,7 +142,8 @@ CREATE TABLE candidat (
     prenom VARCHAR(255) NOT NULL,
     telephone VARCHAR(20),
     email VARCHAR(255) UNIQUE NOT NULL,
-    cv_url VARCHAR(500)
+    cv_url VARCHAR(500),
+    mot_de_passe VARCHAR(255)
 );
 
 CREATE TABLE offre_emploi (
@@ -193,7 +198,7 @@ CREATE TABLE proposition_embauche (
     date_expiration TIMESTAMP NOT NULL,
     id_statut_proposition INT NOT NULL,
     date_decision TIMESTAMP,
-    remarque TEXT, -- Ajout coéquipier
+    remarque TEXT,
     FOREIGN KEY (id_candidature) REFERENCES candidature(id_candidature),
     FOREIGN KEY (id_statut_proposition) REFERENCES statut_proposition(id_statut_proposition)
 );
@@ -217,18 +222,32 @@ CREATE TABLE validation_proposition (
 CREATE TABLE employer (
     id_employer SERIAL PRIMARY KEY,
     id_candidature INTEGER UNIQUE NOT NULL,
-    matricule VARCHAR(50) UNIQUE NOT NULL,
+    matricule VARCHAR(50) UNIQUE,
     hiring_date DATE NOT NULL,
     status_employer VARCHAR(50) NOT NULL,
     FOREIGN KEY (id_candidature) REFERENCES candidature(id_candidature)
 );
+
+CREATE SEQUENCE IF NOT EXISTS matricule_seq START 1;
+CREATE OR REPLACE FUNCTION set_matricule_on_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.matricule IS NULL THEN
+        NEW.matricule := 'EMP-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || LPAD(nextval('matricule_seq')::text, 4, '0');
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_set_matricule
+BEFORE INSERT ON employer
+FOR EACH ROW EXECUTE FUNCTION set_matricule_on_insert();
 
 CREATE TABLE contract (
     id_contract SERIAL PRIMARY KEY,
     id_employer INTEGER NOT NULL,
     id_poste INTEGER NOT NULL,
     id_type_contrat INTEGER NOT NULL,
-    id_statut_contrat INTEGER NOT NULL, -- Remplace "status"
+    id_statut_contrat INTEGER NOT NULL,
     date_debut DATE NOT NULL,
     date_fin DATE,
     salaire_mensuel NUMERIC(10,2) NOT NULL,
