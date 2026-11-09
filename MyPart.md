@@ -1,93 +1,215 @@
-## Referentiel des postes;
+# Suivi de ma partie du projet
 
-A completer :
-PosteRepository
-PosteMissionRepository
+## 1. Référentiel des postes
 
--A creer:
-PosteReferentielService
-PosteController
+### Éléments à compléter
 
-Le dossier poste dans templates
- -index.html
- -form.html
- -show.html
+- `PosteRepository`
+- `PosteMissionRepository`
 
- ## Grille salariale
+### Éléments à créer
 
- A completer:
- GrilleSalarialeRepository
+- `PosteReferentielService`
+- `PosteController`
 
- A creer:
- GrilleSalarialeService
- GrilleSalarialController
+### Vues associées
 
- Le dossier grille:
- index.html
- form.html
- show.html
+Dossier : `sirh/src/main/resources/templates/poste/`
 
- ## BLOC 6
- Definir horaires,planning et régime de travail .
+- `index.html`
+- `form.html`
+- `show.html`
 
- A creer:
- Dans modele: -Regimetravail.java
- -HoraireTravail.java
- -Planning.java
- AffectaionPlanning.java
+---
 
- Dans repository:
- -RegimeTravailRepository.java
- -PlanningRepository.java
- -AffectationPlanningRepository.java
+## 2. Grille salariale
 
- Dans service:
- -TempsTravailService.java
+### Éléments à compléter
 
- Dans Controller:
- -TempstravailController.java()
+- `GrilleSalarialeRepository`
 
- Dossier : temps-travail:
- -regimes.html
- -regime-form.html
- -plannings.html
- -plamming-form.html
- planning-detail.html
+### Éléments à créer
 
- A ajouter :
- Dans EmployeService.java:getAllEmployesList()
- Dans SecurityConfig.java:.requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
+- `GrilleSalarialeService`
+- `GrilleSalarialController`
 
- Dans le sidebar.html:
--le sous-menu Configuration est désormais visible pour RH et DG ;
--ajout du lien Temps de travail ;
--ajout du lien Plannings ;
--ajout des icônes correspondantes.
+### Vues associées
 
-Creation de base sql:
- 20261109-001-temps-travail.sql.
+Dossier : `sirh/src/main/resources/templates/grille/`
 
+- `index.html`
+- `form.html`
+- `show.html`
 
- Gestion de pointage
- A creer:
- Dans model: Pointage.java
- Dans repository: PointageRepository.java
- Dans le dossier temps-travail:pointage-form.html
- pointages.html
+---
 
- Routes ajouter dans TempsTravailController.java
- Base creer:ajout de la table pointage
+## 3. Bloc 6 — Temps de travail et planning
 
- Un lien pointage ajouter dans le sidebar.html
+### 3.1 Régimes, horaires et plannings
 
- Temps reel pour le travail
+#### Modèles
 
- Temps de présence = Heure de sortie - Heure d’entrée
+- `RegimeTravail.java`
+- `HoraireTravail.java`
+- `Planning.java`
+- `AffectationPlanning.java`
+
+#### Repositories
+
+- `RegimeTravailRepository.java`
+- `PlanningRepository.java`
+- `AffectationPlanningRepository.java`
+
+#### Service
+
+- `TempsTravailService.java`
+
+#### Contrôleur
+
+- `TempsTravailController.java`
+
+#### Vues
+
+Dossier : `sirh/src/main/resources/templates/temps-travail/`
+
+- `regimes.html`
+- `regime-form.html`
+- `plannings.html`
+- `planning-form.html`
+- `planning-detail.html`
+
+### 3.2 Intégration dans l’application
+
+- Ajout de `getAllEmployesList()` dans `EmployeService.java`.
+- Ajout de la règle de sécurité dans `SecurityConfig.java` :
+
+```java
+.requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
+```
+
+- Modification de `sidebar.html` :
+  - affichage du sous-menu Configuration pour les rôles RH et DG ;
+  - ajout du lien « Temps de travail » ;
+  - ajout du lien « Plannings » ;
+  - ajout des icônes correspondantes.
+
+### 3.3 Migration de base de données
+
+Fichier créé :
+
+- `sql/20261109-001-temps-travail.sql`
+
+Cette migration crée les tables nécessaires aux régimes de travail, aux horaires, aux plannings et à leurs affectations.
+
+---
+
+## 4. Gestion des pointages
+
+### 4.1 Fonctionnalités
+
+Le module permet de :
+
+- enregistrer l’heure d’entrée ;
+- enregistrer l’heure de sortie ;
+- calculer le temps de présence ;
+- calculer le temps réellement travaillé ;
+- détecter les retards ;
+- calculer les heures supplémentaires ;
+- consulter et filtrer l’historique des pointages ;
+- modifier un pointage existant.
+
+### 4.2 Modèle et repository
+
+- `Pointage.java`
+- `PointageRepository.java`
+
+Un seul pointage est autorisé par salarié et par date.
+
+### 4.3 Vues
+
+Dossier : `sirh/src/main/resources/templates/temps-travail/`
+
+- `pointage-form.html`
+- `pointages.html`
+
+### 4.4 Contrôleur et routes
+
+Les routes sont gérées dans `TempsTravailController.java` :
+
+```text
+GET  /temps-travail/pointages
+GET  /temps-travail/pointages/nouveau
+GET  /temps-travail/pointages/{id}/edit
+POST /temps-travail/pointages
+```
+
+### 4.5 Intégration dans le menu
+
+Un lien « Pointages » a été ajouté dans `sidebar.html`.
+
+### 4.6 Base de données
+
+La table `pointage` a été ajoutée dans :
+
+- `sql/20261109-001-temps-travail.sql`
+
+Elle contient notamment :
+
+- le salarié concerné ;
+- la date du pointage ;
+- les heures d’entrée et de sortie ;
+- les minutes travaillées ;
+- les minutes de pause ;
+- les minutes de retard ;
+- les minutes supplémentaires ;
+- un commentaire éventuel.
+
+---
+
+## 5. Calcul du temps réellement travaillé
+
+Le calcul tient compte du planning actif et de l’horaire correspondant au jour du pointage.
+
+### Formules utilisées
+
+```text
+Temps de présence = Heure de sortie - Heure d’entrée
 
 Temps réellement travaillé = Temps de présence - Pause prévue
+```
 
-Temps de présence : 540 minutes
-Pause déduite : 60 minutes
-Temps réellement travaillé : 480 minutes
+### Exemple
 
- 
+```text
+Heure d’entrée : 08:00
+Heure de sortie : 17:00
+Pause prévue   : 60 minutes
+```
+
+Résultat :
+
+```text
+Temps de présence            : 540 minutes
+Pause déduite                : 60 minutes
+Temps réellement travaillé   : 480 minutes
+```
+
+Les heures supplémentaires sont calculées à partir du temps réellement travaillé, après déduction de la pause prévue.
+
+---
+
+## 6. Vérification
+
+La compilation du projet a été vérifiée avec :
+
+```bash
+mvn -q -DskipTests compile
+```
+
+La compilation est réussie.
+
+Le test de contexte Spring nécessite toutefois l’exécution préalable de la migration SQL, car le projet utilise :
+
+```properties
+spring.jpa.hibernate.ddl-auto=validate
+```
