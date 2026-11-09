@@ -14,9 +14,15 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     // Mots de passe en clair dans la base (projet de cours uniquement)
+    //@Bean
+    //public PasswordEncoder passwordEncoder() {
+    //   return new BCryptPasswordEncoder();
+    //}
+
     @Bean
+    @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean
@@ -37,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/candidatures/**").hasAnyRole("RH", "MANAGER")
                         .requestMatchers("/employes/**").hasAnyRole("MANAGER", "RH", "DG")
                         .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
+                        .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
 
                         .anyRequest().authenticated())
 

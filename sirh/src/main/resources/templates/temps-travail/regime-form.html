@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div class="flex items-end justify-between">
+        <div><h1 class="text-2xl font-bold text-cobalt-900" th:text="${regime.id == null ? 'Nouveau régime' : 'Modifier le régime'}"></h1>
+            <p class="text-sm text-slate-600 mt-1">Les horaires sont enregistrés séparément pour chaque jour travaillé.</p></div>
+        <a th:href="@{/temps-travail/regimes}" class="text-sm text-cobalt-700 font-semibold">Retour</a>
+    </div>
+    <div th:if="${erreur}" class="p-3 rounded bg-red-50 text-red-700 border border-red-200 text-sm" th:text="${erreur}"></div>
+    <div th:if="${succes}" class="p-3 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm" th:text="${succes}"></div>
+    <form th:action="@{/temps-travail/regimes}" method="post" class="bg-surface-card p-6 rounded-lg border border-neutral-border grid grid-cols-1 md:grid-cols-2 gap-5">
+        <input type="hidden" name="id" th:value="${regime.id}">
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Libellé</label><input required name="libelle" th:value="${regime.libelle}" class="w-full h-10 border border-neutral-border rounded px-3"></div>
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Heures hebdomadaires</label><input required type="number" min="1" max="168" name="heuresHebdomadaires" th:value="${regime.heuresHebdomadaires}" class="w-full h-10 border border-neutral-border rounded px-3"></div>
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Jours travaillés par semaine</label><input required type="number" min="1" max="7" name="joursHebdomadaires" th:value="${regime.joursHebdomadaires}" class="w-full h-10 border border-neutral-border rounded px-3"></div>
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Description</label><input name="description" th:value="${regime.description}" class="w-full h-10 border border-neutral-border rounded px-3"></div>
+        <div class="md:col-span-2 flex justify-end"><button class="h-10 px-5 rounded bg-cobalt-700 text-white text-sm font-semibold">Enregistrer</button></div>
+    </form>
+    <div th:if="${regime.id != null}" class="bg-surface-card rounded-lg border border-neutral-border overflow-hidden">
+        <div class="px-5 py-4 border-b border-neutral-border"><h2 class="font-bold text-cobalt-900">Horaires par jour</h2></div>
+        <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form th:each="jour : ${jours}" th:action="@{/temps-travail/regimes/{id}/horaires(id=${regime.id})}" method="post" class="border border-neutral-border rounded p-4 grid grid-cols-2 gap-3">
+                <input type="hidden" name="jour" th:value="${jour}">
+                <div class="col-span-2 font-bold text-sm text-cobalt-900" th:text="${jour}"></div>
+                <div><label class="block text-[11px] text-slate-500">Début</label><input required type="time" name="heureDebut" class="w-full h-9 border border-neutral-border rounded px-2"></div>
+                <div><label class="block text-[11px] text-slate-500">Fin</label><input required type="time" name="heureFin" class="w-full h-9 border border-neutral-border rounded px-2"></div>
+                <div><label class="block text-[11px] text-slate-500">Pause (minutes)</label><input required type="number" min="0" name="pauseMinutes" value="60" class="w-full h-9 border border-neutral-border rounded px-2"></div>
+                <div class="flex items-end justify-end"><button class="h-9 px-3 rounded bg-slate-800 text-white text-xs font-semibold">Enregistrer</button></div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

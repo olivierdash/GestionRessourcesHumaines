@@ -18,7 +18,7 @@
 
 ## bloc 6 : Temps de travail et pointage
 
-- Definir horaires, planning et regime de travail.
+- Definir horaires, planning et regime de travail. *(Régimes, horaires hebdomadaires, plannings et affectations implémentés.)*
 - Enregistrer entrees, sorties, retards et heures supplementaires.
 - Calculer le temps reelement travaille.
 - Detecter les anomalies de pointage.
