@@ -20,15 +20,16 @@
     </form>
     <div class="bg-surface-card rounded-lg border border-neutral-border overflow-hidden">
         <table class="sirh-table">
-            <thead><tr><th>Date</th><th>Salarié</th><th>Entrée</th><th>Sortie</th><th>Temps travaillé</th><th>Retard</th><th>Supplémentaire</th><th></th></tr></thead>
+            <thead><tr><th>Date</th><th>Salarié</th><th>Entrée</th><th>Sortie</th><th>Pause déduite</th><th>Temps réel</th><th>Retard</th><th>Supplémentaire</th><th></th></tr></thead>
             <tbody>
-            <tr th:if="${#lists.isEmpty(pointages)}"><td colspan="8" class="td-empty text-center py-8">Aucun pointage pour cette période.</td></tr>
+            <tr th:if="${#lists.isEmpty(pointages)}"><td colspan="9" class="td-empty text-center py-8">Aucun pointage pour cette période.</td></tr>
             <tr th:each="pointage : ${pointages}">
                 <td class="whitespace-nowrap" th:text="${#temporals.format(pointage.datePointage, 'dd/MM/yyyy')}"></td>
                 <td class="font-bold text-cobalt-900" th:text="${pointage.employe.matricule}"></td>
                 <td th:text="${pointage.heureEntree == null ? '-' : #temporals.format(pointage.heureEntree, 'HH:mm')}"></td>
                 <td th:text="${pointage.heureSortie == null ? '-' : #temporals.format(pointage.heureSortie, 'HH:mm')}"></td>
-                <td th:text="${pointage.minutesTravaillees + ' min'}"></td>
+                <td th:text="${pointage.minutesPause + ' min'}"></td>
+                <td class="font-bold" th:text="${pointage.minutesTravaillees + ' min'}"></td>
                 <td><span th:class="${pointage.minutesRetard > 0 ? 'text-red-600 font-bold' : 'text-slate-600'}" th:text="${pointage.minutesRetard + ' min'}"></span></td>
                 <td><span th:class="${pointage.minutesSupplementaires > 0 ? 'text-emerald-700 font-bold' : 'text-slate-600'}" th:text="${pointage.minutesSupplementaires + ' min'}"></span></td>
                 <td class="text-right"><a th:href="@{/temps-travail/pointages/{id}/edit(id=${pointage.id})}" class="text-cobalt-700 text-xs font-semibold">Modifier</a></td>

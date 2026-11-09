@@ -37,6 +37,9 @@ public class Pointage {
     @Column(name = "minutes_travaillees", nullable = false)
     private Integer minutesTravaillees = 0;
 
+    @Column(name = "minutes_pause", nullable = false)
+    private Integer minutesPause = 0;
+
     @Column(name = "minutes_retard", nullable = false)
     private Integer minutesRetard = 0;
 

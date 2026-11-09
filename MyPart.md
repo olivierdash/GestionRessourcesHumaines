@@ -80,4 +80,14 @@ Creation de base sql:
 
  Un lien pointage ajouter dans le sidebar.html
 
+ Temps reel pour le travail
+
+ Temps de présence = Heure de sortie - Heure d’entrée
+
+Temps réellement travaillé = Temps de présence - Pause prévue
+
+Temps de présence : 540 minutes
+Pause déduite : 60 minutes
+Temps réellement travaillé : 480 minutes
+
  

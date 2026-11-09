@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS pointage (
     heure_entree TIME,
     heure_sortie TIME,
     minutes_travaillees INTEGER NOT NULL DEFAULT 0 CHECK (minutes_travaillees >= 0),
+    minutes_pause INTEGER NOT NULL DEFAULT 0 CHECK (minutes_pause >= 0),
     minutes_retard INTEGER NOT NULL DEFAULT 0 CHECK (minutes_retard >= 0),
     minutes_supplementaires INTEGER NOT NULL DEFAULT 0 CHECK (minutes_supplementaires >= 0),
     commentaire VARCHAR(500),
@@ -56,3 +57,6 @@ CREATE TABLE IF NOT EXISTS pointage (
 );
 
 CREATE INDEX IF NOT EXISTS idx_pointage_date ON pointage(date_pointage);
+
+ALTER TABLE pointage
+    ADD COLUMN IF NOT EXISTS minutes_pause INTEGER NOT NULL DEFAULT 0;
