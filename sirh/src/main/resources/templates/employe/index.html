@@ -83,6 +83,7 @@
                 <form th:action="@{/employes}" method="get" class="flex items-center gap-2 m-0">
                     <input type="hidden" name="size" th:value="${employes.size}">
                     <!-- On conserve les filtres dans la pagination -->
+                    <input type="hidden" name="recherche" th:value="${filter.recherche}">
                     <input type="hidden" name="idDepartement" th:value="${filter.idDepartement}">
                     <input type="hidden" name="dateMin" th:value="${filter.dateMin}">
                     <input type="hidden" name="dateMax" th:value="${filter.dateMax}">
@@ -127,6 +128,12 @@
                     <!-- Champ caché pour signaler que le filtre a été appliqué -->
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nom ou matricule</label>
+                            <input type="text" name="recherche" th:value="${filter.recherche}"
+                                placeholder="Ex : Rakoto ou EMP-001"
+                                class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
+                        </div>
                         <!-- Département -->
                         <div class="flex flex-col gap-1.5">
                             <label

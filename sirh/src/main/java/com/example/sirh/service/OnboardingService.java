@@ -119,6 +119,20 @@ public class OnboardingService {
         return tache;
     }
 
+    @Transactional
+    public OnboardingTache terminerTache(Integer idTache, Integer idUtilisateur, boolean estRh) {
+        OnboardingTache tache = onboardingTacheService.getById(idTache);
+
+        boolean estResponsable = tache.getResponsable() != null
+                && tache.getResponsable().getIdUtilisateur().equals(idUtilisateur);
+
+        if (!estRh && !estResponsable) {
+            throw new IllegalStateException(
+                    "Seul le responsable de la tâche ou la RH peut la terminer.");
+        }
+        return terminerTache(idTache);
+    }
+
     @Transactional(readOnly = true)
     public int progression(Integer idOnboarding) {
         long total = onboardingTacheService.countByOnboarding(idOnboarding);

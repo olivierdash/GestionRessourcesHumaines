@@ -33,10 +33,11 @@ public class EmployeController {
 
     private final EmployeService employeService;
     private final CandidatureService candidatureService;
-    private final DepartementService departementService; 
+    private final DepartementService departementService;
     private final ContratService contratService;
     private final DocumentService documentService;
     private final StatutEmployeService statutEmployeService;
+    private final AffectationService affectationService;
 
     @GetMapping
     public String index(
@@ -73,22 +74,23 @@ public class EmployeController {
         Employe employe = employeService.getById(id);
 
         List<Contrat> contrats = contratService.historique(id); // déjà trié DESC
-        // List<Affectation> affectations = affectationService.findByEmployeOrderByDateDebutDesc(id);
+        List<Affectation> affectations = affectationService.historique(id);
 
         // Affectation active : celle dont dateFin == null
-        // Affectation affectationActive = affectations.stream()
-        //         .filter(a -> a.getDateFin() == null)
-        //         .findFirst()
-        //         .orElse(null);
+        Affectation affectationActive = affectations.stream()
+                .filter(a -> a.getDateFin() == null)
+                .findFirst()
+                .orElse(null);
 
         // Contrat actif : via le service (déjà présent dans ContratService)
         Contrat contratActif = contratService.contratActif(id).orElse(null);
 
         model.addAttribute("employe", employe);
         model.addAttribute("contrats", contrats);
-        // model.addAttribute("affectations", affectations);
-        // model.addAttribute("affectationActive", affectationActive);
+        model.addAttribute("affectations", affectations);
+        model.addAttribute("affectationActive", affectationActive);
         model.addAttribute("contratActif", contratActif);
+        model.addAttribute("documents", documentService.documentsDe(id));
 
         return "employe/fiche";
     }

@@ -50,9 +50,14 @@ public class OnboardingController {
     @PostMapping("/taches/{idTache}/terminer")
     public String terminer(@PathVariable Integer idTache,
             @RequestParam Integer idEmploye,
+            Authentication auth,
             RedirectAttributes redirect) {
         try {
-            onboardingService.terminerTache(idTache);
+            Utilisateur utilisateur = utilisateurService.getByEmail(auth.getName());
+            boolean estRh = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_RH"));
+
+            onboardingService.terminerTache(idTache, utilisateur.getIdUtilisateur(), estRh);
             redirect.addFlashAttribute("succes", "Tâche terminée");
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirect.addFlashAttribute("erreur", e.getMessage());
@@ -70,10 +75,10 @@ public class OnboardingController {
         model.addAttribute("onboarding", onboarding);
         model.addAttribute("taches", onboardingService.taches(onboarding.getId()));
         model.addAttribute("progression", onboardingService.progression(onboarding.getId()));
-        
+
         // APPEL AU SERVICE Document (qui gérera les types de documents)
         model.addAttribute("typesDocument", documentService.getAllTypesDocument());
-        
+
         return "onboarding/checklist";
     }
 }
