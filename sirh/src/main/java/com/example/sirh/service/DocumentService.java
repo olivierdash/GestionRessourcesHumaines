@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.example.sirh.model.Document;
 import com.example.sirh.model.Employe;
@@ -74,10 +76,25 @@ public class DocumentService {
         return documentRepository.existsByTacheIdAndTypeDocumentLibelle(idTache, libelle);
     }
 
-    /**
-     * Conservé pour OnboardingController. Délègue à TypeDocumentService.
-     * À supprimer côté controller quand on exposera directement le service concerné.
-     */
+    @Transactional(readOnly = true)
+    public List<Document> documentsDe(Integer idEmploye) {
+        return documentRepository.findByEmployeIdEmployerOrderByDateDepotDesc(idEmploye);
+    }
+
+    @Transactional(readOnly = true)
+    public Document getById(Integer idDocument) {
+        return documentRepository.findById(idDocument)
+                .orElseThrow(() -> new IllegalArgumentException("Document introuvable : " + idDocument));
+    }
+
+    public Resource charger(Document doc) {
+        Path chemin = dossier.resolve(doc.getFichierUrl()).normalize();
+        if (!chemin.startsWith(dossier) || !Files.exists(chemin)) {
+            throw new IllegalStateException("Fichier introuvable sur le disque");
+        }
+        return new FileSystemResource(chemin);
+    }
+
     @Transactional(readOnly = true)
     public List<TypeDocument> getAllTypesDocument() {
         return typeDocumentService.getAllTypes();

@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface AffectationRepository extends JpaRepository<Affectation, Integer> {
     List<Affectation> findByEmployeIdEmployer(Integer idEmployer);
+
+    List<Affectation> findByEmployeIdEmployerOrderByDateDebutDesc(Integer idEmployer);
 }

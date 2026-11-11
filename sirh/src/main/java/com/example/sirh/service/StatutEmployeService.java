@@ -12,8 +12,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatutEmployeService {
 
-    public static final String ACTIF         = "ACTIF";
-    public static final String INACTIF       = "INACTIF";
+    public static final String ACTIF = "ACTIF";
+    public static final String INACTIF = "INACTIF";
     public static final String EN_ONBOARDING = "EN_ONBOARDING";
 
     private final StatutEmployeRepository statutEmployeRepository;
