@@ -26,4 +26,68 @@ Le dossier poste dans templates
  index.html
  form.html
  show.html
+
+ ## BLOC 6
+ Definir horaires,planning et régime de travail .
+
+ A creer:
+ Dans modele: -Regimetravail.java
+ -HoraireTravail.java
+ -Planning.java
+ AffectaionPlanning.java
+
+ Dans repository:
+ -RegimeTravailRepository.java
+ -PlanningRepository.java
+ -AffectationPlanningRepository.java
+
+ Dans service:
+ -TempsTravailService.java
+
+ Dans Controller:
+ -TempstravailController.java()
+
+ Dossier : temps-travail:
+ -regimes.html
+ -regime-form.html
+ -plannings.html
+ -plamming-form.html
+ planning-detail.html
+
+ A ajouter :
+ Dans EmployeService.java:getAllEmployesList()
+ Dans SecurityConfig.java:.requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
+
+ Dans le sidebar.html:
+-le sous-menu Configuration est désormais visible pour RH et DG ;
+-ajout du lien Temps de travail ;
+-ajout du lien Plannings ;
+-ajout des icônes correspondantes.
+
+Creation de base sql:
+ 20261109-001-temps-travail.sql.
+
+
+ Gestion de pointage
+ A creer:
+ Dans model: Pointage.java
+ Dans repository: PointageRepository.java
+ Dans le dossier temps-travail:pointage-form.html
+ pointages.html
+
+ Routes ajouter dans TempsTravailController.java
+ Base creer:ajout de la table pointage
+
+ Un lien pointage ajouter dans le sidebar.html
+
+ Temps reel pour le travail
+
+ Temps de présence = Heure de sortie - Heure d’entrée
+
+Temps réellement travaillé = Temps de présence - Pause prévue
+
+Temps de présence : 540 minutes
+Pause déduite : 60 minutes
+Temps réellement travaillé : 480 minutes
+
  

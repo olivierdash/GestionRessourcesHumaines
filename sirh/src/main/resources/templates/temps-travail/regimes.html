@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div class="flex items-end justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900">Régimes de travail</h1>
+            <p class="text-sm text-slate-600 mt-1">Définissez la durée hebdomadaire et les horaires de référence.</p>
+        </div>
+        <a th:href="@{/temps-travail/regimes/nouveau}" class="h-9 px-4 rounded bg-cobalt-700 text-white text-xs font-semibold flex items-center">Nouveau régime</a>
+    </div>
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <table class="sirh-table">
+            <thead><tr><th>Libellé</th><th>Durée</th><th>Jours</th><th>Horaires définis</th><th></th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(regimes)}"><td colspan="5" class="td-empty text-center py-8">Aucun régime de travail.</td></tr>
+            <tr th:each="regime : ${regimes}">
+                <td><strong class="text-cobalt-900" th:text="${regime.libelle}"></strong><p class="text-xs text-slate-500" th:text="${regime.description}"></p></td>
+                <td th:text="${regime.heuresHebdomadaires + ' h / semaine'}"></td>
+                <td th:text="${regime.joursHebdomadaires + ' jour(s)'}"></td>
+                <td th:text="${#lists.size(regime.horaires) + ' jour(s) configuré(s)'}"></td>
+                <td class="text-right"><a th:href="@{/temps-travail/regimes/{id}/edit(id=${regime.id})}" class="text-cobalt-700 text-xs font-semibold">Configurer</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

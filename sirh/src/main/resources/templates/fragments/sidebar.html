@@ -107,7 +107,7 @@
                     </span>
                 </a>
                 <!-- Configuration (sous-menu) -->
-                <div sec:authorize="hasRole('RH')" class="sidebar-submenu-group" data-submenu-group="configuration">
+                <div sec:authorize="hasAnyRole('RH', 'DG')" class="sidebar-submenu-group" data-submenu-group="configuration">
 
                     <button type="button"
                         class="sidebar-nav-link submenu-toggle flex items-center justify-between w-full px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
@@ -127,6 +127,24 @@
                             <span
                                 class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">description</span>
                             <span class="sidebar-text whitespace-nowrap">Types de contrat</span>
+                        </a>
+                        <a th:href="@{/temps-travail/regimes}" data-path="/temps-travail"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Temps de travail">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">schedule</span>
+                            <span class="sidebar-text whitespace-nowrap">Temps de travail</span>
+                        </a>
+                        <a th:href="@{/temps-travail/plannings}" data-path="/temps-travail/plannings"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Plannings">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">calendar_month</span>
+                            <span class="sidebar-text whitespace-nowrap">Plannings</span>
+                        </a>
+                        <a th:href="@{/temps-travail/pointages}" data-path="/temps-travail/pointages"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Pointages">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">fingerprint</span>
+                            <span class="sidebar-text whitespace-nowrap">Pointages</span>
                         </a>
                     </div>
                 </div>

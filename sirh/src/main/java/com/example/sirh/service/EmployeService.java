@@ -31,6 +31,11 @@ public class EmployeService {
         return employeRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
+    public List<Employe> getAllEmployesList() {
+        return employeRepository.findAll();
+    }
+
     @Transactional
     public Employe createEmploye(Integer idCandidature, LocalDate hiringDate) {
         Candidature candidature = candidatureService.getCandidatureById(idCandidature);
