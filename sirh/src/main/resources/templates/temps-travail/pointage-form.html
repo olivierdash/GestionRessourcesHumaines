@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div>
+        <h1 class="text-2xl font-bold text-cobalt-900" th:text="${pointage.id == null ? 'Nouveau pointage' : 'Modifier le pointage'}"></h1>
+        <p class="text-sm text-slate-600 mt-1">Les retards et heures supplémentaires sont calculés automatiquement selon le planning actif.</p>
+    </div>
+    <form th:action="@{/temps-travail/pointages}" method="post" class="bg-surface-card p-6 rounded-lg border border-neutral-border max-w-3xl flex flex-col gap-5">
+        <input type="hidden" name="id" th:value="${pointage.id}">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Salarié</label><select required name="employeId" class="w-full h-10 border border-neutral-border rounded px-2"><option value="">Sélectionner</option><option th:each="employe : ${employes}" th:value="${employe.idEmployer}" th:selected="${pointage.employe != null and employe.idEmployer == pointage.employe.idEmployer}" th:text="${employe.matricule + ' - #' + employe.idEmployer}"></option></select></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Date</label><input required type="date" name="datePointage" th:value="${pointage.datePointage}" class="w-full h-10 border border-neutral-border rounded px-2"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Heure d'entrée</label><input type="time" name="heureEntree" th:value="${pointage.heureEntree}" class="w-full h-10 border border-neutral-border rounded px-2"></div>
+            <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Heure de sortie</label><input type="time" name="heureSortie" th:value="${pointage.heureSortie}" class="w-full h-10 border border-neutral-border rounded px-2"></div>
+        </div>
+        <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Commentaire</label><textarea name="commentaire" rows="3" class="w-full border border-neutral-border rounded px-3 py-2" th:text="${pointage.commentaire}"></textarea></div>
+        <div class="flex justify-end gap-3"><a th:href="@{/temps-travail/pointages}" class="h-10 px-4 flex items-center text-sm">Annuler</a><button class="h-10 px-5 rounded bg-cobalt-700 text-white text-sm font-semibold">Enregistrer</button></div>
+    </form>
+</main>
+</body>
+</html>
