@@ -13,6 +13,7 @@ import com.example.sirh.model.OnboardingTache;
 import com.example.sirh.model.StatutTacheOnboarding;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.OnboardingRepository;
+import com.example.sirh.constants.ConstantSirh.Statut;
 
 @Service
 public class OnboardingService {
@@ -23,19 +24,24 @@ public class OnboardingService {
     private final EmployeService employeService;
     private final UtilisateurService utilisateurService;
     private final DocumentService documentService;
+    private final StatutEmployeService statutEmployeService;
+    // + le paramètre correspondant dans le constructeur et son this.xxx = xxx
 
     public OnboardingService(OnboardingRepository onboardingRepository,
             OnboardingTacheService onboardingTacheService,
             StatutTacheOnboardingService statutTacheOnboardingService,
             UtilisateurService utilisateurService,
             EmployeService employeService,
-            DocumentService documentService) {
+            DocumentService documentService,
+            StatutEmployeService statutEmployeService) {
         this.onboardingRepository = onboardingRepository;
         this.onboardingTacheService = onboardingTacheService;
         this.statutTacheOnboardingService = statutTacheOnboardingService;
         this.utilisateurService = utilisateurService;
         this.employeService = employeService;
         this.documentService = documentService;
+        this.statutEmployeService = statutEmployeService;
+
     }
 
     private void creerTache(Onboarding onboarding, String titre, String roleLibelle, int jours) {
@@ -140,7 +146,7 @@ public class OnboardingService {
             onboardingRepository.save(onboarding);
 
             Employe employe = onboarding.getEmploye();
-            employe.setStatusEmployer("actif");
+            employe.setStatusEmploye(statutEmployeService.getByLibelle(Statut.ACTIF_EMPLOYE));
             employeService.save(employe);
         }
     }

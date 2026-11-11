@@ -59,10 +59,9 @@
                 </div>
                 <div>
                     <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Statut</span>
-                    <span
-                        class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                        th:classappend="${employe.statusEmployer == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-600'}"
-                        th:text="${employe.statusEmployer}">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                        th:classappend="${employe.statusEmploye.libelle == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmploye.libelle == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
+                        th:text="${employe.statusEmploye.libelle}">
                     </span>
                 </div>
             </div>
@@ -100,9 +99,10 @@
                                 th:text="${#numbers.formatDecimal(c.salaireMensuel, 0, 'COMMA', 2, 'POINT')} + ' €'">
                             </td>
                             <td>
-                                <span
-                                    class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded"
-                                    th:text="${c.status}"></span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                    th:classappend="${c.statut.libelle == 'actif' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-600'}"
+                                    th:text="${c.statut.libelle}">
+                                </span>
                             </td>
                         </tr>
                     </tbody>

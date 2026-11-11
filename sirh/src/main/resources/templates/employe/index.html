@@ -26,8 +26,10 @@
                 <table class="sirh-table">
                     <thead>
                         <tr>
-                            <th scope="col">Réf.</th>
                             <th scope="col">Matricule</th>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Département</th>
                             <th scope="col">Date d'embauche</th>
                             <th scope="col">Statut</th>
                             <th scope="col" class="text-right">Action</th>
@@ -41,16 +43,19 @@
                         </tr>
 
                         <tr th:each="employe : ${employes.content}">
-                            <td class="font-mono text-cobalt-800 font-bold whitespace-nowrap">
-                                #<span th:text="${employe.idEmployer}"></span>
-                            </td>
                             <td class="font-bold text-cobalt-900" th:text="${employe.matricule}"></td>
+                            <td class="font-semibold text-slate-800"
+                                th:text="${employe.candidature.candidat.prenom + ' ' + employe.candidature.candidat.nom}"></td>
+                            <td class="text-slate-600"
+                                th:text="${employe.candidature.demandeRecrutement.poste.intitule}"></td>
+                            <td class="text-slate-600"
+                                th:text="${employe.candidature.demandeRecrutement.poste.departement.titre}"></td>
                             <td class="text-slate-600 font-mono"
                                 th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
                             <td>
-                                <span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                                    th:classappend="${employe.statusEmployer == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmployer == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
-                                    th:text="${employe.statusEmployer}">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                    th:classappend="${employe.statusEmploye.libelle == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmploye.libelle == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
+                                    th:text="${employe.statusEmploye.libelle}">
                                 </span>
                             </td>
                             <td class="text-right whitespace-nowrap">
