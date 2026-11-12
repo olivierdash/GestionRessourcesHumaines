@@ -56,6 +56,8 @@ CREATE TABLE regime_travail (
 );
 ```
 
+Insérer ensuite les donnés de test dans insertionTest.sql après avoir insérer les tables.sql et test.sql 
+
 **Model :**  
 - JournalAudit.java
 - CoordonneesEmploye.java
