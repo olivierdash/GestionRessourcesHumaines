@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "planning")
@@ -13,6 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Planning {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_planning")
@@ -32,5 +35,10 @@ public class Planning {
     private LocalDate dateFin;
 
     @Column(nullable = false)
-    private boolean actif = true;
+    @Builder.Default
+    private Boolean actif = true;
+
+    @OneToMany(mappedBy = "planning", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<AffectationPlanning> affectations = new ArrayList<>();
 }
