@@ -58,6 +58,15 @@
                     <span class="sidebar-text whitespace-nowrap">Employés</span>
                 </a>
 
+                // bloc 5 
+                <a sec:authorize="hasAnyRole('RH', 'ADMIN', 'DG')" th:href="@{/dossier}" data-path="/dossier"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Dossiers Salariés">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">folder_shared</span>
+                    <span class="sidebar-text whitespace-nowrap">Dossiers Salariés</span>
+                </a>
+                // bloc 5 
+
                 <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/departements}" data-path="/departements"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                     title="Départements">
