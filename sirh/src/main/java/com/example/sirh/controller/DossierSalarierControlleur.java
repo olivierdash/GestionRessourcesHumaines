@@ -22,6 +22,8 @@ import com.example.sirh.repository.JournalAuditRepository;
 import com.example.sirh.repository.CoordonneesEmployeRepository;
 import com.example.sirh.service.AuditService;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
 
@@ -38,33 +40,33 @@ public class DossierSalarierControlleur {
 
     @GetMapping("/{id}")
     public String voirDossier(@PathVariable Integer id, Model model, Principal principal) {
-        // 1. Récupération de l'employé
         Employe employe = employerRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employé introuvable avec l'ID : " + id));
 
-        // 2. Centralisation des données (Le référentiel)
+        // Référentiel central
         model.addAttribute("employe", employe);
-        model.addAttribute("contrats", contratRepo.findByEmployeIdEmployer(id));
+        model.addAttribute("contrats", contratRepo.findByEmployeIdEmployerOrderByDateDebutDesc(id)); // Trié par date
         model.addAttribute("documents", documentRepo.findByEmployeIdEmployerOrderByDateDepotDesc(id));
         
-        // Coordonnées (si vide, on crée un objet vide pour éviter le crash de Thymeleaf)
+        // Coordonnées
         model.addAttribute("coordonnees", coordonneesRepo.findByEmploye(employe).orElse(new CoordonneesEmploye()));
         
-        // Historique d'audit
+        // Journal d'audit
         model.addAttribute("historiqueAudit", journalAuditRepo.findByEntiteCibleAndIdEntiteCibleOrderByDateActionDesc("employer", id));
 
-        // 3. Gestion de la validité des documents (Ta règle)
+        // Gestion de la validité des documents
         LocalDate today = LocalDate.now();
         List<Document> docsExpires = documentRepo.findByEmployeIdEmployerAndDateExpirationBefore(id, today);
         model.addAttribute("alerteDocuments", docsExpires);
 
-        // 4. Journal d'audit : On trace la consultation (Ta règle)
+        // Traçabilité : On trace la consultation
         auditService.enregistrerAction(principal.getName(), "CONSULTATION_DOSSIER", "employer", id, "Consultation du dossier complet");
 
-        return "dossier/dossier-salarie"; // Le nom de la vue HTML
+        return "dossier/dossier-salarie";
     }
 
     @PostMapping("/{id}/coordonnees")
+    @Transactional 
     public String updateCoordonnees(@PathVariable Integer id, 
                                     @ModelAttribute CoordonneesEmploye coords, 
                                     Principal principal,
@@ -72,24 +74,24 @@ public class DossierSalarierControlleur {
         Employe employe = employerRepo.findById(id).orElseThrow();
         CoordonneesEmploye existantes = coordonneesRepo.findByEmploye(employe).orElse(new CoordonneesEmploye());
         
-        // Garder l'ancienne adresse pour l'audit
-        String ancienneAdresse = existantes.getAdresse();
+        String ancienneAdresse = existantes.getAdresse() != null ? existantes.getAdresse() : "Non renseignée";
 
-        // Mise à jour
+        // Mise à jour (CORRECTION : Ajout du nombre d'enfants)
         existantes.setEmploye(employe);
         existantes.setAdresse(coords.getAdresse());
         existantes.setVille(coords.getVille());
         existantes.setCodePostal(coords.getCodePostal());
         existantes.setSituationMatrimoniale(coords.getSituationMatrimoniale());
         existantes.setTelephonePersonnel(coords.getTelephonePersonnel());
+        existantes.setNombreEnfants(coords.getNombreEnfants()); // LIGNE AJOUTÉE
         
         coordonneesRepo.save(existantes);
 
-        // Journal d'audit : On trace la modification
+        // Journal d'audit
         String details = "Adresse modifiée : " + ancienneAdresse + " -> " + coords.getAdresse();
         auditService.enregistrerAction(principal.getName(), "MODIFICATION_COORDONNEES", "employer", id, details);
 
-        redirectAttributes.addFlashAttribute("success", "Coordonnées mises à jour !");
+        redirectAttributes.addFlashAttribute("success", "Coordonnées mises à jour avec succès !");
         return "redirect:/dossier/" + id;
     }
 
