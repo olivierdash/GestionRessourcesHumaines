@@ -14,16 +14,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     // Mots de passe en clair dans la base (projet de cours uniquement)
-    //@Bean
-    //public PasswordEncoder passwordEncoder() {
-    //   return new BCryptPasswordEncoder();
-    //}
-
     @Bean
+    public PasswordEncoder passwordEncoder() {
+       return new BCryptPasswordEncoder();
+    }
+
+    /*@Bean
     @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
-    }
+    }*/
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
