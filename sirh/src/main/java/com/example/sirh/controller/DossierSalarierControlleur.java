@@ -17,6 +17,8 @@ import com.example.sirh.repository.ContratRepository;
 import com.example.sirh.repository.EmployeRepository;
 import com.example.sirh.repository.DocumentRepository;
 import com.example.sirh.repository.JournalAuditRepository;
+import com.example.sirh.repository.CoordonneesEmployeRepository;
+import com.example.sirh.service.AuditService;
 
 import ch.qos.logback.core.model.Model;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class DossierSalarierControlleur {
     private final DocumentRepository documentRepo;
     private final JournalAuditRepository journalAuditRepo;
     private final CoordonneesEmployeRepository coordonneesRepo;
+    private final AuditService auditService;
 
     @GetMapping("/{id}")
     public String voirDossier(@PathVariable Integer id, Model model, Principal principal) {
