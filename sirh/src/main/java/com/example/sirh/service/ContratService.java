@@ -26,19 +26,22 @@ public class ContratService {
     private final EmployeService employeService;
     private final PosteService posteService;
     private final TypeContratService typeContratService;
+    private final AffectationService affectationService;
 
     public ContratService(ContratRepository contratRepository,
             GrilleSalarialService grilleSalarialService,
             StatutContratService statutContratService,
             EmployeService employeService,
             PosteService posteService,
-            TypeContratService typeContratService) {
+            TypeContratService typeContratService,
+            AffectationService affectationService) {
         this.contratRepository = contratRepository;
         this.grilleSalarialService = grilleSalarialService;
         this.statutContratService = statutContratService;
         this.employeService = employeService;
         this.posteService = posteService;
         this.typeContratService = typeContratService;
+        this.affectationService = affectationService;
     }
 
     @Transactional(readOnly = true)
@@ -69,11 +72,21 @@ public class ContratService {
 
         nouveau.setEmploye(ancien.getEmploye());
 
-        ancien.setDateFin(nouveau.getDateDebut().minusDays(1));
+        LocalDate veille = nouveau.getDateDebut().minusDays(1);
+        // On ne raccourcit l'ancien contrat que s'il durait plus longtemps (ou n'avait
+        // pas de fin, comme un CDI).
+        // S'il était déjà fini avant, on garde sa vraie date de fin.
+        if (ancien.getDateFin() == null || ancien.getDateFin().isAfter(veille)) {
+            ancien.setDateFin(veille);
+        }
         ancien.setStatut(termine);
         contratRepository.saveAndFlush(ancien);
 
-        return creer(nouveau);
+        Contrat cree = creer(nouveau);
+        if (!ancien.getPoste().getIdPoste().equals(nouveau.getPoste().getIdPoste())) {
+            affectationService.changerPoste(ancien.getEmploye(), nouveau.getPoste(), nouveau.getDateDebut());
+        }
+        return cree;
     }
 
     @Transactional

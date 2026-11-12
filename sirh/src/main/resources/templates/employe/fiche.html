@@ -6,8 +6,21 @@
     <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
 
         <!-- En-tête -->
-        <!-- En-tête -->
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+            <div class="flex flex-wrap gap-2">
+                <a th:href="@{/contrats/employe/{id}(id=${employe.idEmployer})}"
+                class="inline-flex items-center gap-1.5 h-9 px-4 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                    Historique des contrats
+                </a>
+                <a th:href="@{/contrats/employe/{id}/nouveau(id=${employe.idEmployer})}"
+                class="inline-flex items-center gap-1.5 h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold">
+                    Nouveau contrat
+                </a>
+                <a th:href="@{/onboarding/employe/{id}(id=${employe.idEmployer})}"
+                class="inline-flex items-center gap-1.5 h-9 px-4 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                    Onboarding
+                </a>
+            </div>
             <div>
                 <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight flex flex-wrap items-center gap-3">
                     Fiche salarié
@@ -59,11 +72,20 @@
                 </div>
                 <div>
                     <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Statut</span>
-                    <span
-                        class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                        th:classappend="${employe.statusEmployer == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-600'}"
-                        th:text="${employe.statusEmployer}">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                        th:classappend="${employe.statusEmploye.libelle == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmploye.libelle == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
+                        th:text="${employe.statusEmploye.libelle}">
                     </span>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Poste actuel</span>
+                    <div class="text-sm font-bold text-slate-800"
+                        th:text="${affectationActive != null ? affectationActive.poste.intitule : 'Aucune affectation en cours'}"></div>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Département</span>
+                    <div class="text-sm text-slate-600"
+                        th:text="${affectationActive != null ? affectationActive.poste.departement.titre : '-'}"></div>
                 </div>
             </div>
         </div>
@@ -100,9 +122,10 @@
                                 th:text="${#numbers.formatDecimal(c.salaireMensuel, 0, 'COMMA', 2, 'POINT')} + ' €'">
                             </td>
                             <td>
-                                <span
-                                    class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded"
-                                    th:text="${c.status}"></span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                    th:classappend="${c.statut.libelle == 'actif' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-600'}"
+                                    th:text="${c.statut.libelle}">
+                                </span>
                             </td>
                         </tr>
                     </tbody>
@@ -139,7 +162,41 @@
                 </table>
             </div>
         </div>
-
+        <!-- Section Documents -->
+        <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mt-2">Documents</h2>
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Type</th>
+                            <th scope="col">Fichier</th>
+                            <th scope="col">Tâche</th>
+                            <th scope="col">Déposé le</th>
+                            <th scope="col" class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(documents)}">
+                            <td colspan="5" class="td-empty py-6 text-center text-slate-500 italic">Aucun document déposé.</td>
+                        </tr>
+                        <tr th:each="d : ${documents}">
+                            <td class="font-bold text-cobalt-900" th:text="${d.typeDocument.libelle}"></td>
+                            <td class="text-slate-600" th:text="${d.nomFichier}"></td>
+                            <td class="text-slate-600" th:text="${d.tache != null ? d.tache.titre : '-'}"></td>
+                            <td class="font-mono text-slate-600"
+                                th:text="${d.dateDepot != null ? #temporals.format(d.dateDepot, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                            <td class="text-right">
+                                <a th:href="@{/documents/{id}/telecharger(id=${d.idDocument})}"
+                                class="inline-flex items-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                                    Télécharger
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </main>
 </body>
 

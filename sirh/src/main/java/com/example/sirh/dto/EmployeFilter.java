@@ -7,12 +7,20 @@ import java.time.LocalDate;
 @Data
 public class EmployeFilter {
     private Integer idDepartement;
-    
+    private String recherche;
+
+    public String getRecherchePattern() {
+        if (recherche == null || recherche.isBlank()) {
+            return "%";
+        }
+        return "%" + recherche.trim().toLowerCase() + "%";
+    }
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateMin;
-    
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateMax;
-    
-    private Integer statusEmployer = null; 
+
+    private Integer statusEmployer = null;
 }

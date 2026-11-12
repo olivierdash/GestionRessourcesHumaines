@@ -26,8 +26,10 @@
                 <table class="sirh-table">
                     <thead>
                         <tr>
-                            <th scope="col">Réf.</th>
                             <th scope="col">Matricule</th>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Département</th>
                             <th scope="col">Date d'embauche</th>
                             <th scope="col">Statut</th>
                             <th scope="col" class="text-right">Action</th>
@@ -41,16 +43,19 @@
                         </tr>
 
                         <tr th:each="employe : ${employes.content}">
-                            <td class="font-mono text-cobalt-800 font-bold whitespace-nowrap">
-                                #<span th:text="${employe.idEmployer}"></span>
-                            </td>
                             <td class="font-bold text-cobalt-900" th:text="${employe.matricule}"></td>
+                            <td class="font-semibold text-slate-800"
+                                th:text="${employe.candidature.candidat.prenom + ' ' + employe.candidature.candidat.nom}"></td>
+                            <td class="text-slate-600"
+                                th:text="${employe.candidature.demandeRecrutement.poste.intitule}"></td>
+                            <td class="text-slate-600"
+                                th:text="${employe.candidature.demandeRecrutement.poste.departement.titre}"></td>
                             <td class="text-slate-600 font-mono"
                                 th:text="${#temporals.format(employe.hiringDate, 'dd/MM/yyyy')}"></td>
                             <td>
-                                <span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
-                                    th:classappend="${employe.statusEmployer == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmployer == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
-                                    th:text="${employe.statusEmployer}">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                    th:classappend="${employe.statusEmploye.libelle == 'ACTIF' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (employe.statusEmploye.libelle == 'EN_ONBOARDING' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-600')}"
+                                    th:text="${employe.statusEmploye.libelle}">
                                 </span>
                             </td>
                             <td class="text-right whitespace-nowrap">
@@ -84,6 +89,7 @@
                 <form th:action="@{/employes}" method="get" class="flex items-center gap-2 m-0">
                     <input type="hidden" name="size" th:value="${employes.size}">
                     <!-- On conserve les filtres dans la pagination -->
+                    <input type="hidden" name="recherche" th:value="${filter.recherche}">
                     <input type="hidden" name="idDepartement" th:value="${filter.idDepartement}">
                     <input type="hidden" name="dateMin" th:value="${filter.dateMin}">
                     <input type="hidden" name="dateMax" th:value="${filter.dateMax}">
@@ -128,6 +134,12 @@
                     <!-- Champ caché pour signaler que le filtre a été appliqué -->
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nom ou matricule</label>
+                            <input type="text" name="recherche" th:value="${filter.recherche}"
+                                placeholder="Ex : Rakoto ou EMP-001"
+                                class="w-full h-10 px-3 border border-neutral-border rounded text-sm text-slate-800 focus:outline-none focus:border-cobalt-700 bg-white">
+                        </div>
                         <!-- Département -->
                         <div class="flex flex-col gap-1.5">
                             <label
