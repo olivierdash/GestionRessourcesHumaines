@@ -2,7 +2,8 @@ package com.example.sirh.constants;
 
 public final class ConstantSirh {
 
-    private ConstantSirh() {}
+    private ConstantSirh() {
+    }
 
     public static final class Statut {
         public static final String A_FAIRE = "à faire";
@@ -55,5 +56,10 @@ public final class ConstantSirh {
     public static final class Decision {
         public static final String APPROUVEE = "APPROUVEE";
         public static final String REFUSEE = "REFUSEE";
+    }
+
+    public static final class TypeDecompteCode {
+        public static final String HEURES = "HEURES";
+        public static final String JOURS = "JOURS";
     }
 }

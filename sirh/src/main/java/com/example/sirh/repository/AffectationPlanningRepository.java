@@ -7,15 +7,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface AffectationPlanningRepository extends JpaRepository<AffectationPlanning, Integer> {
+
     List<AffectationPlanning> findByPlanningIdOrderByDateDebutDesc(Integer idPlanning);
+
+    List<AffectationPlanning> findByEmployeIdEmployerOrderByDateDebutDesc(Integer employeId);
 
     @Query("""
             SELECT a FROM AffectationPlanning a
             JOIN FETCH a.planning p
             JOIN FETCH p.regimeTravail r
+            LEFT JOIN FETCH r.horaires
             WHERE a.employe.idEmployer = :employeId
               AND a.dateDebut <= :datePointage
               AND (a.dateFin IS NULL OR a.dateFin >= :datePointage)
@@ -24,5 +27,5 @@ public interface AffectationPlanningRepository extends JpaRepository<Affectation
             ORDER BY a.dateDebut DESC
             """)
     List<AffectationPlanning> findActivesForDate(@Param("employeId") Integer employeId,
-                                                  @Param("datePointage") LocalDate datePointage);
+                                                 @Param("datePointage") LocalDate datePointage);
 }

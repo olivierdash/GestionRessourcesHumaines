@@ -16,6 +16,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class Pointage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pointage")
@@ -34,17 +35,9 @@ public class Pointage {
     @Column(name = "heure_sortie")
     private LocalTime heureSortie;
 
-    @Column(name = "minutes_travaillees", nullable = false)
-    private Integer minutesTravaillees = 0;
-
-    @Column(name = "minutes_pause", nullable = false)
-    private Integer minutesPause = 0;
-
-    @Column(name = "minutes_retard", nullable = false)
-    private Integer minutesRetard = 0;
-
-    @Column(name = "minutes_supplementaires", nullable = false)
-    private Integer minutesSupplementaires = 0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "saisi_par")
+    private Utilisateur saisiPar;
 
     @Column(length = 500)
     private String commentaire;

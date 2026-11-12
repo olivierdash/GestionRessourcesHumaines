@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight"
+                th:text="${planning.libelle}"></h1>
+        </div>
+        <a th:href="@{/temps-travail/plannings}"
+           class="text-sm text-cobalt-700 font-semibold flex items-center gap-1 self-start md:self-auto">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Retour
+        </a>
+    </div>
+
+    <div th:if="${succes}"
+         class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
+         th:text="${succes}"></div>
+    <div th:if="${erreur}"
+         class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+         th:text="${erreur}"></div>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border overflow-hidden shadow-sm">
+        <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+            <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">
+                Affecter un salarié à ce planning
+            </h3>
+        </div>
+        <form th:action="@{/temps-travail/plannings/{id}/affectations(id=${planning.id})}"
+              method="post" th:object="${affectation}"
+              class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+
+            <div class="md:col-span-2">
+                <label for="employe" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                    Salarié <span class="text-red-500">*</span>
+                </label>
+                <select id="employe" th:field="*{employe.idEmployer}" required
+                        class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 cursor-pointer">
+                    <option value="">Sélectionner un salarié</option>
+                    <option th:each="employe : ${employes}"
+                            th:value="${employe.idEmployer}"
+                            th:text="${employe.matricule + ' — ' + employe.candidature.candidat.prenom + ' ' + employe.candidature.candidat.nom}"></option>
+                </select>
+            </div>
+
+            <div>
+                <label for="dateDebutAff" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                    Début <span class="text-red-500">*</span>
+                </label>
+                <input id="dateDebutAff" type="date" th:field="*{dateDebut}" required
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+
+            <div>
+                <label for="dateFinAff" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                    Fin
+                </label>
+                <input id="dateFinAff" type="date" th:field="*{dateFin}"
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+
+            <div class="md:col-span-4 flex justify-end">
+                <button type="submit"
+                        class="h-10 px-5 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold shadow-sm">
+                    Affecter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mt-2">
+        Affectations
+    </h2>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Salarié</th>
+                        <th scope="col">Matricule</th>
+                        <th scope="col">Période</th>
+                        <th scope="col">Durée</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(affectations)}">
+                        <td colspan="4" class="td-empty py-8 text-center text-slate-500 italic">
+                            Aucune affectation pour ce planning.
+                        </td>
+                    </tr>
+                    <tr th:each="affectation : ${affectations}">
+                        <td class="font-bold text-cobalt-900"
+                            th:text="${affectation.employe.candidature.candidat.prenom + ' ' + affectation.employe.candidature.candidat.nom}"></td>
+                        <td>
+                            <span class="font-mono text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded"
+                                  th:text="${affectation.employe.matricule}"></span>
+                        </td>
+                        <td class="text-sm text-slate-700 whitespace-nowrap">
+                            <span th:text="${#temporals.format(affectation.dateDebut, 'dd/MM/yyyy')}"></span>
+                            <span class="text-slate-400 mx-1">→</span>
+                            <span th:text="${affectation.dateFin == null ? 'En cours' : #temporals.format(affectation.dateFin, 'dd/MM/yyyy')}"></span>
+                        </td>
+                        <td class="text-slate-600 text-sm"
+                            th:text="${affectation.dateFin == null ? '—' : (#temporals.format(affectation.dateDebut, 'dd/MM/yyyy') + ' au ' + #temporals.format(affectation.dateFin, 'dd/MM/yyyy'))}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

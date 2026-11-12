@@ -2,18 +2,19 @@ package com.example.sirh.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "horaire_travail")
+@Table(name = "horaire_travail",
+        uniqueConstraints = @UniqueConstraint(name = "uq_horaire_regime_dayweek",
+                columnNames = {"id_regime_travail", "dayweek"}))
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class HoraireTravail {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_horaire_travail")
@@ -23,9 +24,8 @@ public class HoraireTravail {
     @JoinColumn(name = "id_regime_travail", nullable = false)
     private RegimeTravail regimeTravail;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "jour_semaine", nullable = false, length = 12)
-    private DayOfWeek jourSemaine;
+    @Column(nullable = false)
+    private Integer dayweek;
 
     @Column(name = "heure_debut")
     private LocalTime heureDebut;
@@ -34,5 +34,6 @@ public class HoraireTravail {
     private LocalTime heureFin;
 
     @Column(name = "pause_minutes", nullable = false)
+    @Builder.Default
     private Integer pauseMinutes = 0;
 }

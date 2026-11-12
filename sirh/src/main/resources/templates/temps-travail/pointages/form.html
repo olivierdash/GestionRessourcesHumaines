@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div>
+        <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight"
+            th:text="${pointage.id == null ? 'Nouveau pointage' : 'Modifier le pointage'}"></h1>
+    </div>
+
+    <div th:if="${erreur}"
+         class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+         th:text="${erreur}"></div>
+
+    <form th:action="@{/temps-travail/pointages}" method="post" th:object="${pointage}"
+          class="bg-surface-card p-6 rounded-lg border border-neutral-border max-w-3xl flex flex-col gap-5 shadow-sm">
+
+        <input type="hidden" th:field="*{id}">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div class="md:col-span-2">
+                <label for="employe" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                    Salarié <span class="text-red-500">*</span>
+                </label>
+                <select id="employe" th:field="*{employe.idEmployer}" required
+                        class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 cursor-pointer">
+                    <option value="">Sélectionner un salarié</option>
+                    <option th:each="employe : ${employes}"
+                            th:value="${employe.idEmployer}"
+                            th:text="${employe.matricule + ' — ' + employe.candidature.candidat.prenom + ' ' + employe.candidature.candidat.nom}"></option>
+                </select>
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="datePointage" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                    Date <span class="text-red-500">*</span>
+                </label>
+                <input id="datePointage" type="date" th:field="*{datePointage}" required
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+
+            <div>
+                <label for="heureEntree" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                    Heure d'entrée
+                </label>
+                <input id="heureEntree" type="time" th:field="*{heureEntree}"
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm font-mono focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+
+            <div>
+                <label for="heureSortie" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                    Heure de sortie
+                </label>
+                <input id="heureSortie" type="time" th:field="*{heureSortie}"
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm font-mono focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+        </div>
+
+        <div>
+            <label for="commentaire" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
+                Commentaire
+            </label>
+            <textarea id="commentaire" th:field="*{commentaire}" rows="3" maxlength="500"
+                      placeholder="Motif de correction, contexte particulier…"
+                      class="w-full border border-neutral-border rounded px-3 py-2 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700"></textarea>
+            <p class="text-xs text-slate-500 mt-1">
+                Un commentaire est recommandé en cas de correction manuelle.
+            </p>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-neutral-border">
+            <a th:href="@{/temps-travail/pointages}"
+               class="h-10 px-4 flex items-center rounded bg-surface-card border border-neutral-border text-slate-700 text-sm font-semibold hover:bg-slate-50">
+                Annuler
+            </a>
+            <button type="submit"
+                    class="h-10 px-5 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-sm font-semibold shadow-sm">
+                Enregistrer
+            </button>
+        </div>
+    </form>
+
+</main>
+</body>
+</html>

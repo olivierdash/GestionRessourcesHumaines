@@ -1,195 +1,143 @@
 package com.example.sirh.service;
 
-import com.example.sirh.model.*;
-import com.example.sirh.repository.*;
+import com.example.sirh.dto.PointageCalculDto;
+import com.example.sirh.dto.PointageFilter;
+import com.example.sirh.model.AffectationPlanning;
+import com.example.sirh.model.HoraireTravail;
+import com.example.sirh.model.Planning;
+import com.example.sirh.model.Pointage;
+import com.example.sirh.model.RegimeTravail;
+import com.example.sirh.model.TypeDecompte;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.Duration;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class TempsTravailService {
-    private final RegimeTravailRepository regimeRepository;
-    private final PlanningRepository planningRepository;
-    private final AffectationPlanningRepository affectationRepository;
-    private final EmployeRepository employeRepository;
-    private final PointageRepository pointageRepository;
 
-    @Transactional(readOnly = true)
+    private final RegimeTravailService regimeTravailService;
+    private final PlanningService planningService;
+    private final AffectationPlanningService affectationPlanningService;
+    private final PointageService pointageService;
+    private final JourFerieService jourFerieService;
+    private final TypeDecompteService typeDecompteService;
+
+    // =========================================================
+    // RÉGIME DE TRAVAIL
+    // =========================================================
+
     public List<RegimeTravail> regimes() {
-        return regimeRepository.findAll();
+        return regimeTravailService.getAll();
     }
 
-    @Transactional(readOnly = true)
     public RegimeTravail regime(Integer id) {
-        return regimeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Régime de travail introuvable : " + id));
+        return regimeTravailService.getById(id);
     }
 
-    @Transactional
-    public RegimeTravail enregistrerRegime(Integer id, String libelle, String description,
-                                           Integer heuresHebdomadaires, Integer joursHebdomadaires) {
-        if (libelle == null || libelle.isBlank() || heuresHebdomadaires == null
-                || heuresHebdomadaires <= 0 || joursHebdomadaires == null
-                || joursHebdomadaires < 1 || joursHebdomadaires > 7) {
-            throw new IllegalArgumentException("Le libellé, les heures et le nombre de jours sont obligatoires et valides.");
-        }
-        RegimeTravail regime = id == null ? new RegimeTravail() : regime(id);
-        regime.setLibelle(libelle.trim());
-        regime.setDescription(description);
-        regime.setHeuresHebdomadaires(heuresHebdomadaires);
-        regime.setJoursHebdomadaires(joursHebdomadaires);
-        return regimeRepository.save(regime);
+    public RegimeTravail enregistrerRegime(RegimeTravail form) {
+        return regimeTravailService.enregistrer(form);
     }
 
-    @Transactional
-    public void enregistrerHoraire(Integer regimeId, DayOfWeek jour, java.time.LocalTime debut,
-                                   java.time.LocalTime fin, Integer pauseMinutes) {
-        RegimeTravail regime = regime(regimeId);
-        if (debut == null || fin == null || !fin.isAfter(debut) || pauseMinutes == null || pauseMinutes < 0) {
-            throw new IllegalArgumentException("Les heures et la pause doivent former un horaire valide.");
-        }
-        HoraireTravail horaire = regime.getHoraires().stream()
-                .filter(item -> item.getJourSemaine() == jour).findFirst().orElseGet(() -> {
-                    HoraireTravail nouveau = HoraireTravail.builder()
-                            .regimeTravail(regime).jourSemaine(jour).build();
-                    regime.getHoraires().add(nouveau);
-                    return nouveau;
-                });
-        horaire.setHeureDebut(debut);
-        horaire.setHeureFin(fin);
-        horaire.setPauseMinutes(pauseMinutes);
-        regimeRepository.save(regime);
+    public HoraireTravail enregistrerHoraire(HoraireTravail form) {
+        return regimeTravailService.enregistrerHoraire(form);
     }
 
-    @Transactional(readOnly = true)
+    // =========================================================
+    // PLANNING
+    // =========================================================
+
     public List<Planning> plannings() {
-        return planningRepository.findAll();
+        return planningService.getAll();
     }
 
-    @Transactional(readOnly = true)
     public Planning planning(Integer id) {
-        return planningRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Planning introuvable : " + id));
+        return planningService.getById(id);
     }
 
-    @Transactional
-    public Planning enregistrerPlanning(Integer id, String libelle, Integer regimeId,
-                                         LocalDate dateDebut, LocalDate dateFin) {
-        if (libelle == null || libelle.isBlank() || regimeId == null || dateDebut == null
-                || (dateFin != null && dateFin.isBefore(dateDebut))) {
-            throw new IllegalArgumentException("Les informations du planning sont invalides.");
-        }
-        Planning planning = id == null ? new Planning() : planning(id);
-        planning.setLibelle(libelle.trim());
-        planning.setRegimeTravail(regime(regimeId));
-        planning.setDateDebut(dateDebut);
-        planning.setDateFin(dateFin);
-        return planningRepository.save(planning);
+    public Planning enregistrerPlanning(Planning form) {
+        return planningService.enregistrer(form);
     }
 
-    @Transactional
-    public void affecterPlanning(Integer planningId, Integer employeId, LocalDate dateDebut, LocalDate dateFin) {
-        if (employeId == null || dateDebut == null || (dateFin != null && dateFin.isBefore(dateDebut))) {
-            throw new IllegalArgumentException("Les dates d'affectation sont invalides.");
-        }
-        AffectationPlanning affectation = AffectationPlanning.builder()
-                .planning(planning(planningId))
-                .employe(employeRepository.findById(employeId)
-                        .orElseThrow(() -> new IllegalArgumentException("Salarié introuvable : " + employeId)))
-                .dateDebut(dateDebut)
-                .dateFin(dateFin)
-                .build();
-        affectationRepository.save(affectation);
-    }
+    // =========================================================
+    // AFFECTATION PLANNING
+    // =========================================================
 
-    @Transactional(readOnly = true)
     public List<AffectationPlanning> affectations(Integer planningId) {
-        return affectationRepository.findByPlanningIdOrderByDateDebutDesc(planningId);
+        return affectationPlanningService.listerParPlanning(planningId);
     }
+
+    public AffectationPlanning affecterPlanning(AffectationPlanning form) {
+        return affectationPlanningService.enregistrer(form);
+    }
+
+    // =========================================================
+    // CALCUL (orchestration multi-services)
+    // =========================================================
 
     @Transactional(readOnly = true)
-    public List<Pointage> pointages(LocalDate dateDebut, LocalDate dateFin, Integer employeId) {
-        if (employeId == null) {
-            return pointageRepository.findByDatePointageBetweenOrderByDatePointageDesc(dateDebut, dateFin);
-        }
-        return pointageRepository.findByEmployeIdEmployerAndDatePointageBetweenOrderByDatePointageDesc(
-                employeId, dateDebut, dateFin);
-    }
+    public PointageCalculDto calculer(Pointage pointage) {
+        PointageCalculDto result = new PointageCalculDto();
 
-    @Transactional(readOnly = true)
-    public Pointage pointage(Integer id) {
-        return pointageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pointage introuvable : " + id));
-    }
-
-    @Transactional
-    public Pointage enregistrerPointage(Integer id, Integer employeId, LocalDate datePointage,
-                                        LocalTime heureEntree, LocalTime heureSortie,
-                                        String commentaire) {
-        if (employeId == null || datePointage == null) {
-            throw new IllegalArgumentException("Le salarié et la date sont obligatoires.");
-        }
-        if (heureEntree != null && heureSortie != null && !heureSortie.isAfter(heureEntree)) {
-            throw new IllegalArgumentException("L'heure de sortie doit être postérieure à l'heure d'entrée.");
+        if (pointage == null
+                || pointage.getHeureEntree() == null
+                || pointage.getHeureSortie() == null) {
+            return result;
         }
 
-        Pointage pointage;
-        if (id == null) {
-            pointage = pointageRepository.findByEmployeIdEmployerAndDatePointage(employeId, datePointage)
-                    .orElseGet(Pointage::new);
-        } else {
-            pointage = pointage(id);
+        int minutesPresence = (int) Duration.between(
+                pointage.getHeureEntree(), pointage.getHeureSortie()).toMinutes();
+
+        List<AffectationPlanning> affectations = affectationPlanningService.findActivesForDate(
+                pointage.getEmploye().getIdEmployer(), pointage.getDatePointage());
+
+        if (affectations.isEmpty()) {
+            result.setMinutesPresence(minutesPresence);
+            result.setMinutesTravaillees(minutesPresence);
+            result.setAnomalie("Aucune affectation de planning sur cette date.");
+            return result;
         }
 
-        Employe employe = employeRepository.findById(employeId)
-                .orElseThrow(() -> new IllegalArgumentException("Salarié introuvable : " + employeId));
-        pointage.setEmploye(employe);
-        pointage.setDatePointage(datePointage);
-        pointage.setHeureEntree(heureEntree);
-        pointage.setHeureSortie(heureSortie);
-        pointage.setCommentaire(commentaire);
+        RegimeTravail regime = affectations.get(0).getPlanning().getRegimeTravail();
+        HoraireTravail horaire = regimeTravailService.trouverHorairePourJour(
+                regime, pointage.getDatePointage().getDayOfWeek());
 
-        int minutesPresence = minutesEntre(heureEntree, heureSortie);
-        int minutesPause = 0;
-        int minutesTravaillees = minutesPresence;
+        if (horaire == null) {
+            result.setMinutesPresence(minutesPresence);
+            result.setMinutesTravaillees(minutesPresence);
+            result.setAnomalie("Aucun horaire prévu pour ce jour dans le régime.");
+            return result;
+        }
+
+        int minutesPause = Math.max(0,
+                horaire.getPauseMinutes() != null ? horaire.getPauseMinutes() : 0);
+        int minutesTravaillees = Math.max(0, minutesPresence - Math.min(minutesPause, minutesPresence));
+
         int minutesRetard = 0;
-        int minutesSupplementaires = 0;
-        List<AffectationPlanning> affectations = affectationRepository.findActivesForDate(employeId, datePointage);
-        if (!affectations.isEmpty()) {
-            RegimeTravail regime = affectations.get(0).getPlanning().getRegimeTravail();
-            HoraireTravail horaire = regime.getHoraires().stream()
-                    .filter(item -> item.getJourSemaine() == datePointage.getDayOfWeek())
-                    .findFirst().orElse(null);
-            if (horaire != null) {
-                minutesPause = Math.max(0, horaire.getPauseMinutes());
-                if (heureEntree != null && horaire.getHeureDebut() != null
-                        && heureEntree.isAfter(horaire.getHeureDebut())) {
-                    minutesRetard = (int) Duration.between(horaire.getHeureDebut(), heureEntree).toMinutes();
-                }
-                int minutesPrevues = minutesEntre(horaire.getHeureDebut(), horaire.getHeureFin())
-                        - minutesPause;
-                minutesTravaillees = Math.max(0, minutesPresence - Math.min(minutesPause, minutesPresence));
-                minutesSupplementaires = Math.max(0, minutesTravaillees - Math.max(0, minutesPrevues));
-            }
+        if (pointage.getHeureEntree().isAfter(horaire.getHeureDebut())) {
+            minutesRetard = (int) Duration.between(
+                    horaire.getHeureDebut(), pointage.getHeureEntree()).toMinutes();
         }
-        pointage.setMinutesTravaillees(minutesTravaillees);
-        pointage.setMinutesPause(minutesPause);
-        pointage.setMinutesRetard(minutesRetard);
-        pointage.setMinutesSupplementaires(minutesSupplementaires);
-        return pointageRepository.save(pointage);
-    }
 
-    private int minutesEntre(LocalTime debut, LocalTime fin) {
-        if (debut == null || fin == null) {
-            return 0;
+        int minutesPrevues = (int) Duration.between(
+                horaire.getHeureDebut(), horaire.getHeureFin()).toMinutes() - minutesPause;
+        int minutesSup = Math.max(0, minutesTravaillees - Math.max(0, minutesPrevues));
+
+        String anomalie = null;
+        if (minutesRetard > 15) {
+            anomalie = "Retard de " + minutesRetard + " min";
         }
-        return (int) Duration.between(debut, fin).toMinutes();
+
+        result.setMinutesPresence(minutesPresence);
+        result.setMinutesPause(minutesPause);
+        result.setMinutesTravaillees(minutesTravaillees);
+        result.setMinutesRetard(minutesRetard);
+        result.setMinutesSupplementaires(minutesSup);
+        result.setAnomalie(anomalie);
+
+        return result;
     }
 }
