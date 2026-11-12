@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/employes/**").hasAnyRole("MANAGER", "RH", "DG")
                         .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
                         .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
 
                         .anyRequest().authenticated())
 

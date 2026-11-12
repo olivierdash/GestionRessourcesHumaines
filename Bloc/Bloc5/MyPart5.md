@@ -71,6 +71,12 @@ CREATE TABLE regime_travail (
 - AuditService.java (pour enregistrer les actions effectuer sur tel ou tel dossier)  
 
 
+**Controler :**
+- DossierSalarierControlleur.java
+- SecurityConfig.java (ajout de la route url dans selon le rôle )
+```java
+.requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
+```
 
 
 
