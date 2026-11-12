@@ -8,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -17,14 +16,14 @@ public class SecurityConfig {
     // Mots de passe en clair dans la base (projet de cours uniquement)
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+       return new BCryptPasswordEncoder();
     }
 
-    // @Bean
-    // @SuppressWarnings("deprecation")
-    // public PasswordEncoder passwordEncoder() {
-    // return NoOpPasswordEncoder.getInstance();
-    // }
+    /*@Bean
+    @SuppressWarnings("deprecation")
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }*/
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,21 +37,14 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/departements/**", "/postes/**", "/grilles/**")
-                        .hasAnyRole("RH", "FINANCE", "DG")
+                        .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
                         .requestMatchers("/propositions/**").hasAnyRole("RH", "FINANCE", "DG")
                         .requestMatchers("/offres/**").hasAnyRole("RH", "DG")
                         .requestMatchers("/candidatures/**").hasAnyRole("RH", "MANAGER")
                         .requestMatchers("/employes/**").hasAnyRole("MANAGER", "RH", "DG")
                         .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
                         .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
-                        // Bloc 4 : contrats (lecture RH et DG, écriture RH seulement)
-                        .requestMatchers(HttpMethod.GET, "/contrats/**").hasAnyRole("RH", "DG")
-                        .requestMatchers("/contrats/**").hasRole("RH")
-                        // Onboarding : la RH et le responsable IT (badge, compte, matériel)
-                        .requestMatchers("/onboarding/**").hasAnyRole("RH", "RESPONSABLE_IT")
-                        // Documents (contrats signés, RIB...) : données sensibles
-                        .requestMatchers("/documents/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
 
                         .anyRequest().authenticated())
 

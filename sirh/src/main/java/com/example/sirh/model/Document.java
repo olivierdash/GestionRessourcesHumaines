@@ -2,6 +2,8 @@ package com.example.sirh.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,6 +33,12 @@ public class Document {
     private String fichierUrl;
     @Column(name = "date_depot")
     private LocalDateTime dateDepot;
+
+    @Column(name = "date_expiration")
+    private LocalDate dateExpiration;
+    @Column (name = "statut_document", nullable = false, length = 50)
+    private String statutDocument = "VALIDE";
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_depose_par", nullable = false)
     private Utilisateur deposePar;

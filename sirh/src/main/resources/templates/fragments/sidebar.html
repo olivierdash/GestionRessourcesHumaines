@@ -43,7 +43,7 @@
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">manage_accounts</span>
                     <span class="sidebar-text whitespace-nowrap">Utilisateurs</span>
                 </a>
-
+ 
                 <a sec:authorize="hasAnyRole('MANAGER', 'RH')" th:href="@{/demandes}" data-path="/demandes"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                     title="Demandes">
@@ -57,6 +57,7 @@
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">group</span>
                     <span class="sidebar-text whitespace-nowrap">Employés</span>
                 </a>
+
 
                 <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/departements}" data-path="/departements"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
