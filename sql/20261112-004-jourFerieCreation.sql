@@ -1,20 +1,20 @@
 CREATE TABLE IF NOT EXISTS jour_ferie (
     id_jour_ferie  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    jour           INTEGER,
-    mois           INTEGER,
-    annee          INTEGER,
-    libelle        VARCHAR(25) NOT NULL,
-    CONSTRAINT uq_jour_ferie UNIQUE (jour, mois, annee)
+    jour           INTEGER NOT NULL,
+    mois           INTEGER NOT NULL,
+    annee          INTEGER, -- NULL pour les fêtes fixes annuelles
+    libelle        VARCHAR(25) NOT NULL
 );
+
+-- Index partiel pour les fêtes fixes (ex: 01/01 tous les ans)
+CREATE UNIQUE INDEX IF NOT EXISTS uq_jour_ferie_fixe
+    ON jour_ferie(jour, mois)
+    WHERE annee IS NULL;
+
+-- Index partiel pour les fêtes mobiles spécifiques à une année (ex: Aïd 2025)
+CREATE UNIQUE INDEX IF NOT EXISTS uq_jour_ferie_mobile
+    ON jour_ferie(jour, mois, annee)
+    WHERE annee IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_jour_ferie_annee
     ON jour_ferie(annee);
-
-    INSERT INTO jour_ferie (jour, mois, annee, libelle) VALUES
-(1,  1,  NULL, 'Nouvel An'),
-(29, 3,  NULL, 'Martyrs 1947'),
-(1,  5,  NULL, 'Fête du Travail'),
-(26, 6,  NULL, 'Indépendance'),
-(15, 8,  NULL, 'Assomption'),
-(1,  11, NULL, 'Toussaint'),
-(25, 12, NULL, 'Noël');
