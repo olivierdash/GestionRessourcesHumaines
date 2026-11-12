@@ -2,6 +2,7 @@ package com.example.sirh.controller;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.sirh.model.CoordonneesEmploye;
+import com.example.sirh.model.Document;
 import com.example.sirh.model.Employe;
 import com.example.sirh.repository.ContratRepository;
 import com.example.sirh.repository.EmployeRepository;
@@ -20,7 +22,7 @@ import com.example.sirh.repository.JournalAuditRepository;
 import com.example.sirh.repository.CoordonneesEmployeRepository;
 import com.example.sirh.service.AuditService;
 
-import ch.qos.logback.core.model.Model;
+import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
 
 @Controller 
