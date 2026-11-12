@@ -122,7 +122,7 @@
                             <td th:text="${c.dateFin != null ? c.dateFin : 'Indéterminée'}"></td>
                             <td th:text="${c.salaireMensuel} + ' Ar'"></td>
                             <td>
-                                <span class="badge bg-info" th:text="${c.status}"></span>
+                                <span class="badge bg-info" th:text="${c.statut != null ? c.statut.libelle : 'N/A'}"></span>
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(contrats)}">
