@@ -36,8 +36,8 @@ public class DemandeRecrutement {
     @Column(nullable = false)
     private Integer effectif;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_type_contrat", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_type_contrat")
     private TypeContrat typeContrat;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

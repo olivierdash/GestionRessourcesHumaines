@@ -4,7 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "candidature")
+@Entity
+@Table(
+    name = "candidature",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_candidat_demande",
+        columnNames = {"id_candidat", "id_demande_recrutement"}
+    )
+)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Candidature {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

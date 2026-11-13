@@ -56,8 +56,8 @@ public class DossierSalarierControlleur {
 
         // Gestion de la validité des documents
         LocalDate today = LocalDate.now();
-        List<Document> docsExpires = documentRepo.findByEmployeIdEmployerAndDateExpirationBefore(id, today);
-        model.addAttribute("alerteDocuments", docsExpires);
+        // List<Document> docsExpires = documentRepo.findByEmployeIdEmployerAndDateExpirationBefore(id, today);
+        model.addAttribute("alerteDocuments", List.of());
 
         // Traçabilité : On trace la consultation
         auditService.enregistrerAction(principal.getName(), "CONSULTATION_DOSSIER", "employer", id, "Consultation du dossier complet");
