@@ -54,7 +54,7 @@ public class RegimeTravailService {
         regime.setDescription(form.getDescription());
         regime.setTypeDecompte(typeDecompte);
         regime.setHeuresHebdomadaires(form.getHeuresHebdomadaires());
-        regime.setJoursHebdomadaires(form.getJoursHebdomadaires());
+        //regime.setJoursHebdomadaires(form.getJoursHebdomadaires());
         regime.setJoursAnnuelsReference(form.getJoursAnnuelsReference());
         regime.setPointageObligatoire(form.getPointageObligatoire());
         regime.setSeuilHeuresSupplementaires(form.getSeuilHeuresSupplementaires());
