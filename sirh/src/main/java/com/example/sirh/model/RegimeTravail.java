@@ -37,8 +37,8 @@ public class RegimeTravail {
     @Column(name = "heures_hebdomadaires", precision = 3, scale = 1)
     private BigDecimal heuresHebdomadaires;
 
-    @Column(name = "jours_hebdomadaires")
-    private Integer joursHebdomadaires;
+    //@Column(name = "jours_hebdomadaires")
+    //private Integer joursHebdomadaires;
 
     @Column(name = "jours_annuels_reference")
     private Integer joursAnnuelsReference;
