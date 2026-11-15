@@ -1,1 +1,1 @@
-ALTER TABLE grille_salarial DROP COLUMN salaire_moyen;
+ALTER TABLE grille_salarial DROP COLUMN IF EXISTS salaire_moyen;
