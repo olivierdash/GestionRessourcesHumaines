@@ -2,6 +2,7 @@ package com.example.sirh.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     // Mots de passe en clair dans la base (projet de cours uniquement)
@@ -34,7 +36,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**","/upload/**").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
@@ -45,6 +47,15 @@ public class SecurityConfig {
                         .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
                         .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
                         .requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
+                        .requestMatchers("/conges/types/**", "/conges/droits/**", "/conges/soldes/**",
+                                "/conges/demandes/**", "/conges/absences/**", "/conges/calendrier/**")
+                            .hasAnyRole("RH", "DG")
+                        .requestMatchers("/conges/variables-paie/**")
+                            .hasAnyRole("RH", "DG", "FINANCE")
+                        .requestMatchers("/conges/validations/**")
+                            .hasAnyRole("MANAGER", "RH", "DG")
+                        .requestMatchers("/conges/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/mes-conges/**", "/justificatifs/**").authenticated()
 
                         .anyRequest().authenticated())
 

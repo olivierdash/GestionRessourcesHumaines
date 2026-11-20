@@ -8,6 +8,9 @@ public class PointageCalculDto {
     private int minutesRetard;
     private int minutesSupplementaires;
     private String anomalie;
+    private String statut = "NORMAL";
+    private Integer absenceId;
+    private String libelleAbsence;
 
     public PointageCalculDto() {}
 
@@ -38,4 +41,13 @@ public class PointageCalculDto {
 
     public String getAnomalie() { return anomalie; }
     public void setAnomalie(String anomalie) { this.anomalie = anomalie; }
+
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
+
+    public Integer getAbsenceId() { return absenceId; }
+    public void setAbsenceId(Integer absenceId) { this.absenceId = absenceId; }
+
+    public String getLibelleAbsence() { return libelleAbsence; }
+    public void setLibelleAbsence(String libelleAbsence) { this.libelleAbsence = libelleAbsence; }
 }

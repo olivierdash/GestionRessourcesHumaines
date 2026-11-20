@@ -44,6 +44,27 @@
                     <span class="sidebar-text whitespace-nowrap">Utilisateurs</span>
                 </a>
  
+                <a sec:authorize="isAuthenticated()" th:href="@{/mes-conges}" data-path="/mes-conges"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Mes congés">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">beach_access</span>
+                    <span class="sidebar-text whitespace-nowrap">Mes congés</span>
+                </a>
+
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/conges/validations}"
+                    data-path="/conges/validations"
+                    class="sidebar-nav-link flex items-center justify-between px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Validations congés">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">fact_check</span>
+                        <span class="sidebar-text whitespace-nowrap">Validations congés</span>
+                    </div>
+                    <span th:if="${congesEnAttenteCount != null and congesEnAttenteCount > 0}"
+                        class="bg-cobalt-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full sidebar-text">
+                        <span th:text="${congesEnAttenteCount}"></span>
+                    </span>
+                </a>
+
                 <a sec:authorize="hasAnyRole('MANAGER', 'RH')" th:href="@{/demandes}" data-path="/demandes"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                     title="Demandes">
@@ -146,6 +167,60 @@
                             title="Pointages">
                             <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">fingerprint</span>
                             <span class="sidebar-text whitespace-nowrap">Pointages</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div sec:authorize="hasAnyRole('RH', 'DG', 'FINANCE')" class="sidebar-submenu-group" data-submenu-group="conges">
+
+                    <button type="button"
+                        class="sidebar-nav-link submenu-toggle flex items-center justify-between w-full px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                        data-submenu-target="conges" title="Congés">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">beach_access</span>
+                            <span class="sidebar-text whitespace-nowrap">Congés</span>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-[18px] text-slate-400 sidebar-text transition-transform duration-200 submenu-chevron">expand_more</span>
+                    </button>
+
+                    <div class="submenu-items hidden" data-submenu="conges">
+                        <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/demandes}" data-path="/conges/demandes"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Demandes de congé">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">list_alt</span>
+                            <span class="sidebar-text whitespace-nowrap">Demandes</span>
+                        </a>
+                        <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/absences}" data-path="/conges/absences"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Absences">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">sick</span>
+                            <span class="sidebar-text whitespace-nowrap">Absences</span>
+                        </a>
+                        <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/calendrier}" data-path="/conges/calendrier"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Calendrier des congés">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">calendar_month</span>
+                            <span class="sidebar-text whitespace-nowrap">Calendrier</span>
+                        </a>
+                        <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/soldes}" data-path="/conges/soldes"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Soldes de congé">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">account_balance_wallet</span>
+                            <span class="sidebar-text whitespace-nowrap">Soldes</span>
+                        </a>
+                        <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/droits}" data-path="/conges/droits"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Règles de droit">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">rule</span>
+                            <span class="sidebar-text whitespace-nowrap">Règles de droit</span>
+                        </a>
+                        <a sec:authorize="hasAnyRole('RH', 'DG', 'FINANCE')" th:href="@{/conges/variables-paie}"
+                            data-path="/conges/variables-paie"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Variables de paie">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">receipt_long</span>
+                            <span class="sidebar-text whitespace-nowrap">Variables de paie</span>
                         </a>
                     </div>
                 </div>

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.env.Environment;
 
 import com.example.sirh.constants.ConstantSirh.Statut;
 import com.example.sirh.dto.CandidatureAvecPropositionDTO;
@@ -34,6 +35,8 @@ public class CandidatureService {
     private final CandidatService candidatService;
     private final OffreEmploieService offreService;
     private final StatutCandidatureService statutCandidatureService;
+
+    private final Environment environment;
 
     public List<CandidatureAvecPropositionDTO> findAvecPropositionActive(Integer idOffre) {
         return candidatureRepo.findAvecPropositionActive(idOffre,List.of(Statut.EN_ATTENTE, Statut.SOUMISE, Statut.APPROUVEE));
@@ -93,7 +96,7 @@ public class CandidatureService {
         // 5. Sauvegarder le CV sur le serveur
         String nomOriginal = Paths.get(cvFile.getOriginalFilename()).getFileName().toString();
         String nomStocke = "cv_" + UUID.randomUUID() + "_" + nomOriginal;
-        String cvUrl = "/uploads/" + nomStocke;
+        String cvUrl = environment.getProperty("cv.upload-path", "/uploads") + "/" + nomStocke;
 
         try {
             Path dossier = Paths.get("uploads");

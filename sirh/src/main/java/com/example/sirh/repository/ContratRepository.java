@@ -26,6 +26,22 @@ public interface ContratRepository extends JpaRepository<Contrat, Integer> {
                                  @Param("fin") LocalDate fin);
 
     List<Contrat> findByEmployeIdEmployer(Integer idEmployer);
+
+    Optional<Contrat> findFirstByEmployeIdEmployerOrderByDateDebutDesc(Integer idEmployer);
+
+    Optional<Contrat> findFirstByEmployeIdEmployerOrderByDateDebutAsc(Integer idEmployer);
+
+    @Query("""
+            SELECT c FROM Contrat c
+            JOIN FETCH c.typeContrat
+            WHERE c.employe.idEmployer = :employeId
+              AND c.dateDebut <= :date
+              AND (c.dateFin IS NULL OR c.dateFin >= :date)
+            ORDER BY c.dateDebut DESC
+            """)
+    List<Contrat> findActifsPourDate(@Param("employeId") Integer employeId,
+                                     @Param("date") LocalDate date);
+
     long countByStatutLibelleAndDateFinBetween(
         String libelle,
         LocalDate start,

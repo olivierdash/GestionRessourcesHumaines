@@ -80,6 +80,7 @@
                         <tr>
                             <th scope="col">Date</th>
                             <th scope="col">Salarié</th>
+                            <th scope="col">Statut</th>
                             <th scope="col">Entrée</th>
                             <th scope="col">Sortie</th>
                             <th scope="col">Pause</th>
@@ -92,7 +93,7 @@
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(pointages)}">
-                            <td colspan="10" class="td-empty py-8 text-center text-slate-500 italic">
+                            <td colspan="11" class="td-empty py-8 text-center text-slate-500 italic">
                                 Aucun pointage pour cette période.
                             </td>
                         </tr>
@@ -105,6 +106,25 @@
                                 </div>
                                 <div class="font-mono text-[10px] text-slate-500"
                                     th:text="${pointage.employe.matricule}"></div>
+                            </td>
+                            <td>
+                                <span th:if="${calcul != null and calcul.statut == 'CONGE'}"
+                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-bold bg-blue-50 border-blue-200 text-blue-700">
+                                    <span class="material-symbols-outlined text-[12px]">beach_access</span>
+                                    <span th:text="${calcul.libelleAbsence != null ? calcul.libelleAbsence : 'Congé'}"></span>
+                                </span>
+                                <span th:if="${calcul != null and calcul.statut == 'ABSENCE'}"
+                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-bold bg-red-50 border-red-200 text-red-700">
+                                    <span class="material-symbols-outlined text-[12px]">sick</span>
+                                    <span th:text="${calcul.libelleAbsence != null ? calcul.libelleAbsence : 'Absence'}"></span>
+                                </span>
+                                <span th:if="${calcul != null and calcul.statut == 'FERIE'}"
+                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-bold bg-slate-100 border-slate-200 text-slate-600">
+                                    <span class="material-symbols-outlined text-[12px]">celebration</span>
+                                    Jour férié
+                                </span>
+                                <span th:if="${calcul == null or calcul.statut == 'NORMAL'}"
+                                    class="text-slate-400 text-xs">—</span>
                             </td>
                             <td class="font-mono text-sm text-slate-700"
                                 th:text="${pointage.heureEntree == null ? '—' : #temporals.format(pointage.heureEntree, 'HH:mm')}">
