@@ -66,9 +66,7 @@ public class EmployeController {
         // Appel au service de candidature
         model.addAttribute("candidatures", candidatureService.getCandidaturesSansEmploye());
         return "employe/form";
-    }
-
-    /** Fiche salarié avec matricule, contrat et affectation. */
+    }    /** Fiche salarié avec matricule, contrat et affectation. */
     @GetMapping("/{id}")
     public String show(@PathVariable("id") Integer id, Model model) {
         Employe employe = employeService.getById(id);
@@ -94,4 +92,6 @@ public class EmployeController {
 
         return "employe/fiche";
     }
+
+
 }

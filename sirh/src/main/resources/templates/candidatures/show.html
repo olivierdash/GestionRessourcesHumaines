@@ -69,7 +69,7 @@
                     </div>
                     <div>
                         <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">CV</span>
-                        <a th:if="${candidature.candidat.cvUrl != null}" th:href="@{${candidature.candidat.cvUrl}}"
+                        <a th:if="${candidature.candidat.cvUrl != null}" th:href="${candidature.candidat.cvUrl}"
                             target="_blank"
                             class="inline-flex items-center gap-1 text-sm font-bold text-cobalt-800 hover:text-cobalt-900 underline">
                             Consulter le CV ↗

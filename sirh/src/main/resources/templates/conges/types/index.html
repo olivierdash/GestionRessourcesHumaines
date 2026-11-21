@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Types de congé et d'absence</h1>
+            <p class="text-sm text-slate-600 mt-1">Paramétrez les catégories, le mode de décompte et les justificatifs.</p>
+        </div>
+        <div class="flex items-center gap-2 self-start md:self-auto">
+            <a th:href="@{/conges/droits}"
+               class="h-9 px-4 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">rule</span>
+                Règles de droit
+            </a>
+            <a th:href="@{/conges/types/nouveau}"
+               class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                Nouveau type
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Catégorie</th>
+                        <th>Décompte</th>
+                        <th>Solde</th>
+                        <th>Justificatif</th>
+                        <th>Report</th>
+                        <th>Statut</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(types)}">
+                        <td colspan="8" class="td-empty py-8 text-center text-slate-500 italic">Aucun type configuré.</td>
+                    </tr>
+                    <tr th:each="t : ${types}">
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full border border-black/10"
+                                      th:style="'background-color: ' + (${t.couleur != null} ? ${t.couleur} : '#cbd5e1')"></span>
+                                <div>
+                                    <div class="font-bold text-cobalt-900" th:text="${t.libelle}"></div>
+                                    <div class="font-mono text-[11px] text-slate-500" th:text="${t.code}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border"
+                                  th:classappend="${t.categorie.name() == 'CONGE'
+                                      ? 'bg-blue-50 border-blue-200 text-blue-700'
+                                      : 'bg-amber-50 border-amber-200 text-amber-700'}"
+                                  th:text="${t.categorie}"></span>
+                        </td>
+                        <td class="text-xs" th:text="${t.modeDecompte.name() == 'OUVRES' ? 'Jours ouvrés' : 'Jours calendaires'}"></td>
+                        <td>
+                            <span th:if="${t.consommeSolde}" class="text-xs font-semibold text-emerald-700">Décompté</span>
+                            <span th:unless="${t.consommeSolde}" class="text-xs text-slate-500">Non décompté</span>
+                            <div class="text-[10px] text-slate-400" th:text="${t.paye ? 'Payé' : 'Non payé'}"></div>
+                        </td>
+                        <td class="text-xs">
+                            <span th:if="${t.justificatifRequis}" class="font-semibold text-slate-700">Requis</span>
+                            <span th:unless="${t.justificatifRequis}" class="text-slate-400">Non</span>
+                            <div th:if="${t.delaiJustificatifJours != null}" class="text-[10px] text-slate-400"
+                                 th:text="${'Sous ' + t.delaiJustificatifJours + ' jour(s)'}"></div>
+                        </td>
+                        <td class="text-xs">
+                            <span th:if="${t.reportAutorise}" class="font-semibold text-slate-700">Autorisé</span>
+                            <span th:unless="${t.reportAutorise}" class="text-slate-400">Non</span>
+                            <div th:if="${t.plafondReportJours != null}" class="text-[10px] text-slate-400"
+                                 th:text="${'Plafond ' + t.plafondReportJours + ' j'}"></div>
+                        </td>
+                        <td>
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                  th:classappend="${t.actif
+                                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                      : 'bg-slate-100 border-slate-200 text-slate-500'}">
+                                <span class="w-1.5 h-1.5 rounded-full"
+                                      th:classappend="${t.actif ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+                                <span th:text="${t.actif ? 'Actif' : 'Inactif'}"></span>
+                            </span>
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            <a th:href="@{/conges/types/{id}/edit(id=${t.id})}"
+                               class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-[14px]">edit</span>
+                                Modifier
+                            </a>
+                            <form th:action="@{/conges/types/{id}/basculer(id=${t.id})}" method="post" class="inline">
+                                <button type="submit"
+                                        class="inline-flex items-center h-7 px-3 rounded bg-white border text-xs font-semibold"
+                                        th:classappend="${t.actif ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}"
+                                        th:text="${t.actif ? 'Désactiver' : 'Activer'}">
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

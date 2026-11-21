@@ -53,7 +53,7 @@ public class GrilleSalarialController {
     }
 
     @PostMapping
-    public String store(@ModelAttribute("grille") GrilleSalarial grille, RedirectAttributes redirect) {
+    public String store_Disabled(@ModelAttribute("grille") GrilleSalarial grille, RedirectAttributes redirect) {
         try {
             // Chargement sécurisé (évite les NPE si l'utilisateur n'a rien sélectionné)
             if (grille.getPoste() != null && grille.getPoste().getIdPoste() != null) {
@@ -105,7 +105,7 @@ public class GrilleSalarialController {
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable Integer id,
+    public String update_Disabled(@PathVariable Integer id,
                          @ModelAttribute("grille") GrilleSalarial grille,
                          RedirectAttributes redirect) {
 

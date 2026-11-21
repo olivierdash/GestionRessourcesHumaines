@@ -1,8 +1,10 @@
 package com.example.sirh.service;
 
+import com.example.sirh.model.Absence;
 import com.example.sirh.model.AffectationPlanning;
 import com.example.sirh.model.Employe;
 import com.example.sirh.model.Planning;
+import com.example.sirh.repository.AbsenceRepository;
 import com.example.sirh.repository.AffectationPlanningRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class AffectationPlanningService {
     private final AffectationPlanningRepository affectationRepository;
     private final PlanningService planningService;
     private final EmployeService employeService;
+    private final AbsenceRepository absenceRepository;
 
     @Transactional(readOnly = true)
     public List<AffectationPlanning> listerParPlanning(Integer planningId) {
@@ -65,8 +68,24 @@ public class AffectationPlanningService {
         form.setEmploye(employe);
 
         verifierPasDeChevauchement(form);
+        verifierPasDabsence(form);
 
         return affectationRepository.save(form);
+    }
+
+    private void verifierPasDabsence(AffectationPlanning form) {
+        LocalDate debut = form.getDateDebut();
+        LocalDate fin = form.getDateFin() == null
+                ? LocalDate.of(9999, 12, 31) : form.getDateFin();
+        List<Absence> absences = absenceRepository.findChevauchements(
+                form.getEmploye().getIdEmployer(), debut, fin, null);
+        if (!absences.isEmpty()) {
+            Absence absence = absences.get(0);
+            throw new IllegalArgumentException(
+                    "Le salarié est absent du " + absence.getDateDebut() + " au "
+                            + absence.getDateFin() + " (" + absence.getTypeConge().getLibelle()
+                            + "). Affectation au planning impossible.");
+        }
     }
 
     private void verifierPasDeChevauchement(AffectationPlanning form) {

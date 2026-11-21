@@ -8,7 +8,7 @@
         <!-- En-tête -->
         <div>
             <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight"
-                th:text="${grille.idGrille == null ? 'Nouvelle grille salariale' : 'Modifier la grille salariale'}">
+                th:text="Consultation de la grille salariale">
             </h2>
         </div>
 
@@ -22,8 +22,8 @@
         <!-- Formulaire -->
         <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
             <div class="p-6 md:p-8">
-                <form method="post"
-                    th:action="${grille.idGrille == null} ? @{/grilles} : @{/grilles/{id}(id=${grille.idGrille})}"
+                <form method="get" disabled>
+                    th:action="@{/grilles/{id}(id=${grille.idGrille})}"
                     th:object="${grille}" class="flex flex-col gap-5">
 
                     <!-- Poste -->
@@ -33,7 +33,7 @@
                                 class="text-red-500">*</span></label>
                         <div class="relative">
                             <select th:field="*{poste.idPoste}" id="poste" required
-                                class="w-full h-11 pl-3 pr-10 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors appearance-none cursor-pointer"
+                                class="w-full h-11 pl-3 pr-10 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors appearance-none cursor-pointer not-allowed"
                                 th:classappend="${errors != null and errors['poste.idPoste'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
                                 <option value="">Sélectionner un poste</option>
                                 <option th:each="poste : ${postes}" th:value="${poste.idPoste}"
@@ -53,7 +53,7 @@
                             class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire
                             minimum (€) <span class="text-red-500">*</span></label>
                         <input type="number" th:field="*{salaireMin}" id="salaireMin" step="0.01" min="0" required
-                            class="w-full h-11 px-3 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors placeholder:text-slate-400"
+                            class="w-full h-11 px-3 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors placeholder:text-slate-400" disabled
                             th:classappend="${errors != null and errors['salaireMin'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
                         <p th:if="${errors != null and errors['salaireMin'] != null}" th:text="${errors['salaireMin']}"
                             class="mt-1 text-xs text-red-500 font-semibold"></p>
@@ -65,7 +65,7 @@
                             class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">Salaire
                             maximum (€) <span class="text-red-500">*</span></label>
                         <input type="number" th:field="*{salaireMax}" id="salaireMax" step="0.01" min="0" required
-                            class="w-full h-11 px-3 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors placeholder:text-slate-400"
+                            class="w-full h-11 px-3 bg-white border rounded text-sm text-slate-900 focus:outline-none transition-colors placeholder:text-slate-400" disabled
                             th:classappend="${errors != null and errors['salaireMax'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-slate-300 focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
                         <p th:if="${errors != null and errors['salaireMax'] != null}" th:text="${errors['salaireMax']}"
                             class="mt-1 text-xs text-red-500 font-semibold"></p>
