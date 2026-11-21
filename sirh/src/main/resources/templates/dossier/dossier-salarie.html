@@ -1,0 +1,57 @@
+<!-- Onglet 3 : Documents -->
+<div id="documents" class="tab-pane">
+    <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
+        <h2 class="text-lg font-bold text-slate-800">Documents Administratifs</h2>
+        <!-- Optionnel : un bouton pour ajouter un document plus tard -->
+        <button class="text-sm text-blue-800 font-medium hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">upload</span> Ajouter un document
+        </button>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="sirh-table">
+            <thead>
+                <tr>
+                    <th>Nom du Fichier</th>
+                    <th>Type</th>
+                    <th>Date de dépôt</th>
+                    <th>Date d'expiration</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="d : ${documents}">
+                    <td>
+                        <!-- Lien de téléchargement -->
+                        <a th:href="${d.fichierUrl}" target="_blank" class="text-blue-800 hover:underline flex items-center gap-2 font-medium" th:text="${d.nomFichier}">
+                            cni_emp4.pdf
+                        </a>
+                    </td>
+                    <td th:text="${d.typeDocument != null ? d.typeDocument.libelle : 'N/A'}">Pièce d'identité</td>
+                    <td th:text="${d.dateDepot != null ? #temporals.format(d.dateDepot, 'dd/MM/yyyy') : '-'}">08/11/2026</td>
+                    <td th:text="${d.dateExpiration != null ? #temporals.format(d.dateExpiration, 'dd/MM/yyyy') : 'Permanent'}">2027-09-08</td>
+                    <td>
+                        <!-- Gestion de la validité (Ta fameuse règle) -->
+                        <span th:if="${d.dateExpiration != null && d.dateExpiration.isBefore(#temporals.createToday())}" 
+                              class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 border border-red-200">
+                            <span class="material-symbols-outlined text-[14px] mr-1">error</span> Expiré
+                        </span>
+                        <span th:if="${d.dateExpiration == null || !d.dateExpiration.isBefore(#temporals.createToday())}" 
+                              class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 border border-emerald-200">
+                            <span class="material-symbols-outlined text-[14px] mr-1">check_circle</span> Valide
+                        </span>
+                    </td>
+                </tr>
+                <!-- Si la liste est vide -->
+                <tr th:if="${#lists.isEmpty(documents)}">
+                    <td colspan="5" class="td-empty">
+                        <div class="flex flex-col items-center justify-center py-6 text-slate-400">
+                            <span class="material-symbols-outlined text-4xl mb-2">folder_off</span>
+                            <p>Aucun document administratif n'a été déposé pour cet employé.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
