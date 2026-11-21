@@ -76,4 +76,6 @@ public interface DocumentRepository extends JpaRepository<Document, Integer> {
     @Modifying
     @Query("delete from Document d where d.tache.id = :idTache")
     int deleteByTacheId(@Param("idTache") Integer idTache);
+
+    List<Document> findByEmployeIdEmployerAndDateExpirationBefore(Integer idEmploye, LocalDate date);
 }
