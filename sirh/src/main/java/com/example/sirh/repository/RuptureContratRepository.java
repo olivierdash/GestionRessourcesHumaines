@@ -18,7 +18,7 @@ import com.example.sirh.model.RuptureContrat;
 public interface RuptureContratRepository extends JpaRepository<RuptureContrat,Integer> {
     Optional<RuptureContrat> findByEmployeIdEmployer(Integer idEmployer);
     
-    Optional<RuptureContrat> findByIdContract(Integer idContract);
+    Optional<RuptureContrat> findByContratIdContract(Integer idContract);
     List<RuptureContrat> findByArchiveFalse();
     List<RuptureContrat> findByStatutRupture(String statutRupture);
     // Connaître les dossiers initiés par un utilisateur spécifique

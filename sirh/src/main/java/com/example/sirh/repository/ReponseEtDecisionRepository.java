@@ -16,7 +16,7 @@ import com.example.sirh.model.ReponseEtDecision;
  */
 @Repository 
 public interface ReponseEtDecisionRepository extends JpaRepository<ReponseEtDecision, Integer> {
-    List<ReponseEtDecision> findByDemandeIncidentEmployerIdEmployer(Integer idEmployer);
+    List<ReponseEtDecision> findByDemandeIncidentEmployeIdEmployer(Integer idEmployer);
     
     Optional<ReponseEtDecision> findByDemandeIdDemande(Integer idDemande);
 }

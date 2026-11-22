@@ -16,7 +16,7 @@ import com.example.sirh.model.DemandeExplication;
 
 @Repository 
 public interface DemandeExplicationReposiroty extends JpaRepository <DemandeExplication, Integer>{
-    List<DemandeExplication> findByIncidentIdEmployer(Integer idEmployer);
+    List<DemandeExplication> findByIncidentEmployeIdEmployer(Integer idEmployer);
     
     Optional<DemandeExplication> findByIncidentIdIncident(Integer idIncident);
     

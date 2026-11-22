@@ -20,6 +20,6 @@ public interface IncidentRepository extends JpaRepository <Incident, Integer> {
     // lister les incident selon leur statut
     List<Incident> findByStatutInstruction(String statutInstruction);
     // voir les incidents déclarer par un manager spécifique 
-    List<Incident> findByDeclarantIdDeclarant(Integer id_utilisateur);
+    List<Incident> findByDeclarantIdUtilisateur(Integer id_utilisateur);
     long countByEmployeIdEmployerAndStatutInstructionIn(Integer idEmploye, List<String> status);
 }

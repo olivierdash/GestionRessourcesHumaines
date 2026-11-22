@@ -41,6 +41,7 @@ public class ReponseEtDecisionService {
         ReponseEtDecision saved = repo.save(d);
 
         if (sanction) {
+            incidentService.changerStatut(idIncident, "REPONSE_RECUE");
             incidentService.changerStatut(idIncident, "DECIDE");
         } else {
             incidentService.changerStatut(idIncident, "REPONSE_RECUE");
