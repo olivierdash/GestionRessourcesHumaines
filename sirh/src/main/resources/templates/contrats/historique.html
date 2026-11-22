@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Historique des contrats</h2>
+            <a th:href="@{/contrats/employe/{id}/nouveau(id=${idEmploye})}" 
+               class="inline-flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                Nouveau contrat
+            </a>
+        </div>
+
+        <!-- Message de succès -->
+        <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
+
+        <!-- Tableau -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Type</th>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Début</th>
+                            <th scope="col">Fin</th>
+                            <th scope="col">Salaire mensuel</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ligne vide -->
+                        <tr th:if="${#lists.isEmpty(contrats)}">
+                            <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">
+                                Aucun contrat pour ce salarié.
+                            </td>
+                        </tr>
+
+                        <!-- Boucle -->
+                        <tr th:each="c : ${contrats}" 
+                            th:classappend="${c.statut.libelle == 'actif' ? 'bg-emerald-50/40' : ''}">
+                            
+                            <td class="font-bold text-cobalt-900" th:text="${c.typeContrat.libelle}"></td>
+                            <td class="text-slate-700" th:text="${c.poste.intitule}"></td>
+                            <!-- Correction : formatage des dates -->
+                            <td class="whitespace-nowrap text-slate-600 font-mono text-xs" th:text="${#temporals.format(c.dateDebut, 'dd/MM/yyyy')}"></td>
+                            <td class="whitespace-nowrap text-slate-600 font-mono text-xs" th:text="${c.dateFin != null ? #temporals.format(c.dateFin, 'dd/MM/yyyy') : 'En cours'}"></td>
+                            <!-- Correction : formatage du salaire -->
+                            <td class="font-mono font-semibold text-slate-700" th:text="${#numbers.formatDecimal(c.salaireMensuel, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
+                            <td>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                      th:classappend="${c.statut.libelle == 'actif' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-100 border-slate-300 text-slate-600'}"
+                                      th:text="${c.statut.libelle}">
+                                </span>
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <a th:if="${c.statut.libelle == 'actif'}"
+                                   th:href="@{/contrats/{id}/renouveler(id=${c.idContract})}"
+                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                    Renouveler
+                                </a>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

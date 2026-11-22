@@ -1,0 +1,2 @@
+ALTER TABLE demande_recrutement
+DROP COLUMN id_statut_demande_recrutement;

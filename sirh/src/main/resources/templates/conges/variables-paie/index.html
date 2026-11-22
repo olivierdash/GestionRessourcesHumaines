@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Variables de paie</h1>
+            <p class="text-sm text-slate-600 mt-1">Journal mensuel des congés et absences. Aucun montant n'est calculé.</p>
+        </div>
+        <a th:href="@{/conges/variables-paie/export(periode=${filter.periode},employeId=${filter.employeId},statut=${filter.statut})}"
+           class="h-9 px-4 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm self-start md:self-auto">
+            <span class="material-symbols-outlined text-[16px]">download</span>
+            Exporter en CSV
+        </a>
+    </div>
+
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+
+    <div th:if="${!#lists.isEmpty(totaux)}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div th:each="total : ${totaux}" class="bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
+            <div class="text-[10px] font-bold uppercase text-slate-500 tracking-wider" th:text="${total.key}"></div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1"
+                 th:text="${#numbers.formatDecimal(total.value, 1, 2)}"></div>
+            <div class="text-[10px] text-slate-400 uppercase tracking-wider">jour(s)</div>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/conges/variables-paie}" th:object="${filter}"
+          class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+            <div>
+                <label for="periode" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Période</label>
+                <input id="periode" type="month" th:field="*{periode}" required
+                       class="w-full h-9 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700">
+            </div>
+            <div class="lg:col-span-2">
+                <label for="employeId" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Salarié</label>
+                <select id="employeId" th:field="*{employeId}"
+                        class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+                    <option value="">Tous</option>
+                    <option th:each="e : ${employes}" th:value="${e.idEmployer}"
+                            th:text="${e.matricule + ' — ' + e.candidature.candidat.prenom + ' ' + e.candidature.candidat.nom}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="statut" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Statut</label>
+                <select id="statut" th:field="*{statut}"
+                        class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+                    <option value="">Tous</option>
+                    <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="submit"
+                        class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold">
+                    Filtrer
+                </button>
+                <a th:href="@{/conges/variables-paie}"
+                   class="h-9 px-3 rounded bg-white border border-neutral-border text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center">
+                    Réinitialiser
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th>Période</th>
+                        <th>Salarié</th>
+                        <th>Code</th>
+                        <th>Libellé</th>
+                        <th>Dates</th>
+                        <th>Quantité</th>
+                        <th>Statut</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(variables)}">
+                        <td colspan="8" class="td-empty py-8 text-center text-slate-500 italic">
+                            Aucune variable de paie pour cette période.
+                        </td>
+                    </tr>
+                    <tr th:each="v : ${variables}">
+                        <td class="text-xs font-semibold whitespace-nowrap" th:text="${#temporals.format(v.periode, 'MM/yyyy')}"></td>
+                        <td>
+                            <div class="font-semibold text-cobalt-900"
+                                 th:text="${v.employe.candidature.candidat.prenom + ' ' + v.employe.candidature.candidat.nom}"></div>
+                            <div class="text-[11px] text-slate-500 font-mono" th:text="${v.employe.matricule}"></div>
+                        </td>
+                        <td class="font-mono text-xs text-slate-600" th:text="${v.code}"></td>
+                        <td class="text-sm" th:text="${v.libelle}"></td>
+                        <td class="text-xs text-slate-600 whitespace-nowrap">
+                            <span th:text="${#temporals.format(v.dateDebut, 'dd/MM/yyyy')}"></span>
+                            <span class="text-slate-400 mx-1">→</span>
+                            <span th:text="${#temporals.format(v.dateFin, 'dd/MM/yyyy')}"></span>
+                        </td>
+                        <td class="font-semibold"
+                            th:text="${#numbers.formatDecimal(v.quantite, 1, 2) + ' ' + (v.unite == 'JOUR' ? 'j' : v.unite)}"></td>
+                        <td th:replace="~{conges/fragments/statut :: badge(${v.statut})}"></td>
+                        <td class="text-right">
+                            <form th:if="${v.statut.name() == 'A_CONSOMMER'}"
+                                  th:action="@{/conges/variables-paie/{id}/consommer(id=${v.id})}" method="post"
+                                  onsubmit="return confirm('Marquer cette variable comme consommée ?');">
+                                <input type="hidden" name="periode" th:value="${filter.periode}">
+                                <input type="hidden" name="employeId" th:value="${filter.employeId}">
+                                <input type="hidden" name="statut" th:value="${filter.statut}">
+                                <button type="submit"
+                                        class="h-7 px-3 rounded bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold">
+                                    Consommer
+                                </button>
+                            </form>
+                            <span th:if="${v.statut.name() != 'A_CONSOMMER'}" class="text-[11px] text-slate-400">—</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+
+<body>
+
+    <!-- Visionneuse commune à tous les fichiers déposés via /uploads -->
+    <th:block th:fragment="modal">
+
+    <dialog id="filePreviewModal"
+        class="m-auto w-[92vw] max-w-6xl h-[88vh] max-h-[900px] rounded-lg border border-neutral-border bg-surface-card p-0 shadow-2xl backdrop:bg-slate-900/60 overflow-hidden">
+
+        <div class="flex h-full flex-col">
+
+            <div class="flex items-center justify-between gap-3 px-5 py-3 border-b border-neutral-border bg-slate-50 shrink-0">
+                <h3 id="filePreviewTitle"
+                    class="text-sm font-bold text-cobalt-900 uppercase tracking-wider truncate">
+                    Aperçu du document
+                </h3>
+
+                <div class="flex items-center gap-2 shrink-0">
+                    <a id="filePreviewDownload" href="#"
+                        class="inline-flex items-center h-8 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-100 text-xs font-semibold transition-colors">
+                        <span class="material-symbols-outlined text-[16px] mr-1">download</span>
+                        Télécharger
+                    </a>
+                    <a id="filePreviewOpen" href="#" target="_blank" rel="noopener"
+                        class="inline-flex items-center h-8 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 text-xs font-semibold transition-colors">
+                        <span class="material-symbols-outlined text-[16px] mr-1">open_in_new</span>
+                        Ouvrir dans un onglet
+                    </a>
+                    <button type="button"
+                        class="inline-flex items-center justify-center w-9 h-9 text-2xl leading-none text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition"
+                        onclick="closeFilePreview()" aria-label="Fermer l'aperçu">
+                        &times;
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 min-h-0 bg-slate-100">
+                <iframe id="filePreviewFrame" src="about:blank" title="Aperçu du document"
+                    class="w-full h-full border-0"></iframe>
+            </div>
+
+            <p id="filePreviewHint"
+                class="px-5 py-2 text-[11px] text-slate-500 border-t border-neutral-border bg-slate-50 shrink-0">
+                Si l'aperçu ne s'affiche pas (PDF protégé, format non pris en charge), utilisez
+                « Ouvrir dans un onglet » ou « Télécharger ».
+            </p>
+
+        </div>
+    </dialog>
+
+    <script th:inline="none">
+        function openFilePreview(url, title, downloadUrl) {
+            var dialog = document.getElementById('filePreviewModal');
+            if (!dialog || !url) {
+                if (url) window.open(url, '_blank', 'noopener');
+                return;
+            }
+
+            document.getElementById('filePreviewTitle').textContent = title || 'Aperçu du document';
+            document.getElementById('filePreviewFrame').src = url;
+            document.getElementById('filePreviewOpen').href = url;
+
+            var download = document.getElementById('filePreviewDownload');
+            if (downloadUrl) {
+                download.href = downloadUrl;
+                download.classList.remove('hidden');
+            } else {
+                download.classList.add('hidden');
+            }
+
+            if (typeof dialog.showModal === 'function') {
+                dialog.showModal();
+            } else {
+                window.open(url, '_blank', 'noopener');
+            }
+        }
+
+        function openFilePreviewFromLink(link, event) {
+            // Conserve le comportement natif (nouvel onglet) avec Ctrl/Cmd/Shift
+            // ou clic molette.
+            if (event && (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0)) {
+                return true;
+            }
+            if (!link || !link.href) {
+                return true;
+            }
+            openFilePreview(link.href, link.dataset.previewTitle, link.dataset.previewDownload);
+            return false;
+        }
+
+        function closeFilePreview() {
+            var dialog = document.getElementById('filePreviewModal');
+            if (dialog && dialog.open) {
+                dialog.close();
+            }
+        }
+
+        (function () {
+            var dialog = document.getElementById('filePreviewModal');
+            if (!dialog) return;
+
+            dialog.addEventListener('close', function () {
+                var frame = document.getElementById('filePreviewFrame');
+                if (frame) frame.src = 'about:blank';
+            });
+
+            // Fermeture au clic sur le fond sombre.
+            dialog.addEventListener('click', function (event) {
+                var rect = dialog.getBoundingClientRect();
+                var inside = event.clientX >= rect.left && event.clientX <= rect.right
+                    && event.clientY >= rect.top && event.clientY <= rect.bottom;
+                if (!inside) closeFilePreview();
+            });
+        })();
+    </script>
+
+    </th:block>
+
+</body>
+
+</html>

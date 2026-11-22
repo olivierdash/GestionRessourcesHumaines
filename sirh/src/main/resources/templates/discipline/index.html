@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div class="flex items-end justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900">Discipline</h1>
+            <p class="text-sm text-slate-500">Incidents, demandes d'explication et sanctions.</p>
+        </div>
+        <a th:href="@{/discipline/nouveau}" class="h-9 px-4 rounded bg-cobalt-700 text-white text-xs font-semibold flex items-center">
+            Nouvel incident
+        </a>
+    </div>
+    <div th:if="${succes}" class="p-3 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm" th:text="${erreur}"></div>
+    <div class="bg-white border border-neutral-border rounded-lg overflow-hidden">
+        <table class="sirh-table">
+            <thead><tr><th>Date</th><th>Salarié</th><th>Gravité</th><th>Statut</th><th class="text-right">Action</th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(incidents)}"><td colspan="5" class="td-empty text-center py-8 text-slate-500">Aucun incident.</td></tr>
+            <tr th:each="incident : ${incidents}">
+                <td th:text="${#temporals.format(incident.dateFait,'dd/MM/yyyy')}"></td>
+                <td class="font-semibold" th:text="${incident.employe.candidature.candidat.prenom + ' ' + incident.employe.candidature.candidat.nom}"></td>
+                <td th:text="${incident.gravite}"></td>
+                <td><span class="px-2 py-1 rounded bg-slate-100 text-xs font-bold" th:text="${incident.statutInstruction}"></span></td>
+                <td class="text-right"><a th:href="@{/discipline/incidents/{id}(id=${incident.idIncident})}" class="text-cobalt-700 text-xs font-bold">Consulter</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

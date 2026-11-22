@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:replace="~{layout :: layout(content=~{::mainContent})}">
+
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight flex flex-wrap items-center gap-3">
+                Proposition n° <span th:text="${proposition.idProposition}"></span>
+                <span class="px-2.5 py-1 border rounded font-mono text-sm font-bold" th:classappend="${estEnAttente ? 'bg-slate-100 border-slate-200 text-slate-700'
+                                 : (estSoumise   ? 'bg-amber-50 border-amber-200 text-amber-800'
+                                 : (estApprouvee ? 'bg-blue-50 border-blue-200 text-blue-700'
+                                 : (estAcceptee  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                 : 'bg-red-50 border-red-200 text-red-700')))}"
+                    th:text="${proposition.statut.libelle}">
+                </span>
+            </h1>
+            <div class="flex gap-2">
+                <a th:href="@{/candidatures/{id}(id=${proposition.candidature.idCandidature})}"
+                    class="inline-flex items-center gap-1.5 px-3 h-9 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">person</span>
+                    Candidature
+                </a>
+                <a th:href="@{/propositions}"
+                    class="inline-flex items-center gap-1.5 px-3 h-9 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                    Liste
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${succes}"
+            class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
+            th:text="${succes}"></div>
+        <div th:if="${erreur}"
+            class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+            th:text="${erreur}"></div>
+        <div th:if="${alerteGrille != null}"
+            class="p-4 rounded bg-amber-50 text-amber-800 border border-amber-200 text-sm font-semibold shadow-sm flex items-start gap-2">
+            <span class="material-symbols-outlined text-[20px]">warning</span>
+            <span th:text="${alerteGrille}"></span>
+        </div>
+
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Informations générales</h3>
+            </div>
+            <div class="p-6 flex flex-col gap-3">
+                <p class="m-0 text-sm">
+                    <strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Candidat :</strong>
+                    <span class="text-slate-800 font-semibold"
+                        th:text="${proposition.candidature.candidat.prenom + ' ' + proposition.candidature.candidat.nom}"></span>
+                </p>
+                <p class="m-0 text-sm">
+                    <strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Poste :</strong>
+                    <span class="text-slate-800 font-semibold"
+                        th:text="${proposition.candidature.demandeRecrutement.poste.intitule}"></span>
+                </p>
+                <p class="m-0 text-sm" th:if="${proposition.candidature.demandeRecrutement.typeContrat != null}">
+                    <strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Type de contrat :</strong>
+                    <span
+                        class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider bg-blue-50 border-blue-200 text-blue-700"
+                        th:text="${proposition.candidature.demandeRecrutement.typeContrat.libelle}"></span>
+                </p>
+                <p class="m-0 text-sm">
+                    <strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Salaire proposé :</strong>
+                    <span class="text-slate-800 font-mono font-semibold"
+                        th:text="${#numbers.formatDecimal(proposition.salairePropose, 0, 'COMMA', 2, 'POINT')} + ' €'"></span>
+                </p>
+                <p class="m-0 text-sm">
+                    <strong class="text-slate-500 uppercase tracking-wider text-[11px] mr-2">Expiration :</strong>
+                    <span class="text-slate-800 font-mono"
+                        th:text="${#temporals.format(proposition.dateExpiration, 'dd/MM/yyyy HH:mm')}"></span>
+                </p>
+            </div>
+        </div>
+
+        <div th:if="${estSoumise and peutValider}"
+            class="bg-surface-card rounded-lg shadow-sm border border-neutral-border border-l-4 border-l-cobalt-700 overflow-hidden">
+            <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Validation de la proposition</h3>
+                <p class="text-xs text-slate-500 mt-1">
+                    En tant que Direction ou Finance, approuvez ou refusez cette proposition.
+                </p>
+            </div>
+            <div class="p-6">
+                <form th:action="@{/propositions/{id}/valider(id=${proposition.idProposition})}" method="post"
+                    onsubmit="return confirmValidation(this)" class="flex flex-col gap-5">
+
+                    <div>
+                        <span
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-3">Décision</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label
+                                class="flex items-center gap-3 p-4 bg-white border-2 border-neutral-border rounded-lg cursor-pointer hover:border-emerald-400 transition-colors has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                                <input type="radio" name="decision" value="APPROUVER" checked
+                                    class="w-4 h-4 text-emerald-600 focus:ring-emerald-500">
+                                <div>
+                                    <div class="text-sm font-bold text-emerald-800">Approuver</div>
+                                    <div class="text-xs text-slate-500">La proposition part au candidat</div>
+                                </div>
+                            </label>
+                            <label
+                                class="flex items-center gap-3 p-4 bg-white border-2 border-neutral-border rounded-lg cursor-pointer hover:border-red-400 transition-colors has-[:checked]:border-red-500 has-[:checked]:bg-red-50">
+                                <input type="radio" name="decision" value="REFUSER"
+                                    class="w-4 h-4 text-red-600 focus:ring-red-500">
+                                <div>
+                                    <div class="text-sm font-bold text-red-800">Refuser</div>
+                                    <div class="text-xs text-slate-500">Retour au RH pour correction</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="commentaire"
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Commentaire <span class="text-red-600">(obligatoire en cas de refus)</span>
+                        </label>
+                        <textarea id="commentaire" name="commentaire" rows="3" placeholder="Motif de votre décision…"
+                            class="w-full p-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700"></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2 border-t border-neutral-border">
+                        <button type="submit"
+                            class="h-10 px-6 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-sm shadow-sm transition-colors">
+                            Enregistrer la décision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${estSoumise and !peutValider}"
+            class="p-4 rounded bg-blue-50 text-blue-800 border border-blue-200 text-sm shadow-sm flex items-start gap-2">
+            <span class="material-symbols-outlined text-[20px]">info</span>
+            <div>
+                <p class="font-bold m-0">En attente de validation</p>
+                <p class="m-0 text-xs mt-1">Cette proposition doit être validée par la Direction ou la Finance avant
+                    d'être transmise au candidat.</p>
+            </div>
+        </div>
+
+        <div th:if="${estEnAttente}" class="flex flex-col gap-4">
+            <div th:if="${validations != null and !#lists.isEmpty(validations)}"
+                class="p-4 rounded bg-red-50 text-red-700 border border-red-200 text-sm shadow-sm">
+                <div class="font-bold mb-1">Dernière validation :</div>
+                <div class="text-xs font-mono text-red-600 mb-1"
+                    th:text="${#temporals.format(validations[0].dateValidationProposition, 'dd/MM/yyyy HH:mm')}"></div>
+                <div th:text="${validations[0].commentaire}"></div>
+            </div>
+
+            <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Préparer la proposition</h3>
+                </div>
+                <div class="p-6 flex flex-col gap-4">
+                    <form th:action="@{/propositions/{id}/modifier-salaire(id=${proposition.idProposition})}"
+                        method="post" class="flex flex-wrap items-center gap-3 m-0">
+                        <input type="number" step="0.01" min="0" name="salaire" th:value="${proposition.salairePropose}"
+                            required
+                            class="w-48 h-9 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+                        <button type="submit"
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm">
+                            Modifier le salaire
+                        </button>
+                    </form>
+                    <form th:action="@{/propositions/{id}/soumettre(id=${proposition.idProposition})}" method="post"
+                        class="m-0 border-t border-neutral-border pt-4">
+                        <button type="submit"
+                            class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm">
+                            Soumettre à validation
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${estApprouvee}"
+            class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="px-5 py-4 border-b border-neutral-border bg-slate-50 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Négociation</h3>
+                <div class="flex items-center gap-2">
+                    <span th:if="${attendReponseRh != null and attendReponseRh}"
+                        class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wider rounded">
+                        Réponse attendue
+                    </span>
+                    <span class="text-xs text-slate-500"
+                        th:text="${messages != null ? #lists.size(messages) : 0} + ' message(s)'"></span>
+                </div>
+            </div>
+
+            <div class="p-6 flex flex-col gap-3 max-h-96 overflow-y-auto">
+                <div th:if="${messages == null or #lists.isEmpty(messages)}"
+                    class="text-sm text-slate-400 italic text-center py-4">
+                    Aucun échange pour le moment.
+                </div>
+                <div th:each="m : ${messages}" th:classappend="${m.candidat != null
+                                   ? 'self-start bg-slate-50 border-slate-200'
+                                   : 'self-end bg-cobalt-50 border-cobalt-200'}"
+                    class="max-w-[80%] rounded-lg border p-3 flex flex-col gap-1">
+                    <div class="flex items-baseline gap-2 text-xs">
+                        <strong class="text-cobalt-900" th:text="${m.candidat != null
+                                       ? m.candidat.prenom + ' ' + m.candidat.nom
+                                       : m.utilisateur.nom}"></strong>
+                        <span class="text-slate-400 font-mono"
+                            th:text="${#temporals.format(m.dateCreation, 'dd/MM/yyyy HH:mm')}"></span>
+                    </div>
+                    <div th:if="${m.contenu != null and !m.contenu.isBlank()}"
+                        class="text-sm text-slate-700 whitespace-pre-line" th:text="${m.contenu}"></div>
+                    <div th:if="${m.salairePropose != null}"
+                        class="mt-1 inline-flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded self-start">
+                        Contre-proposition :
+                        <span
+                            th:text="${#numbers.formatDecimal(m.salairePropose, 0, 'COMMA', 2, 'POINT')} + ' €'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-neutral-border bg-slate-50 p-6">
+                <form th:action="@{/propositions/{id}/messages(id=${proposition.idProposition})}" method="post"
+                    class="flex flex-col gap-3">
+                    <div>
+                        <label for="msg-contenu"
+                            class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Répondre au candidat
+                        </label>
+                        <textarea id="msg-contenu" name="contenu" rows="3" required placeholder="Votre feedback…"
+                            class="w-full p-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700"></textarea>
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <label for="msg-salaire" class="text-xs text-slate-600 font-semibold">
+                                Contre-proposition (€) :
+                            </label>
+                            <input type="number" step="0.01" min="0" id="msg-salaire" name="salairePropose"
+                                placeholder="Optionnel"
+                                class="w-32 h-8 px-2 bg-white border border-neutral-border rounded text-xs focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+                        </div>
+                        <button type="submit"
+                            class="ml-auto h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm">
+                            Envoyer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${estAcceptee and employe == null}"
+            class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+
+            <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">
+                    Convertir en salarié
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">
+                    Créez le dossier salarié à partir de cette proposition acceptée.
+                </p>
+            </div>
+
+            <div class="p-6" th:with="typeContrat=${proposition.candidature.demandeRecrutement.typeContrat}">
+
+                <form th:action="@{/propositions/{id}/dossier(id=${proposition.idProposition})}" method="post"
+                    class="flex flex-col gap-4">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="dateDebut"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                                Date de début <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" id="dateDebut" name="dateDebut" required th:value="${proposition.candidature.demandeRecrutement.dateSouhaitee != null
+                                       ? #temporals.format(proposition.candidature.demandeRecrutement.dateSouhaitee, 'yyyy-MM-dd')
+                                       : ''}" th:attr="data-duree-max=${typeContrat != null and typeContrat.dureeMaxMois != null
+                                                    ? typeContrat.dureeMaxMois
+                                                    : ''}"
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+                        </div>
+
+                        <div>
+                            <label for="dateFin"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                                Date de fin
+                            </label>
+                            <input type="date" id="dateFin" name="dateFin"
+                                th:disabled="${typeContrat == null or typeContrat.dureeMaxMois == null}"
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed">
+                            <p id="dateFinHint" class="mt-1 text-[11px] text-slate-500">
+                                <span th:if="${typeContrat != null and typeContrat.dureeMaxMois != null}"
+                                    th:text="${'Calculée automatiquement à partir de la durée maximale (' + typeContrat.dureeMaxMois + ' mois). Modifiable si nécessaire.'}"></span>
+                                <span th:if="${typeContrat == null or typeContrat.dureeMaxMois == null}">
+                                    Contrat à durée indéterminée — pas de date de fin nécessaire.
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="dateFinError"
+                        class="hidden p-3 rounded bg-red-50 text-red-700 border border-red-200 text-xs font-semibold flex items-start gap-2">
+                        <span class="material-symbols-outlined text-[16px]">error</span>
+                        <span id="dateFinErrorText"></span>
+                    </div>
+
+                    <div>
+                        <button type="submit" id="submitBtn"
+                            class="h-9 px-4 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-sm">
+                            Créer le dossier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${employe != null}"
+            class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm">
+            Dossier créé avec succès. Matricule : <strong th:text="${employe.matricule}"></strong>.
+            <a th:href="@{/employes/{id}(id=${employe.idEmployer})}"
+                class="underline font-bold hover:text-emerald-900 ml-1">
+                Voir la fiche salarié
+            </a>
+        </div>
+
+        <div th:if="${estCloturee}"
+            class="p-4 rounded bg-slate-50 text-slate-700 border border-neutral-border text-sm shadow-sm">
+            Proposition clôturée.
+            <a th:href="@{/candidatures/{id}/proposer(id=${proposition.candidature.idCandidature})}"
+                class="text-cobalt-700 font-bold hover:underline ml-1">
+                Faire une nouvelle proposition
+            </a>
+        </div>
+
+        <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mt-4">Historique des validations</h2>
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Validateur</th>
+                            <th scope="col">Décision</th>
+                            <th scope="col">Commentaire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${validations == null or #lists.isEmpty(validations)}">
+                            <td colspan="4" class="td-empty py-6 text-center text-slate-500 italic">
+                                Aucune validation pour le moment.
+                            </td>
+                        </tr>
+                        <tr th:each="v : ${validations}">
+                            <td class="text-slate-600 font-mono whitespace-nowrap" th:text="${v.dateValidationProposition != null
+                                       ? #temporals.format(v.dateValidationProposition, 'dd/MM/yyyy HH:mm')
+                                       : '-'}"></td>
+                            <td class="font-bold text-cobalt-900" th:text="${v.validateur.nom}"></td>
+                            <td>
+                                <span
+                                    class="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                    th:classappend="${v.decision == 'APPROUVEE'
+                                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                                    : 'bg-red-50 border-red-200 text-red-700'}"
+                                    th:text="${v.decision}"></span>
+                            </td>
+                            <td class="text-slate-600 text-sm" th:text="${v.commentaire}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            (function () {
+                const dateDebut = document.getElementById('dateDebut');
+                const dateFin = document.getElementById('dateFin');
+                const dateFinHint = document.getElementById('dateFinHint');
+                const dateFinError = document.getElementById('dateFinError');
+                const dateFinErrorText = document.getElementById('dateFinErrorText');
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (!dateDebut || !dateFin) return;
+
+                const dureeMaxMois = parseInt(dateDebut.dataset.dureeMax, 10);
+                const hasDureeMax = !isNaN(dureeMaxMois) && dureeMaxMois > 0;
+
+                if (!hasDureeMax) return;
+
+                function computeDateFin(dateStr, months) {
+                    const parts = dateStr.split('-').map(Number);
+                    if (parts.length !== 3) return null;
+                    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+                    if (isNaN(d.getTime())) return null;
+                    d.setMonth(d.getMonth() + months);
+                    d.setDate(d.getDate() - 1);
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${day}`;
+                }
+
+                function formatDateFr(dateStr) {
+                    if (!dateStr) return '';
+                    const [y, m, d] = dateStr.split('-');
+                    return `${d}/${m}/${y}`;
+                }
+
+                function clearError() {
+                    dateFinError.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+
+                function showError(message) {
+                    dateFinErrorText.textContent = message;
+                    dateFinError.classList.remove('hidden');
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+
+                function validateDateFin() {
+                    if (!dateFin.value || !dateDebut.value) {
+                        clearError();
+                        return;
+                    }
+                    const fin = new Date(dateFin.value + 'T00:00:00');
+                    const debut = new Date(dateDebut.value + 'T00:00:00');
+                    if (fin < debut) {
+                        showError('La date de fin ne peut pas précéder la date de début.');
+                        return;
+                    }
+                    const limite = computeDateFin(dateDebut.value, dureeMaxMois);
+                    if (limite && dateFin.value > limite) {
+                        showError('La date de fin dépasse la durée maximale de ' + dureeMaxMois
+                            + ' mois (limite : ' + formatDateFr(limite) + ').');
+                        return;
+                    }
+                    clearError();
+                }
+
+                dateDebut.addEventListener('change', function () {
+                    if (!this.value) {
+                        dateFin.value = '';
+                        clearError();
+                        return;
+                    }
+                    const calc = computeDateFin(this.value, dureeMaxMois);
+                    if (calc) {
+                        dateFin.value = calc;
+                        validateDateFin();
+                    }
+                });
+
+                dateFin.addEventListener('change', function () {
+                    if (dateFinHint) {
+                        dateFinHint.classList.add('text-amber-700');
+                    }
+                    validateDateFin();
+                });
+
+                if (dateDebut.value && !dateFin.value) {
+                    const calc = computeDateFin(dateDebut.value, dureeMaxMois);
+                    if (calc) dateFin.value = calc;
+                    validateDateFin();
+                }
+            })();
+        </script>
+
+        <script>
+            function confirmValidation(form) {
+                const decision = form.querySelector('input[name="decision"]:checked').value;
+                const comment = form.querySelector('textarea[name="commentaire"]').value.trim();
+
+                if (decision === 'REFUSER' && !comment) {
+                    alert('Un commentaire est obligatoire pour refuser une proposition.');
+                    return false;
+                }
+
+                if (decision === 'APPROUVER') {
+                    return confirm('Confirmer l\'approbation de cette proposition ? Elle sera transmise au candidat.');
+                }
+
+                return confirm('Confirmer le refus ? La proposition reviendra en préparation pour le RH.');
+            }
+        </script>
+
+    </main>
+
+</body>
+
+</html>

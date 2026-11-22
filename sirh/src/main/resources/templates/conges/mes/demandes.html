@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Mes demandes</h1>
+            <p class="text-sm text-slate-600 mt-1">Suivez vos demandes de congé et leur avancement.</p>
+        </div>
+        <a th:href="@{/mes-conges/nouveau}"
+           class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm self-start md:self-auto">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Nouvelle demande
+        </a>
+    </div>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Type</th>
+                        <th>Période</th>
+                        <th>Jours</th>
+                        <th>Soumise le</th>
+                        <th>Statut</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(demandes)}">
+                        <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">Aucune demande enregistrée.</td>
+                    </tr>
+                    <tr th:each="demande : ${demandes}">
+                        <td class="font-mono text-xs text-slate-600" th:text="${demande.reference}"></td>
+                        <td class="font-semibold text-cobalt-900" th:text="${demande.typeConge.libelle}"></td>
+                        <td class="text-sm text-slate-700 whitespace-nowrap">
+                            <span th:text="${#temporals.format(demande.dateDebut, 'dd/MM/yyyy')}"></span>
+                            <span class="text-slate-400 mx-1">→</span>
+                            <span th:text="${#temporals.format(demande.dateFin, 'dd/MM/yyyy')}"></span>
+                        </td>
+                        <td class="font-semibold" th:text="${#numbers.formatDecimal(demande.nombreJours, 1, 1)}"></td>
+                        <td class="text-xs text-slate-500 whitespace-nowrap"
+                            th:text="${demande.dateSoumission != null ? #temporals.format(demande.dateSoumission, 'dd/MM/yyyy') : '—'}"></td>
+                        <td th:replace="~{conges/fragments/statut :: badge(${demande.statut})}"></td>
+                        <td class="text-right">
+                            <a th:href="@{/mes-conges/{id}(id=${demande.id})}"
+                               class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-[14px]">visibility</span>
+                                Détail
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

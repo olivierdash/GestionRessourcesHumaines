@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Plannings</h1>
+        </div>
+        <a th:href="@{/temps-travail/plannings/nouveau}"
+           class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors self-start md:self-auto">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Nouveau planning
+        </a>
+    </div>
+
+    <div th:if="${succes}"
+         class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
+         th:text="${succes}"></div>
+    <div th:if="${erreur}"
+         class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+         th:text="${erreur}"></div>
+
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Planning</th>
+                        <th scope="col">Régime</th>
+                        <th scope="col">Période</th>
+                        <th scope="col">Affectations</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col" class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(plannings)}">
+                        <td colspan="6" class="td-empty py-8 text-center text-slate-500 italic">
+                            Aucun planning configuré.
+                        </td>
+                    </tr>
+                    <tr th:each="planning : ${plannings}">
+                        <td class="font-bold text-cobalt-900" th:text="${planning.libelle}"></td>
+                        <td>
+                            <span class="font-mono text-xs text-cobalt-800 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded"
+                                  th:text="${planning.regimeTravail.code}"></span>
+                            <div class="text-xs text-slate-500 mt-0.5"
+                                 th:text="${planning.regimeTravail.libelle}"></div>
+                        </td>
+                        <td class="text-slate-700 whitespace-nowrap text-sm">
+                            <span th:text="${#temporals.format(planning.dateDebut, 'dd/MM/yyyy')}"></span>
+                            <span class="text-slate-400 mx-1">→</span>
+                            <span th:text="${planning.dateFin == null ? 'Sans fin' : #temporals.format(planning.dateFin, 'dd/MM/yyyy')}"></span>
+                        </td>
+                        <td class="text-slate-700">
+                            <span th:if="${#lists.isEmpty(planning.affectations)}"
+                                  class="text-slate-400 italic text-xs">Aucune</span>
+                            <span th:if="${!#lists.isEmpty(planning.affectations)}"
+                                  th:text="${#lists.size(planning.affectations)} + ' salarié(s)'"></span>
+                        </td>
+                        <td>
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+                                  th:classappend="${planning.actif
+                                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                                    : 'bg-slate-100 border-slate-200 text-slate-500'}">
+                                <span class="w-1.5 h-1.5 rounded-full"
+                                      th:classappend="${planning.actif ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+                                <span th:text="${planning.actif ? 'Actif' : 'Inactif'}"></span>
+                            </span>
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            <a th:href="@{/temps-travail/plannings/{id}(id=${planning.id})}"
+                               class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                                Consulter
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <!-- En-tête -->
+        <div>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight" 
+                th:text="${departement.idDepartement == null ? 'Nouveau Département' : 'Modifier le Département'}">
+            </h2>
+        </div>
+
+        <!-- Carte du formulaire -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="p-6 md:p-8">
+                
+                <!-- Message d'erreur serveur -->
+                <div th:if="${error}" class="mb-6 p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold" th:text="${error}"></div>
+
+                <form th:action="${departement.idDepartement == null} ? @{/departements} : @{/departements/{id}(id=${departement.idDepartement})}" 
+                      method="post" id="departementForm" novalidate>
+
+                    <!-- Champ caché pour simuler le PUT -->
+                    <input type="hidden" name="_method" value="put" th:if="${departement.idDepartement != null}">
+
+                    <!-- Titre -->
+                    <div class="mb-6">
+                        <label for="titre" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                            Titre du département <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="titre" name="titre" th:value="${departement.titre}" required
+                               class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                        <!-- Message d'erreur JS -->
+                        <p class="mt-2 text-xs text-red-500 font-semibold hidden" id="titreError">Veuillez saisir un titre unique.</p>
+                    </div>
+
+                    <!-- Manager -->
+                    <div class="mb-8">
+                        <label for="idManager" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Manager assigné</label>
+                        <select id="idManager" name="idManager"
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer">
+                            <option value="">— Aucun —</option>
+                            <option th:each="manager : ${managers}" th:value="${manager.idUtilisateur}" th:text="${manager.nom}"
+                                    th:selected="${departement.manager != null and departement.manager.idUtilisateur == manager.idUtilisateur}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border">
+                        <a th:href="@{/departements}" class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
+                            Annuler
+                        </a>
+                        <button type="submit" id="btnSubmit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SCRIPT DE VALIDATION JAVASCRIPT -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById('departementForm');
+                const titreInput = document.getElementById('titre');
+                const titreError = document.getElementById('titreError');
+                const btnSubmit = document.getElementById('btnSubmit');
+                
+                const currentId = /*[[${departement.idDepartement}]]*/ null;
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const titreValue = titreInput.value.trim();
+
+                    if (titreValue === "") {
+                        titreInput.classList.add('border-red-500');
+                        titreError.classList.remove('hidden');
+                        titreError.textContent = "Le titre est obligatoire.";
+                        return;
+                    }
+
+                    btnSubmit.disabled = true;
+                    btnSubmit.textContent = "Vérification...";
+
+                    let url = '/departements/check-titre?titre=' + encodeURIComponent(titreValue);
+                    if (currentId) {
+                        url += '&idDepartement=' + currentId;
+                    }
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(isUnique => {
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = "Enregistrer";
+
+                            if (isUnique) {
+                                titreInput.classList.remove('border-red-500');
+                                form.submit(); 
+                            } else {
+                                titreInput.classList.add('border-red-500');
+                                titreError.classList.remove('hidden');
+                                titreError.textContent = "Ce titre de département est déjà utilisé.";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la vérification:", error);
+                            btnSubmit.disabled = false;
+                            btnSubmit.textContent = "Enregistrer";
+                            form.submit();
+                        });
+                });
+
+                titreInput.addEventListener('input', function() {
+                    titreInput.classList.remove('border-red-500');
+                    titreError.classList.add('hidden');
+                });
+            });
+        </script>
+
+    </main>
+</body>
+</html>

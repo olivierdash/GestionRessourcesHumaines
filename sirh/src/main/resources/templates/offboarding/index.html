@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div><h1 class="text-2xl font-bold text-cobalt-900">Ruptures et offboarding</h1></div>
+    <div th:if="${succes}" class="p-3 rounded bg-emerald-50 border border-emerald-200 text-emerald-700" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-3 rounded bg-red-50 border border-red-200 text-red-700" th:text="${erreur}"></div>
+
+    <section class="bg-white border border-neutral-border rounded-lg p-5">
+        <h2 class="font-bold mb-4">Initier une rupture</h2>
+        <form th:action="@{/offboarding/ruptures}" method="post" class="grid md:grid-cols-3 gap-3">
+            <select name="idEmployer" required class="h-10 border border-neutral-border rounded px-3">
+                <option th:each="e : ${employes}" th:value="${e.idEmployer}" th:text="${e.matricule + ' - ' + e.candidature.candidat.prenom + ' ' + e.candidature.candidat.nom}"></option>
+            </select>
+            <select name="idContract" required class="h-10 border border-neutral-border rounded px-3">
+                <option th:each="c : ${contrats}" th:value="${c.idContract}" th:text="${c.idContract + ' - ' + c.employe.matricule + ' - ' + c.typeContrat.libelle}"></option>
+            </select>
+            <select name="motifRupture" class="h-10 border border-neutral-border rounded px-3">
+                <option>DEMISSION</option><option>LICENCIEMENT</option><option>FIN_CDD</option><option>RETRAITE</option>
+                <option>RUPTURE_CONVENTIONNELLE</option><option>FIN_PERIODE_ESSAI</option>
+            </select>
+            <input type="date" name="dateNotification" class="h-10 border border-neutral-border rounded px-3">
+            <input type="number" name="dureePreavisJours" value="0" min="0" class="h-10 border border-neutral-border rounded px-3" placeholder="Préavis (jours)">
+            <input type="date" name="dateSortie" required class="h-10 border border-neutral-border rounded px-3">
+            <textarea name="commentaire" maxlength="500" rows="2" class="md:col-span-3 border border-neutral-border rounded p-3" placeholder="Commentaire"></textarea>
+            <button class="h-9 px-4 rounded bg-cobalt-700 text-white text-xs font-bold md:col-span-3 justify-self-end">Initier</button>
+        </form>
+    </section>
+
+    <section class="bg-white border border-neutral-border rounded-lg overflow-hidden">
+        <table class="sirh-table">
+            <thead><tr><th>Salarié</th><th>Motif</th><th>Sortie</th><th>Statut</th><th class="text-right">Action</th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(ruptures)}"><td colspan="5" class="td-empty text-center py-8 text-slate-500">Aucune rupture active.</td></tr>
+            <tr th:each="r : ${ruptures}">
+                <td class="font-semibold" th:text="${r.employe.candidature.candidat.prenom + ' ' + r.employe.candidature.candidat.nom}"></td>
+                <td th:text="${r.motifRupture}"></td>
+                <td th:text="${#temporals.format(r.dateSortie,'dd/MM/yyyy')}"></td>
+                <td><span class="px-2 py-1 rounded bg-slate-100 text-xs font-bold" th:text="${r.statutRupture}"></span></td>
+                <td class="text-right"><a th:href="@{/offboarding/ruptures/{id}(id=${r.idRupture})}" class="text-cobalt-700 text-xs font-bold">Ouvrir</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+            <div>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Grille salariale</h2>
+            </div>
+            <a th:href="@{/grilles/{id}/edit(id=${grille.idGrille})}" 
+               class="inline-flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+                Modifier
+            </a>
+        </div>
+
+        <!-- Détails -->
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+            <div class="px-5 py-4 border-b border-neutral-border bg-slate-50">
+                <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Détails de la grille</h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Poste</span>
+                        <div class="text-base font-bold text-cobalt-900" th:text="${grille.poste.intitule}"></div>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Département</span>
+                        <div class="text-base font-semibold text-slate-800" th:text="${grille.departement.titre}"></div>
+                    </div>
+                </div>
+                
+                <hr class="my-6 border-neutral-border">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 border border-neutral-border p-4 rounded">
+                        <span class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Salaire minimum</span>
+                        <div class="text-lg font-bold text-slate-900 font-mono" th:text="${#numbers.formatDecimal(grille.salaireMin, 0, 'COMMA', 2, 'POINT')} + ' €'"></div>
+                    </div>
+                    <div class="bg-slate-50 border border-neutral-border p-4 rounded">
+                        <span class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Salaire maximum</span>
+                        <div class="text-lg font-bold text-slate-900 font-mono" th:text="${#numbers.formatDecimal(grille.salaireMax, 0, 'COMMA', 2, 'POINT')} + ' €'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

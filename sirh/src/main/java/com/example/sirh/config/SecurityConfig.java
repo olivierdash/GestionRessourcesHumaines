@@ -1,0 +1,83 @@
+package com.example.sirh.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    // Mots de passe en clair dans la base (projet de cours uniquement)
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+       return new BCryptPasswordEncoder();
+    }
+
+    /*@Bean
+    @SuppressWarnings("deprecation")
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }*/
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                // API publique (site carrière) : pas de session, pas de token CSRF.
+                // Sans cette ligne, POST /api/public/jobs/{id}/apply renvoie 403.
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/public/**"))
+
+                // Autorise l'aperçu des fichiers dans une iframe de même origine
+                // (visionneuse PDF intégrée aux pages).
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
+                        .requestMatchers("/propositions/**").hasAnyRole("RH", "FINANCE", "DG")
+                        .requestMatchers("/offres/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/candidatures/**").hasAnyRole("RH", "MANAGER")
+                        .requestMatchers("/employes/**").hasAnyRole("MANAGER", "RH", "DG")
+                        .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
+                        .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
+                        .requestMatchers("/discipline/**").hasAnyRole("RH", "DG", "MANAGER")
+                        .requestMatchers("/offboarding/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/conges/types/**", "/conges/droits/**", "/conges/soldes/**",
+                                "/conges/demandes/**", "/conges/absences/**", "/conges/calendrier/**")
+                            .hasAnyRole("RH", "DG")
+                        .requestMatchers("/conges/variables-paie/**")
+                            .hasAnyRole("RH", "DG", "FINANCE")
+                        .requestMatchers("/conges/validations/**")
+                            .hasAnyRole("MANAGER", "RH", "DG")
+                        .requestMatchers("/conges/**").hasAnyRole("RH", "DG")
+                        .requestMatchers("/mes-conges/**", "/justificatifs/**").authenticated()
+
+                        .anyRequest().authenticated())
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("motDePasse")
+                        .defaultSuccessUrl("/utilisateur", true)
+                        .permitAll())
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll());
+
+        return http.build();
+    }
+}

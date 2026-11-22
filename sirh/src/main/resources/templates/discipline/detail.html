@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <a th:href="@{/discipline}" class="text-sm text-cobalt-700">← Retour aux incidents</a>
+    <div th:if="${succes}" class="p-3 rounded bg-emerald-50 border border-emerald-200 text-emerald-700" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-3 rounded bg-red-50 border border-red-200 text-red-700" th:text="${erreur}"></div>
+    <section class="bg-white border border-neutral-border rounded-lg p-5">
+        <h1 class="text-xl font-bold text-cobalt-900">Incident <span th:text="${incident.idIncident}"></span></h1>
+        <dl class="grid md:grid-cols-3 gap-4 mt-4 text-sm">
+            <div><dt class="text-slate-500">Salarié</dt><dd class="font-semibold" th:text="${incident.employe.candidature.candidat.prenom + ' ' + incident.employe.candidature.candidat.nom}"></dd></div>
+            <div><dt class="text-slate-500">Date</dt><dd th:text="${#temporals.format(incident.dateFait,'dd/MM/yyyy')}"></dd></div>
+            <div><dt class="text-slate-500">Statut</dt><dd th:text="${incident.statutInstruction}"></dd></div>
+        </dl>
+        <p class="mt-4 whitespace-pre-line text-slate-700" th:text="${incident.descriptions}"></p>
+    </section>
+
+    <section th:if="${demande == null}" class="bg-white border border-neutral-border rounded-lg p-5">
+        <h2 class="font-bold mb-4">Envoyer une demande d'explication</h2>
+        <form th:action="@{/discipline/incidents/{id}/demande(id=${incident.idIncident})}" method="post" class="flex flex-col gap-3">
+            <input type="date" name="dateLimiteReponse" required class="h-10 border border-neutral-border rounded px-3 max-w-xs">
+            <textarea name="motif" maxlength="500" required rows="4" class="border border-neutral-border rounded p-3"></textarea>
+            <button class="h-9 px-4 rounded bg-cobalt-700 text-white text-xs font-bold self-end">Envoyer</button>
+        </form>
+    </section>
+
+    <section th:if="${demande != null}" class="bg-white border border-neutral-border rounded-lg p-5">
+        <h2 class="font-bold">Demande d'explication</h2>
+        <p class="mt-2 text-sm text-slate-700" th:text="${demande.motif}"></p>
+        <p class="text-xs text-slate-500 mt-2">Réponse attendue avant le <span th:text="${#temporals.format(demande.dateLimiteReponse,'dd/MM/yyyy')}"></span></p>
+        <div th:if="${decision != null}" class="mt-4 p-3 bg-slate-50 border border-neutral-border rounded">
+            <div class="text-xs text-slate-500">Réponse / décision</div>
+            <p th:text="${decision.contenuReponse}"></p>
+            <p class="font-bold mt-2" th:text="${decision.typeSanction}"></p>
+        </div>
+        <form th:if="${decision == null or decision.typeSanction == 'AUCUNE'}" th:action="@{/discipline/demandes/{id}/decision(id=${demande.idDemande})}" method="post" class="mt-4 grid md:grid-cols-3 gap-3">
+            <select name="typeSanction" class="h-10 border border-neutral-border rounded px-3"><option>AUCUNE</option><option>AVERTISSEMENT</option><option>BLAME</option><option>MISE_A_PIED</option><option>LICENCIEMENT</option></select>
+            <input type="date" name="dateNotification" class="h-10 border border-neutral-border rounded px-3">
+            <input name="commentaireDecision" placeholder="Commentaire" class="h-10 border border-neutral-border rounded px-3">
+            <button class="h-9 px-4 rounded bg-cobalt-700 text-white text-xs font-bold md:col-span-3 justify-self-end">Enregistrer la décision</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

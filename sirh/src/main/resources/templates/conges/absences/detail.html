@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <div class="flex items-center gap-2">
+                <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight" th:text="${absence.typeConge.libelle}"></h1>
+                <span th:replace="~{conges/fragments/statut :: badge(${absence.statut})}"></span>
+            </div>
+            <p class="text-sm text-slate-600 mt-1">
+                <span th:text="${absence.employe.candidature.candidat.prenom + ' ' + absence.employe.candidature.candidat.nom}"></span>
+                <span class="text-slate-400 mx-1">·</span>
+                <span th:text="${absence.employe.matricule}"></span>
+            </p>
+        </div>
+        <a th:href="@{/conges/absences}" class="text-sm text-cobalt-700 font-semibold flex items-center gap-1 self-start md:self-auto">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Retour
+        </a>
+    </div>
+
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 flex flex-col gap-6">
+
+            <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
+                <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Informations</h2>
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                    <div>
+                        <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Période</dt>
+                        <dd class="mt-1 font-semibold text-slate-800 whitespace-nowrap">
+                            <span th:text="${#temporals.format(absence.dateDebut, 'dd/MM/yyyy')}"></span>
+                            <span class="text-slate-400 mx-1">→</span>
+                            <span th:text="${#temporals.format(absence.dateFin, 'dd/MM/yyyy')}"></span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Nombre de jours</dt>
+                        <dd class="mt-1 text-2xl font-bold text-cobalt-900"
+                            th:text="${#numbers.formatDecimal(absence.nombreJours, 1, 1)}"></dd>
+                    </div>
+                    <div>
+                        <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Source</dt>
+                        <dd class="mt-1 text-slate-700" th:text="${absence.source}"></dd>
+                    </div>
+                    <div>
+                        <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Demande liée</dt>
+                        <dd class="mt-1">
+                            <a th:if="${absence.demandeConge != null}"
+                               th:href="@{/conges/demandes/{id}(id=${absence.demandeConge.id})}"
+                               class="text-cobalt-700 font-semibold hover:underline"
+                               th:text="${absence.demandeConge.reference}"></a>
+                            <span th:if="${absence.demandeConge == null}" class="text-slate-500">Saisie directe</span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Créée par</dt>
+                        <dd class="mt-1 text-slate-700" th:text="${absence.createur != null ? absence.createur.nom : '—'}"></dd>
+                    </div>
+                    <div>
+                        <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Justificatif attendu avant le</dt>
+                        <dd class="mt-1 text-slate-700"
+                            th:text="${absence.dateLimiteJustificatif != null ? #temporals.format(absence.dateLimiteJustificatif, 'dd/MM/yyyy') : '—'}"></dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Motif</dt>
+                        <dd class="mt-1 text-slate-700 whitespace-pre-line"
+                            th:text="${absence.motif != null and !absence.motif.isEmpty() ? absence.motif : 'Aucun motif renseigné.'}"></dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
+                <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Justificatifs</h2>
+                <div th:if="${#lists.isEmpty(justificatifs)}" class="text-sm text-slate-500 italic">Aucun justificatif déposé.</div>
+                <ul class="flex flex-col gap-3">
+                    <li th:each="j : ${justificatifs}"
+                        class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 rounded border border-neutral-border bg-slate-50">
+                        <div class="min-w-0">
+                            <a th:href="@{/justificatifs/{id}/apercu(id=${j.id})}"
+                               target="_blank" rel="noopener"
+                               th:attr="data-preview-title=${j.nomFichier},
+                                        data-preview-download=@{/justificatifs/{id}(id=${j.id})}"
+                               onclick="return openFilePreviewFromLink(this, event)"
+                               class="text-sm font-semibold text-cobalt-700 hover:underline break-all"
+                               th:text="${j.nomFichier}"></a>
+                            <div class="text-[11px] text-slate-500 mt-0.5">
+                                Déposé le <span th:text="${#temporals.format(j.dateDepot, 'dd/MM/yyyy HH:mm')}"></span>
+                                par <span th:text="${j.deposePar != null ? j.deposePar.nom : '—'}"></span>
+                            </div>
+                            <div th:if="${j.commentaire != null and !j.commentaire.isEmpty()}"
+                                 class="text-xs text-slate-600 mt-1" th:text="${j.commentaire}"></div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span th:replace="~{conges/fragments/statut :: badge(${j.statut})}"></span>
+                            <form th:if="${j.statut.name() == 'DEPOSE'}" sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')"
+                                  th:action="@{/justificatifs/{id}/valider(id=${j.id})}" method="post">
+                                <button type="submit"
+                                        class="h-7 px-3 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold">
+                                    Valider
+                                </button>
+                            </form>
+                            <form th:if="${j.statut.name() == 'DEPOSE'}" sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')"
+                                  th:action="@{/justificatifs/{id}/refuser(id=${j.id})}" method="post"
+                                  class="flex items-center gap-1">
+                                <input type="text" name="commentaire" maxlength="500" placeholder="Motif du refus"
+                                       class="h-7 w-32 border border-neutral-border rounded px-2 text-[11px]">
+                                <button type="submit"
+                                        class="h-7 px-3 rounded bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold">
+                                    Refuser
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+                <form th:if="${absence.statut.name() != 'ANNULEE'}"
+                      th:action="@{/conges/absences/{id}/justificatifs(id=${absence.id})}"
+                      method="post" enctype="multipart/form-data"
+                      class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2 border-t border-neutral-border pt-4">
+                    <input type="file" name="fichier" required accept=".pdf,.jpg,.jpeg,.png" class="text-xs flex-1">
+                    <button type="submit"
+                            class="h-9 px-4 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                        Déposer un justificatif
+                    </button>
+                </form>
+            </section>
+
+            <section th:if="${!#lists.isEmpty(variablesPaie)}"
+                     class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
+                <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Variables de paie générées</h2>
+                <div class="overflow-x-auto">
+                    <table class="sirh-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Période</th>
+                                <th>Quantité</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="v : ${variablesPaie}">
+                                <td class="font-mono text-xs" th:text="${v.code}"></td>
+                                <td class="text-xs" th:text="${#temporals.format(v.periode, 'MM/yyyy')}"></td>
+                                <td class="font-semibold"
+                                    th:text="${#numbers.formatDecimal(v.quantite, 1, 1) + ' ' + (v.unite == 'JOUR' ? 'jour(s)' : v.unite)}"></td>
+                                <td th:replace="~{conges/fragments/statut :: badge(${v.statut})}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <aside class="flex flex-col gap-6 h-fit">
+            <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-5">
+                <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-3">Actions</h2>
+
+                <form th:if="${absence.statut.name() == 'DECLAREE'}"
+                      th:action="@{/conges/absences/{id}/justifier(id=${absence.id})}" method="post" class="mb-2">
+                    <button type="submit"
+                            class="w-full h-10 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm">
+                        Marquer comme justifiée
+                    </button>
+                </form>
+
+                <form th:if="${absence.statut.name() == 'DECLAREE' or absence.statut.name() == 'JUSTIFIEE'}"
+                      th:action="@{/conges/absences/{id}/non-justifiee(id=${absence.id})}" method="post" class="mb-2">
+                    <button type="submit"
+                            class="w-full h-10 rounded bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold">
+                        Marquer non justifiée
+                    </button>
+                </form>
+
+                <form th:if="${absence.statut.name() != 'ANNULEE'}"
+                      th:action="@{/conges/absences/{id}/annuler(id=${absence.id})}" method="post"
+                      class="flex flex-col gap-2 border-t border-neutral-border pt-3 mt-3">
+                    <label for="motifAnnulation" class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Motif d'annulation</label>
+                    <input id="motifAnnulation" type="text" name="motif" maxlength="500"
+                           class="w-full h-9 border border-neutral-border rounded px-3 text-sm">
+                    <button type="submit"
+                            class="w-full h-9 rounded bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold">
+                        Annuler l'absence
+                    </button>
+                </form>
+
+                <p class="text-[11px] text-slate-400 mt-3">Aujourd'hui : <span th:text="${#temporals.format(aujourdhui, 'dd/MM/yyyy')}"></span></p>
+            </section>
+        </aside>
+    </div>
+</main>
+</body>
+</html>

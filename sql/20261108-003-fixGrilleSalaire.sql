@@ -1,0 +1,1 @@
+ALTER TABLE grille_salarial DROP COLUMN salaire_moyen;

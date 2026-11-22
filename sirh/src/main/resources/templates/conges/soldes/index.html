@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Soldes de congé</h1>
+                <p class="text-sm text-slate-600 mt-1">Gestion automatique des soldes par employé.</p>
+        </div>
+        <div class="flex items-center gap-2 self-start md:self-auto">
+        </div>
+    </div>
+
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+
+    <form method="get" th:action="@{/conges/soldes}"
+          class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+            <div>
+                <label for="annee" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Année</label>
+                <input id="annee" type="number" name="annee" min="2000" max="2100" th:value="${annee}"
+                       class="w-full h-9 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700">
+            </div>
+            <div class="lg:col-span-2">
+                <label for="employeId" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Salarié</label>
+                <select id="employeId" name="employeId"
+                        class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+                    <option value="">Tous</option>
+                    <option th:each="e : ${employes}" th:value="${e.idEmployer}"
+                            th:selected="${employeId != null and employeId == e.idEmployer}"
+                            th:text="${e.matricule + ' — ' + e.candidature.candidat.prenom + ' ' + e.candidature.candidat.nom}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="typeId" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Type</label>
+                <select id="typeId" name="typeId"
+                        class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+                    <option value="">Tous</option>
+                    <option th:each="t : ${types}" th:value="${t.id}"
+                            th:selected="${typeId != null and typeId == t.id}" th:text="${t.libelle}"></option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="submit"
+                        class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold">
+                    Filtrer
+                </button>
+                <a th:href="@{/conges/soldes}"
+                   class="h-9 px-3 rounded bg-white border border-neutral-border text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center">
+                    Réinitialiser
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th>Salarié</th>
+                        <th>Type</th>
+                        <th>Acquis</th>
+                        <th>Reportés</th>
+                        <th>Ajustés</th>
+                        <th>Utilisés</th>
+                        <th>En attente</th>
+                        <th>Disponible</th>
+                        <th>Statut</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(soldes)}">
+                        <td colspan="10" class="td-empty py-8 text-center text-slate-500 italic">
+                            Aucun solde pour cette année. Les soldes sont générés à la création de chaque employé.
+                        </td>
+                    </tr>
+                    <tr th:each="s : ${soldes}">
+                        <td>
+                            <div class="font-semibold text-cobalt-900"
+                                 th:text="${s.employe.candidature.candidat.prenom + ' ' + s.employe.candidature.candidat.nom}"></div>
+                            <div class="text-[11px] text-slate-500 font-mono" th:text="${s.employe.matricule}"></div>
+                        </td>
+                        <td>
+                            <div class="text-sm" th:text="${s.typeConge.libelle}"></div>
+                            <div class="text-[10px] text-slate-400"
+                                 th:text="${s.modeAcquisition.name() == 'MENSUEL' ? 'Mensuel' : 'Annuel'}"></div>
+                        </td>
+                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursAcquis, 1, 1)}"></td>
+                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursReportes, 1, 1)}"></td>
+                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursAjustes, 1, 1)}"></td>
+                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursUtilises, 1, 1)}"></td>
+                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursEnAttente, 1, 1)}"></td>
+                        <td class="font-bold text-cobalt-900"
+                            th:text="${#numbers.formatDecimal(disponibles[s.id], 1, 2)}"></td>
+                        <td>
+                            <span th:if="${s.anneeCloturee}"
+                                  class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500">
+                                Clôturé
+                            </span>
+                            <span th:unless="${s.anneeCloturee}"
+                                  class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700">
+                                Ouvert
+                            </span>
+                        </td>
+                        <td class="text-right">
+                            <a th:href="@{/conges/soldes/{id}(id=${s.id})}"
+                               class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-[14px]">history</span>
+                                Mouvements
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

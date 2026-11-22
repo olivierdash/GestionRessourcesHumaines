@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+        <div>
+            <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Référentiel des postes</h2>
+            <p class="text-sm text-slate-600 mt-1"
+               th:text="${postes.totalElements} + ' poste(s)'"></p>
+        </div>
+        <a th:href="@{/postes/create}"
+           class="inline-flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Nouveau poste
+        </a>
+    </div>
+
+    <div th:if="${succes}"
+         class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm"
+         th:text="${succes}"></div>
+    <div th:if="${erreur}"
+         class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm"
+         th:text="${erreur}"></div>
+
+    <div class="bg-surface-card border border-neutral-border rounded-lg p-4 shadow-sm">
+        <form method="get" th:action="@{/postes}" th:object="${filter}"
+              class="flex flex-wrap items-end gap-3">
+
+            <div class="flex flex-col gap-1.5 min-w-[220px] flex-1">
+                <label for="q" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    Recherche
+                </label>
+                <input type="search" id="q" th:field="*{q}"
+                       placeholder="Intitulé du poste…"
+                       class="h-9 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+
+            <div class="flex flex-col gap-1.5 min-w-[180px]">
+                <label for="idDepartement" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    Département
+                </label>
+                <select id="idDepartement" th:field="*{idDepartement}"
+                        class="h-9 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 cursor-pointer">
+                    <option value="">Tous les départements</option>
+                    <option th:each="d : ${departements}"
+                            th:value="${d.idDepartement}"
+                            th:text="${d.titre}"></option>
+                </select>
+            </div>
+
+            <div class="flex flex-col gap-1.5 min-w-[180px]">
+                <label for="idLieu" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    Lieu
+                </label>
+                <select id="idLieu" th:field="*{idLieu}"
+                        class="h-9 px-3 bg-white border border-neutral-border rounded text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 cursor-pointer">
+                    <option value="">Tous les lieux</option>
+                    <option th:each="l : ${lieux}"
+                            th:value="${l.idLieu}"
+                            th:text="${l.libelle}"></option>
+                </select>
+            </div>
+
+            <input type="hidden" name="size" th:value="${postes.size}">
+
+            <button type="submit"
+                    class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">filter_list</span>
+                Filtrer
+            </button>
+
+            <a th:href="@{/postes}"
+               th:if="${filter.q != null or filter.idDepartement != null or filter.idLieu != null}"
+               class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+                Réinitialiser
+            </a>
+        </form>
+    </div>
+
+    <div th:if="${postes.totalElements == 0}"
+         class="p-4 rounded bg-cobalt-50 text-cobalt-800 border border-cobalt-200 text-sm font-semibold shadow-sm">
+        <span th:if="${filter.q == null and filter.idDepartement == null and filter.idLieu == null}">
+            Aucun poste n'a encore été créé.
+        </span>
+        <span th:if="${filter.q != null or filter.idDepartement != null or filter.idLieu != null}">
+            Aucun poste ne correspond à ces critères.
+        </span>
+    </div>
+
+    <div th:if="${postes.totalElements > 0}"
+         class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden flex flex-col">
+
+        <div class="overflow-x-auto">
+            <table class="sirh-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Intitulé</th>
+                        <th scope="col">Département</th>
+                        <th scope="col">Lieu</th>
+                        <th scope="col">Durée hebdomadaire</th>
+                        <th scope="col" class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="poste : ${postes.content}">
+                        <td class="font-bold text-cobalt-900" th:text="${poste.intitule}"></td>
+                        <td class="text-slate-700" th:text="${poste.departement.titre}"></td>
+                        <td class="text-slate-700"
+                            th:text="${poste.lieu != null ? poste.lieu.libelle : '-'}"></td>
+                        <td>
+                            <span th:if="${poste.dureeHebdo != null}"
+                                  class="text-slate-700"
+                                  th:text="${poste.dureeHebdo + ' h/semaine'}"></span>
+                            <span th:if="${poste.dureeHebdo == null}"
+                                  class="text-slate-400 italic">-</span>
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            <a th:href="@{/postes/{id}(id=${poste.idPoste})}"
+                               class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                Consulter
+                            </a>
+                            <a th:href="@{/postes/{id}/edit(id=${poste.idPoste})}"
+                               class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors shadow-sm ml-2">
+                                Modifier
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="p-3 bg-slate-50 border-t border-neutral-border flex flex-col sm:flex-row items-center justify-between gap-4">
+
+            <form method="get" th:action="@{/postes}" class="flex flex-col sm:flex-row items-center justify-between gap-4 w-full m-0">
+                <input type="hidden" name="q" th:value="${filter.q}">
+                <input type="hidden" name="idDepartement" th:value="${filter.idDepartement}">
+                <input type="hidden" name="idLieu" th:value="${filter.idLieu}">
+
+                <div class="flex items-center gap-3 flex-wrap text-xs text-slate-600">
+
+                    <span class="hidden sm:inline-block h-4 w-px bg-slate-300"></span>
+
+                    <div class="flex items-center gap-2">
+                        <label for="size-select" class="text-slate-600 font-medium">
+                            Éléments par page :
+                        </label>
+                        <select id="size-select" name="size"
+                                onchange="this.form.submit()"
+                                class="h-7 px-2 bg-white border border-neutral-border rounded text-xs font-semibold cursor-pointer focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+                            <option th:each="opt : ${per_page}"
+                                    th:value="${opt}"
+                                    th:text="${opt}"
+                                    th:selected="${postes.size == opt}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div th:if="${postes.totalPages > 1}" class="flex items-center gap-2">
+                    <button type="submit" name="page" th:value="${postes.number - 1}"
+                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            th:disabled="${postes.first}">
+                        Précédent
+                    </button>
+
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded whitespace-nowrap">
+                        Page <span th:text="${postes.number + 1}"></span> / <span th:text="${postes.totalPages}"></span>
+                    </span>
+
+                    <button type="submit" name="page" th:value="${postes.number + 1}"
+                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            th:disabled="${postes.last}">
+                        Suivant
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

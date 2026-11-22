@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+    <main th:fragment="mainContent" class="w-full flex flex-col gap-6 select-none">
+
+        <!-- En-tête -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+            <div>
+                <h2 class="text-2xl font-bold text-cobalt-900 tracking-tight">Grilles salariales</h2>
+                <p class="text-sm text-slate-600 mt-1">Gérez les fourchettes salariales par poste.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="button" onclick="document.getElementById('filter-modal-backdrop').style.display='flex'"
+                        class="flex items-center gap-1.5 px-4 h-9 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">tune</span>
+                    <span>Filtrer</span>
+                </button>
+                <a th:href="@{/grilles/create}" class="inline-flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">add</span>
+                    Nouvelle grille
+                </a>
+            </div>
+        </div>
+
+        <!-- Message vide -->
+        <div th:if="${grilles.content.isEmpty()}" class="p-4 rounded bg-cobalt-50 text-cobalt-800 border border-cobalt-200 text-sm font-semibold shadow-sm">
+            Aucune grille salariale ne correspond à ces critères.
+        </div>
+
+        <!-- Tableau -->
+        <div th:if="${!grilles.content.isEmpty()}" class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden flex flex-col">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Poste</th>
+                            <th scope="col">Département</th>
+                            <th scope="col">Salaire minimum</th>
+                            <th scope="col">Salaire maximum</th>
+                            <th scope="col" class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="grille : ${grilles.content}">
+                            <td class="font-bold text-cobalt-900" th:text="${grille.poste.intitule}"></td>
+                            <td class="text-slate-700" th:text="${grille.departement.titre}"></td>
+                            <td class="font-mono font-semibold text-slate-700" th:text="${#numbers.formatDecimal(grille.salaireMin, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
+                            <td class="font-mono font-semibold text-slate-700" th:text="${#numbers.formatDecimal(grille.salaireMax, 0, 'COMMA', 2, 'POINT')} + ' €'"></td>
+                            <td class="text-right whitespace-nowrap">
+                                <a th:href="@{/grilles/{id}(id=${grille.idGrille})}" 
+                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors">
+                                    Consulter
+                                </a>
+                                <a th:href="@{/grilles/{id}/edit(id=${grille.idGrille})}" 
+                                   class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-cobalt-700 text-white hover:bg-cobalt-800 font-semibold text-xs transition-colors shadow-sm ml-2">
+                                    Modifier
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-3 bg-slate-50 border-t border-neutral-border flex flex-col sm:flex-row items-center justify-between gap-4" th:if="${grilles.totalPages > 1 or grilles.size != 5}">
+                
+                <!-- Info & Selecteur de taille -->
+                <div class="flex items-center gap-3 text-xs text-slate-600 font-medium">
+                    <span>
+                        Affichage de <span class="font-bold" th:text="${grilles.number * grilles.size + 1}"></span> à 
+                        <span class="font-bold" th:text="${grilles.number * grilles.size + grilles.numberOfElements}"></span> sur 
+                        <span class="font-bold" th:text="${grilles.totalElements}"></span>
+                    </span>
+                    
+                    <form th:action="@{/grilles}" method="get" class="m-0 inline-flex items-center">
+                        <input type="hidden" name="idDepartement" th:value="${filter.idDepartement}">
+                        <input type="hidden" name="salaireMin" th:value="${filter.salaireMin}">
+                        <input type="hidden" name="salaireMax" th:value="${filter.salaireMax}">
+                        <select name="size" onchange="this.form.submit()" class="h-7 px-2 border border-slate-300 rounded bg-white text-xs font-semibold cursor-pointer focus:outline-none focus:border-cobalt-700">
+                            <option value="5" th:selected="${grilles.size == 5}">5 par page</option>
+                            <option value="10" th:selected="${grilles.size == 10}">10 par page</option>
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Boutons Précédent / Suivant -->
+                <form th:action="@{/grilles}" method="get" class="flex items-center gap-2 m-0">
+                    <input type="hidden" name="size" th:value="${grilles.size}">
+                    <input type="hidden" name="idDepartement" th:value="${filter.idDepartement}">
+                    <input type="hidden" name="salaireMin" th:value="${filter.salaireMin}">
+                    <input type="hidden" name="salaireMax" th:value="${filter.salaireMax}">
+
+                    <button type="submit" name="page" th:value="${grilles.number - 1}"
+                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            th:disabled="${grilles.first}">
+                        Précédent
+                    </button>
+                    
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded">
+                        Page <span th:text="${grilles.number + 1}"></span> / <span th:text="${grilles.totalPages}"></span>
+                    </span>
+
+                    <button type="submit" name="page" th:value="${grilles.number + 1}"
+                            class="px-3 py-1.5 bg-white border border-neutral-border rounded text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                            th:disabled="${grilles.last}">
+                        Suivant
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DE FILTRE -->
+        <div id="filter-modal-backdrop" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all duration-200">
+            <div class="bg-surface-card w-full max-w-2xl rounded-lg shadow-xl border border-neutral-border overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transform max-h-[90vh]" role="dialog">
+                
+                <div class="px-6 py-4 border-b border-neutral-border flex justify-between items-center bg-slate-50">
+                    <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Filtres des grilles</h3>
+                    <button type="button" class="text-slate-400 hover:text-slate-700" onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+
+                <form th:action="@{/grilles}" method="get" class="p-6 flex flex-col gap-5 overflow-y-auto">
+                    <!-- Conserver la taille par défaut -->
+                    <input type="hidden" name="size" value="5">
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Département</label>
+                        <div class="relative">
+                            <select name="idDepartement" class="w-full h-10 pl-3 pr-10 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 bg-white appearance-none cursor-pointer">
+                                <option value="">Tous les départements</option>
+                                <option th:each="dept : ${departements}" th:value="${dept.idDepartement}" th:text="${dept.titre}" th:selected="${filter.idDepartement == dept.idDepartement}"></option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Salaire minimum (€)</label>
+                            <input name="salaireMin" type="number" step="0.01" min="0" th:value="${filter.salaireMin}" placeholder="Ex: 2000"
+                                   class="w-full h-10 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 bg-white placeholder:text-slate-400">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Salaire maximum (€)</label>
+                            <input name="salaireMax" type="number" step="0.01" min="0" th:value="${filter.salaireMax}" placeholder="Ex: 3000"
+                                   class="w-full h-10 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 bg-white placeholder:text-slate-400">
+                        </div>
+                    </div>
+
+                    <!-- Footer Modal -->
+                    <div class="px-2 py-3 mt-2 border-t border-neutral-border flex items-center justify-between gap-4 shrink-0">
+                        <a th:href="@{/grilles}" class="text-xs font-bold text-slate-500 hover:text-cobalt-900 hover:underline transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">restart_alt</span> Réinitialiser
+                        </a>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="px-4 h-9 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors" onclick="document.getElementById('filter-modal-backdrop').style.display='none'">
+                                Annuler
+                            </button>
+                            <button type="submit" class="px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">check</span> Appliquer
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
