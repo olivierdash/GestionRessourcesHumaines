@@ -58,9 +58,10 @@ public class OffboardingService {
             throw new IllegalStateException("Matériel non restitué");
         if (!documentService.tousRemis(idRupture))
             throw new IllegalStateException("Documents de sortie non tous remis");
-        if (stcService.listerParStatut("BROUILLON").stream()
-                .anyMatch(s -> s.getRuptureContrat().getIdRupture().equals(idRupture)))
-            throw new IllegalStateException("STC encore en BROUILLON");
+        var stc = stcService.findByrupture(idRupture)
+                .orElseThrow(() -> new IllegalStateException("Solde de tout compte manquant"));
+        if (!"VALIDE".equals(stc.getStatut()) && !"PAYE".equals(stc.getStatut()))
+            throw new IllegalStateException("Le solde de tout compte doit être validé");
 
         // Passage en CLOTUREE + archivage du dossier employé
         ruptureService.changerStatut(idRupture, "CLOTUREE");

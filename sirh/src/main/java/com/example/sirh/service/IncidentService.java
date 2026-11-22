@@ -29,6 +29,10 @@ public class IncidentService {
         return repo.findByEmployeIdEmployer(idEmployer);
     }
 
+    public List<Incident> lister() {
+        return repo.findAll();
+    }
+
     public List<Incident> findByStatut(String statut) {
         return repo.findByStatutInstruction(statut);
     }

@@ -21,12 +21,27 @@ public class MaterielService {
 
     private final MaterielEmployeRepository repo;
 
+    public MaterielEmploye attribuer(MaterielEmploye materiel) {
+        if (materiel.getDateRemise() == null) materiel.setDateRemise(LocalDate.now());
+        if (materiel.getMontantRetenue() == null)
+            materiel.setMontantRetenue(java.math.BigDecimal.ZERO);
+        if (materiel.getMontantRetenue().signum() < 0)
+            throw new IllegalArgumentException("La retenue ne peut pas être négative");
+        return repo.save(materiel);
+    }
+
+    public List<MaterielEmploye> listerParEmploye(Integer idEmployer) {
+        return repo.findByEmployeIdEmployer(idEmployer);
+    }
+
     /** RÈGLE : date_restitution >= date_remise (le CHECK SQL le garantit aussi). */
     public MaterielEmploye restituer(Integer idMateriel, String etat, java.math.BigDecimal retenue) {
         MaterielEmploye m = repo.findById(idMateriel)
                 .orElseThrow(() -> new IllegalArgumentException("Matériel introuvable"));
         if (m.getDateRestitution() != null)
             throw new IllegalStateException("Matériel déjà restitué");
+        if (retenue != null && retenue.signum() < 0)
+            throw new IllegalArgumentException("La retenue ne peut pas être négative");
 
         m.setDateRestitution(LocalDate.now());
         m.setEtatRestitution(etat);

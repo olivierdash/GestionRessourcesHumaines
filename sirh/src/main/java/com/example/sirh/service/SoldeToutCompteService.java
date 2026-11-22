@@ -36,15 +36,30 @@ public class SoldeToutCompteService {
     }
 
     public SoldeToutCompte modifier(SoldeToutCompte stc) {
-        if (!"BROUILLON".equals(stc.getStatut()))
-            throw new IllegalStateException("STC non modifiable (statut " + stc.getStatut() + ")");
-        recalculer(stc);
-        return repo.save(stc);
+        if (stc.getIdStc() == null)
+            throw new IllegalArgumentException("Un identifiant de STC est requis");
+        SoldeToutCompte existant = repo.findById(stc.getIdStc())
+                .orElseThrow(() -> new IllegalArgumentException("STC introuvable"));
+        if (!"BROUILLON".equals(existant.getStatut()))
+            throw new IllegalStateException("STC non modifiable (statut " + existant.getStatut() + ")");
+        if (stc.getSalaireMensuelReference() == null)
+            throw new IllegalArgumentException("Le salaire mensuel de référence est obligatoire");
+        if (stc.getJoursCongesRestants() != null && stc.getJoursCongesRestants().signum() < 0)
+            throw new IllegalArgumentException("Les jours de congés restants ne peuvent pas être négatifs");
+        existant.setSalaireMensuelReference(stc.getSalaireMensuelReference());
+        existant.setJoursCongesRestants(stc.getJoursCongesRestants() == null
+                ? BigDecimal.ZERO : stc.getJoursCongesRestants());
+        existant.setTotalGains(stc.getTotalGains());
+        existant.setTotalRetenues(stc.getTotalRetenues());
+        recalculer(existant);
+        return repo.save(existant);
     }
 
     private void recalculer(SoldeToutCompte stc) {
         stc.setTotalGains(stc.getTotalGains() == null ? BigDecimal.ZERO : stc.getTotalGains());
         stc.setTotalRetenues(stc.getTotalRetenues() == null ? BigDecimal.ZERO : stc.getTotalRetenues());
+        if (stc.getTotalGains().signum() < 0 || stc.getTotalRetenues().signum() < 0)
+            throw new IllegalArgumentException("Les gains et retenues ne peuvent pas être négatifs");
         stc.setNetAPayer(stc.getTotalGains().subtract(stc.getTotalRetenues()));
     }
 
@@ -58,6 +73,16 @@ public class SoldeToutCompteService {
         stc.setStatut("VALIDE");
         stc.setValidePar(valideur);
         stc.setDateValidation(LocalDate.now());
+        return repo.save(stc);
+    }
+
+    public SoldeToutCompte marquerPaye(Integer idStc) {
+        SoldeToutCompte stc = repo.findById(idStc)
+                .orElseThrow(() -> new IllegalArgumentException("STC introuvable"));
+        if (!"VALIDE".equals(stc.getStatut()))
+            throw new IllegalStateException("Seul un STC VALIDE peut être marqué PAYE");
+
+        stc.setStatut("PAYE");
         return repo.save(stc);
     }
 
