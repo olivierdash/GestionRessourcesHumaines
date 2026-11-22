@@ -187,7 +187,7 @@ CREATE TABLE document_sortie (
     fichier_url        VARCHAR(500),
     date_generation    DATE NOT NULL DEFAULT CURRENT_DATE,
     date_remise        DATE,
-    genere_par         INTEGER REFERENCES utilisateur(id_utilisateur)
+    genere_par         INTEGER REFERENCES utilisateur(id_utilisateur) 
 );
 
 -- Archivage complet du dossier employé (le flag `rupture_contrat.archive`
