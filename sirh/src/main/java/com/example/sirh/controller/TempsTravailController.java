@@ -2,11 +2,13 @@ package com.example.sirh.controller;
 
 import com.example.sirh.dto.PointageCalculDto;
 import com.example.sirh.dto.PointageFilter;
+import com.example.sirh.model.Absence;
 import com.example.sirh.model.AffectationPlanning;
 import com.example.sirh.model.HoraireTravail;
 import com.example.sirh.model.Planning;
 import com.example.sirh.model.Pointage;
 import com.example.sirh.model.RegimeTravail;
+import com.example.sirh.service.AbsenceService;
 import com.example.sirh.service.AffectationPlanningService;
 import com.example.sirh.service.EmployeService;
 import com.example.sirh.service.PlanningService;
@@ -46,6 +48,7 @@ public class TempsTravailController {
     private final PointageService pointageService;
     private final TypeDecompteService typeDecompteService;
     private final EmployeService employeService;
+    private final AbsenceService absenceService;
 
     // =========================================================
     // RÉGIME DE TRAVAIL
@@ -151,8 +154,22 @@ public class TempsTravailController {
     public String detailPlanning(@PathVariable Integer id,
             @ModelAttribute("affectation") AffectationPlanning affectation,
             Model model) {
-        model.addAttribute("planning", planningService.getById(id));
-        model.addAttribute("affectations", affectationPlanningService.listerParPlanning(id));
+        Planning planning = planningService.getById(id);
+        List<AffectationPlanning> affectations = affectationPlanningService.listerParPlanning(id);
+
+        Map<Integer, List<Absence>> absencesParAffectation = new LinkedHashMap<>();
+        for (AffectationPlanning a : affectations) {
+            LocalDate debut = a.getDateDebut();
+            LocalDate fin = a.getDateFin() != null
+                    ? a.getDateFin()
+                    : (planning.getDateFin() != null ? planning.getDateFin() : LocalDate.now().plusMonths(1));
+            absencesParAffectation.put(a.getId(), absenceService.absencesPeriode(
+                    List.of(a.getEmploye().getIdEmployer()), debut, fin));
+        }
+
+        model.addAttribute("planning", planning);
+        model.addAttribute("affectations", affectations);
+        model.addAttribute("absencesParAffectation", absencesParAffectation);
         model.addAttribute("employes", employeService.getAllEmployesList());
         return "temps-travail/plannings/detail";
     }

@@ -35,6 +35,12 @@ const routes = [
     props: true,
     meta: { layout: 'public', requiresCandidateAuth: true },
   },
+  {
+    path: '/mes-demandes-explication',
+    name: 'disciplinary-requests',
+    component: () => import('@/modules/candidate-space/MyDisciplinaryRequestsView.vue'),
+    meta: { layout: 'public', requiresCandidateAuth: true },
+  },
 
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/modules/home/HomeView.vue'), meta: { layout: 'public' } },
 ]

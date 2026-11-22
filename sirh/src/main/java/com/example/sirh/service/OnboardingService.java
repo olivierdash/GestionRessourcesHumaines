@@ -92,9 +92,9 @@ public class OnboardingService {
         onboarding = onboardingRepository.save(onboarding);
 
         creerTache(onboarding, "Contrat signé", "RH", 3);
-        creerTache(onboarding, "Badge", "RESPONSABLE_IT", 5);
-        creerTache(onboarding, "Compte informatique", "RESPONSABLE_IT", 5);
-        creerTache(onboarding, "Matériel", "RESPONSABLE_IT", 7);
+        // creerTache(onboarding, "Badge", "RESPONSABLE_IT", 5);
+        // creerTache(onboarding, "Compte informatique", "RESPONSABLE_IT", 5);
+        // creerTache(onboarding, "Matériel", "RESPONSABLE_IT", 7);
         creerTache(onboarding, "Formation", "RH", 14);
         creerTache(onboarding, "Inscription à la paie", "RH", 14);
 

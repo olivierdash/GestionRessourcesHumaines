@@ -5,6 +5,7 @@ import com.example.sirh.dto.LoginChangeDTO;
 import com.example.sirh.exception.ValidationMetierException;
 import com.example.sirh.model.Role;
 import com.example.sirh.model.Utilisateur;
+import com.example.sirh.service.EmployeService;
 import com.example.sirh.service.RoleService;
 import com.example.sirh.service.UtilisateurService;
 
@@ -25,6 +26,7 @@ public class AdminUtilisateurController {
 
     private final UtilisateurService utilisateurService;
     private final RoleService roleService;
+    private final EmployeService employeService;
 
     // =========================================================
     // LISTE (GET)
@@ -38,6 +40,7 @@ public class AdminUtilisateurController {
 
         model.addAttribute("utilisateurs", utilisateurService.getAllUtilisateurs());
         model.addAttribute("roles", roleService.getRoles());
+        model.addAttribute("employes", employeService.getAllEmployesList());
         model.addAttribute("utilisateur", utilisateur);
         return "admin/utilisateurs";
     }
@@ -50,9 +53,10 @@ public class AdminUtilisateurController {
     public String store(
             @ModelAttribute Utilisateur utilisateur,
             @RequestParam(required = false) String codeSecret,
+            @RequestParam(required = false) Integer idEmploye,
             RedirectAttributes redirect) {
         try {
-            utilisateurService.createUtilisateur(utilisateur, codeSecret);
+            utilisateurService.createUtilisateur(utilisateur, codeSecret, idEmploye);
             redirect.addFlashAttribute("success", "Utilisateur créé avec succès");
         } catch (ValidationMetierException e) {
             redirect.addFlashAttribute("errors", e.getErrors());

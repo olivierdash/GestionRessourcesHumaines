@@ -34,6 +34,10 @@ public class UtilisateurController {
             return "redirect:/admin";
         }
 
+        if ("EMPLOYE".equals(role)) {
+            return "redirect:/mes-conges";
+        }
+
         if ("RH".equals(role)) {
             model.addAttribute("dashboard", rhDashboardService.getRHDashboardData(period));
             return "utilisateur/rh";

@@ -28,4 +28,16 @@ public interface AffectationPlanningRepository extends JpaRepository<Affectation
             """)
     List<AffectationPlanning> findActivesForDate(@Param("employeId") Integer employeId,
                                                  @Param("datePointage") LocalDate datePointage);
+
+    @Query("""
+            SELECT a FROM AffectationPlanning a
+            JOIN FETCH a.planning p
+            WHERE a.employe.idEmployer = :employeId
+              AND a.dateDebut <= :fin
+              AND (a.dateFin IS NULL OR a.dateFin >= :debut)
+            ORDER BY a.dateDebut ASC
+            """)
+    List<AffectationPlanning> findChevauchementsForEmploye(@Param("employeId") Integer employeId,
+                                                          @Param("debut") LocalDate debut,
+                                                          @Param("fin") LocalDate fin);
 }

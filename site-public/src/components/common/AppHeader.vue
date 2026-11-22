@@ -33,6 +33,14 @@
 >
   Mes propositions
 </RouterLink>
+        <RouterLink
+          v-if="candidateStore.isAuthenticated"
+          to="/mes-demandes-explication"
+          class="py-2 text-gray-500 font-medium border-b-2 border-transparent hover:text-gray-900 transition-colors"
+          active-class="!text-gray-900 !border-primary"
+        >
+          Mes demandes
+        </RouterLink>
       </nav>
 
       <div class="flex items-center gap-3">

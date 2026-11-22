@@ -18,4 +18,8 @@ public class Utilisateur {
     @ManyToOne
     @JoinColumn(name = "id_role", nullable = false)
     private Role role;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_employe", unique = true)
+    private Employe employe;
 }

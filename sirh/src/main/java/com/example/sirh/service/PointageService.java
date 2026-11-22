@@ -1,5 +1,6 @@
 package com.example.sirh.service;
 
+import com.example.sirh.dto.CouvertureAbsenceDto;
 import com.example.sirh.dto.PointageCalculDto;
 import com.example.sirh.dto.PointageFilter;
 import com.example.sirh.model.AffectationPlanning;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,8 @@ public class PointageService {
     private final EmployeService employeService;
     private final AffectationPlanningService affectationPlanningService;
     private final RegimeTravailService regimeTravailService;
+    private final AbsenceService absenceService;
+    private final JourFerieService jourFerieService;
 
     @Transactional(readOnly = true)
     public Page<Pointage> lister(PointageFilter filter, Pageable pageable) {
@@ -94,17 +98,54 @@ public class PointageService {
     public PointageCalculDto calculer(Pointage pointage) {
         PointageCalculDto result = new PointageCalculDto();
 
-        if (pointage == null
-                || pointage.getHeureEntree() == null
-                || pointage.getHeureSortie() == null) {
+        if (pointage == null || pointage.getEmploye() == null
+                || pointage.getDatePointage() == null) {
             return result;
         }
 
-        int minutesPresence = (int) Duration.between(
-                pointage.getHeureEntree(), pointage.getHeureSortie()).toMinutes();
+        Integer employeId = pointage.getEmploye().getIdEmployer();
+        LocalDate date = pointage.getDatePointage();
+        Integer minutesPresence = null;
+        if (pointage.getHeureEntree() != null && pointage.getHeureSortie() != null) {
+            minutesPresence = (int) Duration.between(
+                    pointage.getHeureEntree(), pointage.getHeureSortie()).toMinutes();
+        }
 
-        List<AffectationPlanning> affectations = affectationPlanningService.findActivesForDate(
-                pointage.getEmploye().getIdEmployer(), pointage.getDatePointage());
+        Optional<CouvertureAbsenceDto> couverture = absenceService.couverture(employeId, date);
+        if (couverture.isPresent()) {
+            CouvertureAbsenceDto absence = couverture.get();
+            result.setStatut(absence.getCategorie() != null
+                    && "CONGE".equals(absence.getCategorie().name()) ? "CONGE" : "ABSENCE");
+            result.setAbsenceId(absence.getAbsenceId());
+            result.setLibelleAbsence(absence.getLibelle());
+            result.setMinutesPresence(0);
+            result.setMinutesPause(0);
+            result.setMinutesTravaillees(0);
+            result.setMinutesRetard(0);
+            result.setMinutesSupplementaires(0);
+            if (minutesPresence != null) {
+                result.setAnomalie("Pointage pendant une absence/congé : " + absence.getLibelle());
+            }
+            return result;
+        }
+
+        if (jourFerieService.estFerie(date)) {
+            result.setStatut("FERIE");
+            result.setLibelleAbsence(jourFerieService.libelleFerie(date));
+            if (minutesPresence == null) {
+                return result;
+            }
+            result.setMinutesPresence(minutesPresence);
+            result.setMinutesTravaillees(minutesPresence);
+            result.setMinutesSupplementaires(minutesPresence);
+            return result;
+        }
+
+        if (minutesPresence == null) {
+            return result;
+        }
+
+        List<AffectationPlanning> affectations = affectationPlanningService.findActivesForDate(employeId, date);
 
         if (affectations.isEmpty()) {
             result.setMinutesPresence(minutesPresence);
@@ -115,7 +156,7 @@ public class PointageService {
 
         RegimeTravail regime = affectations.get(0).getPlanning().getRegimeTravail();
         HoraireTravail horaire = regimeTravailService.trouverHorairePourJour(
-                regime, pointage.getDatePointage().getDayOfWeek());
+                regime, date.getDayOfWeek());
 
         if (horaire == null) {
             result.setMinutesPresence(minutesPresence);

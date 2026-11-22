@@ -40,6 +40,7 @@ public final class ConstantSirh {
     public static final class Role {
         public static final String ADMIN = "ADMIN";
         public static final String DG = "DG";
+        public static final String EMPLOYE = "EMPLOYE";
         public static final String FINANCE = "FINANCE";
         public static final String MANAGER = "MANAGER";
         public static final String RESPONSABLE_IT = "RESPONSABLE_IT";

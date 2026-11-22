@@ -2,8 +2,10 @@ package com.example.sirh.service;
 
 import com.example.sirh.dto.LoginChangeDTO;
 import com.example.sirh.exception.ValidationMetierException;
+import com.example.sirh.model.Employe;
 import com.example.sirh.model.Role;
 import com.example.sirh.model.Utilisateur;
+import com.example.sirh.repository.EmployeRepository;
 import com.example.sirh.repository.RoleRepository;
 import com.example.sirh.repository.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class UtilisateurService {
 
     private final UtilisateurRepository utilisateurRepository;
     private final RoleRepository roleRepository;
+    private final EmployeRepository employeRepository;
 
     @Value("${app.admin.secret-code:}")
     private String adminSecretCode;
@@ -59,6 +62,12 @@ public class UtilisateurService {
 
     @Transactional
     public Utilisateur createUtilisateur(Utilisateur utilisateur, String codeSecret) {
+        return createUtilisateur(utilisateur, codeSecret, null);
+    }
+
+    @Transactional
+    public Utilisateur createUtilisateur(Utilisateur utilisateur, String codeSecret,
+                                         Integer idEmploye) {
         Map<String, String> errors = new LinkedHashMap<>();
 
         // 1. Validation des champs de base
@@ -79,7 +88,7 @@ public class UtilisateurService {
 
         // 2. Validation du code secret si rôle = ADMIN
         if (utilisateur.getRole() != null && utilisateur.getRole().getIdRole() != null) {
-            if (estRoleAdmin(utilisateur.getRole().getIdRole())) {
+            if (estRole(utilisateur.getRole().getIdRole(), "ADMIN")) {
                 if (adminSecretCode == null || adminSecretCode.isBlank()) {
                     log.error("Configuration manquante : app.admin.secret-code non défini.");
                     errors.put("codeSecret", "Configuration manquante côté serveur.");
@@ -90,11 +99,31 @@ public class UtilisateurService {
             }
         }
 
+        // 3. Lien éventuel avec un salarié
+        final Integer employeId = utilisateur.getEmploye().getIdEmployer();
+        if (employeId != null) {
+            if (utilisateurRepository.existsByEmployeIdEmployer(employeId)) {
+                errors.put("employe", "Ce salarié possède déjà un compte utilisateur.");
+            } else {
+                Employe employe = employeRepository.findById(employeId)
+                        .orElseThrow(() -> new NoSuchElementException("Salarié introuvable : " + employeId));
+                utilisateur.setEmploye(employe);
+            }
+        } else {
+            utilisateur.setEmploye(null);
+        }
+
+        if (utilisateur.getRole() != null && utilisateur.getRole().getIdRole() != null
+                && estRole(utilisateur.getRole().getIdRole(), "EMPLOYE")
+                && employeId == null) {
+            errors.put("employe", "Un compte salarié doit être lié à un employé.");
+        }
+
         if (!errors.isEmpty()) {
             throw new ValidationMetierException(errors);
         }
 
-        // 3. Hash et sauvegarde
+        // 4. Hash et sauvegarde
         utilisateur.setMotDePasse(new BCryptPasswordEncoder().encode(utilisateur.getMotDePasse()));
         return utilisateurRepository.save(utilisateur);
     }
@@ -137,9 +166,13 @@ public class UtilisateurService {
     }
 
     private boolean estRoleAdmin(Integer idRole) {
+        return estRole(idRole, "ADMIN");
+    }
+
+    private boolean estRole(Integer idRole, String libelle) {
         if (idRole == null) return false;
         return roleRepository.findById(idRole)
-                .map(r -> "ADMIN".equalsIgnoreCase(r.getLibelle()))
+                .map(r -> libelle.equalsIgnoreCase(r.getLibelle()))
                 .orElse(false);
     }
 }

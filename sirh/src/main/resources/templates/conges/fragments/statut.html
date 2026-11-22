@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<span th:fragment="badge(statut)"
+      class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
+      th:classappend="${statut == null
+        ? ' bg-slate-100 border-slate-300 text-slate-600'
+        : (statut.name() == 'APPROUVEE' or statut.name() == 'JUSTIFIEE' or statut.name() == 'VALIDE' or statut.name() == 'CONSOMME')
+          ? ' bg-emerald-50 border-emerald-200 text-emerald-700'
+        : (statut.name() == 'REFUSEE' or statut.name() == 'NON_JUSTIFIEE' or statut.name() == 'REFUSE' or statut.name() == 'ANNULEE' or statut.name() == 'ANNULE')
+          ? ' bg-red-50 border-red-200 text-red-700'
+        : (statut.name() == 'BROUILLON')
+          ? ' bg-slate-100 border-slate-300 text-slate-700'
+        : ' bg-amber-50 border-amber-200 text-amber-800'}"
+      th:text="${statut}"></span>
+
+</body>
+</html>

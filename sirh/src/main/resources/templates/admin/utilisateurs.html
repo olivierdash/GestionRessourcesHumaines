@@ -36,12 +36,13 @@
                             <th scope="col">Nom</th>
                             <th scope="col">Email</th>
                             <th scope="col">Rôle</th>
+                            <th scope="col">Salarié lié</th>
                             <th scope="col" class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${utilisateurs.isEmpty()}">
-                            <td colspan="5" class="td-empty py-8 text-center text-slate-500 italic">
+                            <td colspan="6" class="td-empty py-8 text-center text-slate-500 italic">
                                 Aucun utilisateur enregistré.
                             </td>
                         </tr>
@@ -53,6 +54,11 @@
                                 <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider bg-slate-100 border-slate-300 text-slate-700"
                                       th:text="${u.role.libelle}">
                                 </span>
+                            </td>
+                            <td>
+                                <span th:if="${u.employe != null}" class="text-xs text-slate-700"
+                                      th:text="${u.employe.matricule + ' — ' + u.employe.candidature.candidat.prenom + ' ' + u.employe.candidature.candidat.nom}"></span>
+                                <span th:if="${u.employe == null}" class="text-xs text-slate-400 italic">Non lié</span>
                             </td>
                             <td class="text-right whitespace-nowrap">
                                 <button type="button"
@@ -124,6 +130,25 @@
                             </select>
                             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
                         </div>
+                    </div>
+
+                    <!-- Salarié lié -->
+                    <div>
+                        <label for="idEmploye" class="block text-[11px] uppercase tracking-wider text-slate-700 font-bold mb-2">
+                            Salarié lié
+                        </label>
+                        <div class="relative">
+                            <select name="idEmploye" id="idEmploye"
+                                    class="w-full h-11 pl-3 pr-10 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors appearance-none cursor-pointer">
+                                <option value="">Aucun salarié lié</option>
+                                <option th:each="e : ${employes}" th:value="${e.idEmployer}"
+                                        th:selected="${utilisateur.employe != null and utilisateur.employe.idEmployer == e.idEmployer}"
+                                        th:text="${e.matricule + ' — ' + e.candidature.candidat.prenom + ' ' + e.candidature.candidat.nom}"></option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-[20px]">expand_more</span>
+                        </div>
+                        <p class="mt-1 text-xs text-slate-500">Requis pour les rôles salarié, manager et RH afin d'accéder au module congés.</p>
+                        <p th:if="${errors != null and errors['employe'] != null}" th:text="${errors['employe']}" class="mt-1 text-xs text-red-500 font-semibold"></p>
                     </div>
 
                     <!-- Code secret (affiché si rôle = ADMIN) -->
