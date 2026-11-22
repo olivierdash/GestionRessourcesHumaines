@@ -94,14 +94,27 @@ public class CandidatureService {
         }
 
         // 5. Sauvegarder le CV sur le serveur
-        String nomOriginal = Paths.get(cvFile.getOriginalFilename()).getFileName().toString();
-        String nomStocke = "cv_" + UUID.randomUUID() + "_" + nomOriginal;
+        String nomFichier = "cv.pdf";
+        String nomOriginal = cvFile.getOriginalFilename();
+        if (nomOriginal != null && !nomOriginal.isBlank()) {
+            Path nom = Paths.get(nomOriginal).getFileName();
+            if (nom != null && !nom.toString().isBlank()) {
+                nomFichier = nom.toString();
+            }
+        }
+        String nomStocke = "cv_" + UUID.randomUUID() + "_" + nomFichier;
         String cvUrl = environment.getProperty("cv.upload-path", "/uploads") + "/" + nomStocke;
 
         try {
-            Path dossier = Paths.get("uploads");
+            // Même dossier racine que FileStorageService / DocumentService.
+            Path dossier = Paths.get(environment.getProperty("app.upload.dir", "uploads"))
+                    .toAbsolutePath().normalize();
             Files.createDirectories(dossier);
-            Files.copy(cvFile.getInputStream(), dossier.resolve(nomStocke));
+            Path cible = dossier.resolve(nomStocke).normalize();
+            if (!cible.startsWith(dossier)) {
+                throw new IllegalStateException("Chemin de stockage invalide.");
+            }
+            Files.copy(cvFile.getInputStream(), cible);
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de la sauvegarde du CV", e);
         }
