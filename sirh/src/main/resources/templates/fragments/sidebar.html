@@ -72,6 +72,20 @@
                     <span class="sidebar-text whitespace-nowrap">Demandes</span>
                 </a>
 
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/discipline}" data-path="/discipline"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Discipline">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">gavel</span>
+                    <span class="sidebar-text whitespace-nowrap">Discipline</span>
+                </a>
+
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/offboarding}" data-path="/offboarding"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Ruptures et offboarding">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">logout</span>
+                    <span class="sidebar-text whitespace-nowrap">Ruptures / sorties</span>
+                </a>
+
                 <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/employes}" data-path="/employes"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                     title="Employés">

@@ -51,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
                         .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
                         .requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
+                        .requestMatchers("/discipline/**").hasAnyRole("RH", "DG", "MANAGER")
+                        .requestMatchers("/offboarding/**").hasAnyRole("RH", "DG")
                         .requestMatchers("/conges/types/**", "/conges/droits/**", "/conges/soldes/**",
                                 "/conges/demandes/**", "/conges/absences/**", "/conges/calendrier/**")
                             .hasAnyRole("RH", "DG")

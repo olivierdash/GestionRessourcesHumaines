@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <a th:href="@{/offboarding}" class="text-sm text-cobalt-700">← Retour aux sorties</a>
+    <div th:if="${succes}" class="p-3 rounded bg-emerald-50 border border-emerald-200 text-emerald-700" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-3 rounded bg-red-50 border border-red-200 text-red-700" th:text="${erreur}"></div>
+
+    <section class="bg-white border border-neutral-border rounded-lg p-5">
+        <h1 class="text-xl font-bold text-cobalt-900">Dossier de sortie</h1>
+        <dl class="grid md:grid-cols-4 gap-4 mt-4 text-sm">
+            <div><dt class="text-slate-500">Salarié</dt><dd class="font-semibold" th:text="${rupture.employe.candidature.candidat.prenom + ' ' + rupture.employe.candidature.candidat.nom}"></dd></div>
+            <div><dt class="text-slate-500">Motif</dt><dd th:text="${rupture.motifRupture}"></dd></div>
+            <div><dt class="text-slate-500">Date de sortie</dt><dd th:text="${#temporals.format(rupture.dateSortie,'dd/MM/yyyy')}"></dd></div>
+            <div><dt class="text-slate-500">Statut</dt><dd th:text="${rupture.statutRupture}"></dd></div>
+        </dl>
+        <div class="flex gap-2 mt-5">
+            <form th:action="@{/offboarding/ruptures/{id}/demarrer(id=${rupture.idRupture})}" method="post">
+                <button class="h-9 px-4 rounded bg-cobalt-700 text-white text-xs font-bold">Démarrer l'offboarding</button>
+            </form>
+            <form th:action="@{/offboarding/ruptures/{id}/cloturer(id=${rupture.idRupture})}" method="post">
+                <button class="h-9 px-4 rounded border border-neutral-border text-xs font-bold">Contrôler et clôturer</button>
+            </form>
+        </div>
+    </section>
+
+    <div class="grid md:grid-cols-2 gap-6">
+        <section class="bg-white border border-neutral-border rounded-lg p-5">
+            <h2 class="font-bold mb-3">Matériel</h2>
+            <p th:if="${#lists.isEmpty(materiels)}" class="text-sm text-slate-500">Aucun matériel.</p>
+            <div th:each="m : ${materiels}" class="py-2 border-b text-sm flex justify-between">
+                <span th:text="${m.designation}"></span><span th:text="${m.dateRestitution != null ? 'Restitué' : 'À restituer'}"></span>
+            </div>
+        </section>
+        <section class="bg-white border border-neutral-border rounded-lg p-5">
+            <h2 class="font-bold mb-3">Accès</h2>
+            <p th:if="${#lists.isEmpty(acces)}" class="text-sm text-slate-500">Aucun accès à désactiver.</p>
+            <div th:each="a : ${acces}" class="py-2 border-b text-sm flex justify-between">
+                <span th:text="${a.typeAcces}"></span><span th:text="${a.statut}"></span>
+            </div>
+        </section>
+        <section class="bg-white border border-neutral-border rounded-lg p-5">
+            <h2 class="font-bold mb-3">Documents de sortie</h2>
+            <p th:if="${#lists.isEmpty(documents)}" class="text-sm text-slate-500">Aucun document généré.</p>
+            <div th:each="d : ${documents}" class="py-2 border-b text-sm flex justify-between">
+                <span th:text="${d.typeDocument}"></span><span th:text="${d.dateRemise != null ? 'Remis' : 'À remettre'}"></span>
+            </div>
+        </section>
+        <section class="bg-white border border-neutral-border rounded-lg p-5">
+            <h2 class="font-bold mb-3">Solde de tout compte</h2>
+            <div th:if="${stc != null}" class="text-sm">
+                <p>Statut : <strong th:text="${stc.statut}"></strong></p>
+                <p>Net à payer : <strong th:text="${stc.netAPayer}"></strong></p>
+            </div>
+            <form th:if="${stc == null}" th:action="@{/offboarding/ruptures/{id}/solde(id=${rupture.idRupture})}" method="post" class="grid grid-cols-2 gap-2 mt-3">
+                <input type="number" step="0.01" name="salaireMensuelReference" required placeholder="Salaire mensuel" class="h-9 border border-neutral-border rounded px-2">
+                <input type="number" step="0.01" name="joursCongesRestants" value="0" placeholder="Congés restants" class="h-9 border border-neutral-border rounded px-2">
+                <input type="number" step="0.01" name="totalGains" value="0" placeholder="Gains" class="h-9 border border-neutral-border rounded px-2">
+                <input type="number" step="0.01" name="totalRetenues" value="0" placeholder="Retenues" class="h-9 border border-neutral-border rounded px-2">
+                <button class="h-9 px-3 rounded bg-cobalt-700 text-white text-xs font-bold col-span-2">Créer le STC</button>
+            </form>
+        </section>
+    </div>
+</main>
+</body>
+</html>

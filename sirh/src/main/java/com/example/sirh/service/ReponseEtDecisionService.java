@@ -1,5 +1,6 @@
 package com.example.sirh.service;
 
+import com.example.sirh.model.DemandeExplication;
 import com.example.sirh.model.ReponseEtDecision;
 import com.example.sirh.repository.ReponseEtDecisionRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,12 @@ public class ReponseEtDecisionService {
      *  - statut incident : REPONSE_RECUE si AUCUNE, DECIDE sinon
      */
     public ReponseEtDecision enregistrer(ReponseEtDecision d) {
+        if (d.getDemande() == null)
+            throw new IllegalArgumentException("La demande d'explication est obligatoire");
+        if (d.getContenuReponse() != null && d.getContenuReponse().isBlank())
+            d.setContenuReponse(null);
+        if (d.getTypeSanction() == null)
+            d.setTypeSanction("AUCUNE");
         if (d.getDateReponse() == null) d.setDateReponse(LocalDate.now());
 
         boolean sanction = d.getTypeSanction() != null && !"AUCUNE".equals(d.getTypeSanction());

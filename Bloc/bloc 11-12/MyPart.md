@@ -13,3 +13,7 @@ restituer matériel et désactiver les accès
 produire les documents de sortie puis archiver le dossier   
 
 documents de sortie : stc(conge , tout , certificat de travail) , certification de travail(pour la continuité de carrière , lorsqu 'un employer quitte la société ) , attestation d'emploie (dans le cas d'être employer dans la société)
+
+
+**prompt blackbox :**
+peux tu paufiner les controlleurs et faire les pages nécéssaire dans sirh et site-public et me faire une liste dans le repertoire Bloc/bloc 11-12 dans un fichier compteRendu.md please

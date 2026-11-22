@@ -38,8 +38,11 @@ public class OffboardingService {
     /** Étape 1 : on entre en offboarding (checklist + génération des documents). */
     public RuptureContrat demarrerOffboarding(Integer idRupture, Utilisateur acteur) {
         RuptureContrat r = ruptureService.findById(idRupture);
+        if (!"INITIEE".equals(r.getStatutRupture()) && !"PREAVIS_EN_COURS".equals(r.getStatutRupture()))
+            throw new IllegalStateException("L'offboarding ne peut être démarré depuis le statut " + r.getStatutRupture());
 
-        ruptureService.changerStatut(idRupture, "PREAVIS_EN_COURS");
+        if ("INITIEE".equals(r.getStatutRupture()))
+            ruptureService.changerStatut(idRupture, "PREAVIS_EN_COURS");
         ruptureService.changerStatut(idRupture, "OFFBOARDING_EN_COURS");
 
         accesService.initChecklist(r);
