@@ -1,6 +1,7 @@
 package com.example.sirh.repository;
 
 import com.example.sirh.model.Pointage;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,24 +14,26 @@ import java.util.Optional;
 
 public interface PointageRepository extends JpaRepository<Pointage, Integer> {
 
-    @EntityGraph(attributePaths = {"employe", "employe.candidature", "employe.candidature.candidat"})
-    Optional<Pointage> findByEmployeIdEmployerAndDatePointage(Integer employeId, LocalDate datePointage);
+  List<Pointage> findByEmployeIdEmployerAndDatePointageBetween(
+      Integer idEmploye, LocalDate debut, LocalDate fin);
 
-    @EntityGraph(attributePaths = {"employe", "employe.candidature", "employe.candidature.candidat"})
-    @Query(value = """
-            SELECT p FROM Pointage p
-            WHERE (CAST(:debut AS date) IS NULL OR p.datePointage >= :debut)
-              AND (CAST(:fin AS date) IS NULL OR p.datePointage <= :fin)
-              AND (:employeId IS NULL OR p.employe.idEmployer = :employeId)
-            """,
-           countQuery = """
-            SELECT COUNT(p) FROM Pointage p
-            WHERE (CAST(:debut AS date) IS NULL OR p.datePointage >= :debut)
-              AND (CAST(:fin AS date) IS NULL OR p.datePointage <= :fin)
-              AND (:employeId IS NULL OR p.employe.idEmployer = :employeId)
-            """)
-    Page<Pointage> findWithFilters(@Param("debut") LocalDate debut,
-                                   @Param("fin") LocalDate fin,
-                                   @Param("employeId") Integer employeId,
-                                   Pageable pageable);
+  @EntityGraph(attributePaths = { "employe", "employe.candidature", "employe.candidature.candidat" })
+  Optional<Pointage> findByEmployeIdEmployerAndDatePointage(Integer employeId, LocalDate datePointage);
+
+  @EntityGraph(attributePaths = { "employe", "employe.candidature", "employe.candidature.candidat" })
+  @Query(value = """
+      SELECT p FROM Pointage p
+      WHERE (CAST(:debut AS date) IS NULL OR p.datePointage >= :debut)
+        AND (CAST(:fin AS date) IS NULL OR p.datePointage <= :fin)
+        AND (:employeId IS NULL OR p.employe.idEmployer = :employeId)
+      """, countQuery = """
+      SELECT COUNT(p) FROM Pointage p
+      WHERE (CAST(:debut AS date) IS NULL OR p.datePointage >= :debut)
+        AND (CAST(:fin AS date) IS NULL OR p.datePointage <= :fin)
+        AND (:employeId IS NULL OR p.employe.idEmployer = :employeId)
+      """)
+  Page<Pointage> findWithFilters(@Param("debut") LocalDate debut,
+      @Param("fin") LocalDate fin,
+      @Param("employeId") Integer employeId,
+      Pageable pageable);
 }

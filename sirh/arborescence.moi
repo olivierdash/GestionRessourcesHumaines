@@ -1,0 +1,745 @@
+.
+├── arborescence.moi
+├── docs
+│   ├── Architecture.md
+│   ├── cnaps.md
+│   ├── Gestion.md
+│   ├── message.md
+│   ├── MyPart.md
+│   ├── README.md
+│   ├── SIRH — Ce qu'il faut étudier côté métier RH.pdf
+│   ├── SIRH pages et fonctionnalités attendues.pdf
+│   ├── SIRH qui fait quoi.pdf
+│   ├── SIRH userflow complet.pdf
+│   ├── sujet.md
+│   ├── Surplus.md
+│   ├── todo.md
+│   ├── todo.pdf
+│   └── todo-suite.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── example
+│   │   │           └── sirh
+│   │   │               ├── config
+│   │   │               │   ├── BreadcrumbInterceptor.java
+│   │   │               │   ├── CustomUserDetails.java
+│   │   │               │   ├── GlobalModelAttributes.java
+│   │   │               │   ├── SecurityConfig.java
+│   │   │               │   └── WebConfig.java
+│   │   │               ├── constants
+│   │   │               │   └── ConstantSirh.java
+│   │   │               ├── controller
+│   │   │               │   ├── AdminUtilisateurController.java
+│   │   │               │   ├── api
+│   │   │               │   │   ├── ApiExceptionHandler.java
+│   │   │               │   │   └── v1
+│   │   │               │   │       ├── JobController.java
+│   │   │               │   │       ├── PublicApplicationController.java
+│   │   │               │   │       ├── PublicAuthController.java
+│   │   │               │   │       └── PublicPropositionController.java
+│   │   │               │   ├── AuthController.java
+│   │   │               │   ├── CandidatureController.java
+│   │   │               │   ├── ContratController.java
+│   │   │               │   ├── DemandeRecrutementController.java
+│   │   │               │   ├── DepartementController.java
+│   │   │               │   ├── DocumentController.java
+│   │   │               │   ├── DossierSalarierControlleur.java
+│   │   │               │   ├── EmployeController.java
+│   │   │               │   ├── EvaluationController.java
+│   │   │               │   ├── GrilleSalarialController.java
+│   │   │               │   ├── OffreEmploiController.java
+│   │   │               │   ├── OnboardingController.java
+│   │   │               │   ├── PosteController.java
+│   │   │               │   ├── PropositionEmbaucheController.java
+│   │   │               │   ├── TempsTravailController.java
+│   │   │               │   ├── TypeContratController.java
+│   │   │               │   └── UtilisateurController.java
+│   │   │               ├── dto
+│   │   │               │   ├── BreadcrumbItem.java
+│   │   │               │   ├── CandidatLoginChangeDTO.java
+│   │   │               │   ├── CandidatPublicDto.java
+│   │   │               │   ├── CandidatureAvecPropositionDTO.java
+│   │   │               │   ├── CandidaturePublicDto.java
+│   │   │               │   ├── ChartPointDto.java
+│   │   │               │   ├── ContextePaie.java
+│   │   │               │   ├── DashboardDto.java
+│   │   │               │   ├── DemandeRecrutementDTO.java
+│   │   │               │   ├── DemandeRecrutementFilter.java
+│   │   │               │   ├── DemandeRecrutementLib.java
+│   │   │               │   ├── DemandeResumeDto.java
+│   │   │               │   ├── EmployeFilter.java
+│   │   │               │   ├── FunnelStepDto.java
+│   │   │               │   ├── GrilleSalarialFilter.java
+│   │   │               │   ├── HiringDelayDto.java
+│   │   │               │   ├── LoginChangeDTO.java
+│   │   │               │   ├── LoginRequestDto.java
+│   │   │               │   ├── MessageCandidatRequestDto.java
+│   │   │               │   ├── MessagePubliqueDto.java
+│   │   │               │   ├── OffreFilter.java
+│   │   │               │   ├── OffrePublicDto.java
+│   │   │               │   ├── OnboardingStatutCountDto.java
+│   │   │               │   ├── PointageCalculDto.java
+│   │   │               │   ├── PointageFilter.java
+│   │   │               │   ├── PosteFilter.java
+│   │   │               │   ├── PropositionDetailPubliqueDto.java
+│   │   │               │   ├── PropositionEmbaucheFilter.java
+│   │   │               │   ├── PropositionPubliqueDto.java
+│   │   │               │   ├── RegisterRequestDto.java
+│   │   │               │   ├── ReponseCandidatRequestDto.java
+│   │   │               │   ├── RHDashboardDto.java
+│   │   │               │   └── ValidationPageData.java
+│   │   │               ├── exception
+│   │   │               │   └── ValidationMetierException.java
+│   │   │               ├── model
+│   │   │               │   ├── Affectation.java
+│   │   │               │   ├── AffectationPlanning.java
+│   │   │               │   ├── Candidat.java
+│   │   │               │   ├── Candidature.java
+│   │   │               │   ├── Contrat.java
+│   │   │               │   ├── CoordonneesEmploye.java
+│   │   │               │   ├── DemandeRecrutement.java
+│   │   │               │   ├── Departement.java
+│   │   │               │   ├── Document.java
+│   │   │               │   ├── Employe.java
+│   │   │               │   ├── EtatDemande.java
+│   │   │               │   ├── Evaluation.java
+│   │   │               │   ├── GrilleSalarial.java
+│   │   │               │   ├── HistoriqueCandidatIdentifiants.java
+│   │   │               │   ├── HistoriqueDemandeRecrutement.java
+│   │   │               │   ├── HistoriqueTypeContrat.java
+│   │   │               │   ├── HoraireTravail.java
+│   │   │               │   ├── JourFerie.java
+│   │   │               │   ├── JournalAudit.java
+│   │   │               │   ├── Lieu.java
+│   │   │               │   ├── MotifDemande.java
+│   │   │               │   ├── Notification.java
+│   │   │               │   ├── OffreEmploi.java
+│   │   │               │   ├── Onboarding.java
+│   │   │               │   ├── OnboardingTache.java
+│   │   │               │   ├── Planning.java
+│   │   │               │   ├── Pointage.java
+│   │   │               │   ├── Poste.java
+│   │   │               │   ├── PosteMission.java
+│   │   │               │   ├── PropositionEmbauche.java
+│   │   │               │   ├── PropositionMessage.java
+│   │   │               │   ├── RegimeTravail.java
+│   │   │               │   ├── Role.java
+│   │   │               │   ├── StatutCandidature.java
+│   │   │               │   ├── StatutContrat.java
+│   │   │               │   ├── StatutDemandeRecrutement.java
+│   │   │               │   ├── StatutEmploye.java
+│   │   │               │   ├── StatutOffreEmploi.java
+│   │   │               │   ├── StatutProposition.java
+│   │   │               │   ├── StatutTacheOnboarding.java
+│   │   │               │   ├── TypeContrat.java
+│   │   │               │   ├── TypeDecompte.java
+│   │   │               │   ├── TypeDocument.java
+│   │   │               │   ├── TypeEvaluation.java
+│   │   │               │   ├── TypeNotification.java
+│   │   │               │   ├── Utilisateur.java
+│   │   │               │   └── ValidationProposition.java
+│   │   │               ├── repository
+│   │   │               │   ├── AffectationPlanningRepository.java
+│   │   │               │   ├── AffectationRepository.java
+│   │   │               │   ├── CandidatRepository.java
+│   │   │               │   ├── CandidatureRepository.java
+│   │   │               │   ├── ContratRepository.java
+│   │   │               │   ├── CoordonneesEmployeRepository.java
+│   │   │               │   ├── DemandeRecrutementRepository.java
+│   │   │               │   ├── DepartementRepository.java
+│   │   │               │   ├── DocumentRepository.java
+│   │   │               │   ├── EmployeRepository.java
+│   │   │               │   ├── EtatDemandeRepository.java
+│   │   │               │   ├── EvaluationRepository.java
+│   │   │               │   ├── GrilleSalarialRepository.java
+│   │   │               │   ├── HistoriqueCandidatIdentifiantsRepository.java
+│   │   │               │   ├── HistoriqueDemandeRecrutementRepository.java
+│   │   │               │   ├── HistoriqueTypeContratRepository.java
+│   │   │               │   ├── JourFerieRepository.java
+│   │   │               │   ├── JournalAuditRepository.java
+│   │   │               │   ├── LieuRepository.java
+│   │   │               │   ├── MotifDemandeRepository.java
+│   │   │               │   ├── OffreEmploieRepository.java
+│   │   │               │   ├── OnboardingRepository.java
+│   │   │               │   ├── OnboardingTacheRepository.java
+│   │   │               │   ├── PlanningRepository.java
+│   │   │               │   ├── PointageRepository.java
+│   │   │               │   ├── PosteMissionRepository.java
+│   │   │               │   ├── PosteRepository.java
+│   │   │               │   ├── PropositionEmbaucheRepository.java
+│   │   │               │   ├── PropositionMessageRepository.java
+│   │   │               │   ├── RegimeTravailRepository.java
+│   │   │               │   ├── RoleRepository.java
+│   │   │               │   ├── StatutCandidatureRepository.java
+│   │   │               │   ├── StatutContratRepository.java
+│   │   │               │   ├── StatutDemandeRecrutementRepository.java
+│   │   │               │   ├── StatutEmployeRepository.java
+│   │   │               │   ├── StatutOffreEmploieRepository.java
+│   │   │               │   ├── StatutPropositionRepository.java
+│   │   │               │   ├── StatutTacheOnboardingRepository.java
+│   │   │               │   ├── TypeContractRepository.java
+│   │   │               │   ├── TypeDecompteRepository.java
+│   │   │               │   ├── TypeDocumentRepository.java
+│   │   │               │   ├── TypeEvaluationRepository.java
+│   │   │               │   ├── TypeNotificationRepository.java
+│   │   │               │   ├── UtilisateurRepository.java
+│   │   │               │   └── ValidationPropositionRepository.java
+│   │   │               ├── service
+│   │   │               │   ├── AffectationPlanningService.java
+│   │   │               │   ├── AffectationService.java
+│   │   │               │   ├── AuditService.java
+│   │   │               │   ├── BreadcrumbService.java
+│   │   │               │   ├── CandidatService.java
+│   │   │               │   ├── CandidatureService.java
+│   │   │               │   ├── ContextePaieService.java
+│   │   │               │   ├── ContratService.java
+│   │   │               │   ├── CustomUserDetailsService.java
+│   │   │               │   ├── DashboardService.java
+│   │   │               │   ├── DemandeRecrutementService.java
+│   │   │               │   ├── DepartementService.java
+│   │   │               │   ├── DocumentService.java
+│   │   │               │   ├── EmbaucheService.java
+│   │   │               │   ├── EmployeService.java
+│   │   │               │   ├── EtatDemandeService.java
+│   │   │               │   ├── EvaluationService.java
+│   │   │               │   ├── GrilleSalarialService.java
+│   │   │               │   ├── HistoriqueCandidatIdentifiantsService.java
+│   │   │               │   ├── HistoriqueDemandeRecrutementService.java
+│   │   │               │   ├── JourFerieService.java
+│   │   │               │   ├── LieuService.java
+│   │   │               │   ├── MotifDemandeService.java
+│   │   │               │   ├── OffreEmploieService.java
+│   │   │               │   ├── OnboardingService.java
+│   │   │               │   ├── OnboardingTacheService.java
+│   │   │               │   ├── PlanningService.java
+│   │   │               │   ├── PointageService.java
+│   │   │               │   ├── PosteReferentielService.java
+│   │   │               │   ├── PosteService.java
+│   │   │               │   ├── PropositionMessageService.java
+│   │   │               │   ├── PropositionService.java
+│   │   │               │   ├── RegimeTravailService.java
+│   │   │               │   ├── RHDashboardService.java
+│   │   │               │   ├── RoleService.java
+│   │   │               │   ├── StatutCandidatureService.java
+│   │   │               │   ├── StatutContratService.java
+│   │   │               │   ├── StatutEmployeService.java
+│   │   │               │   ├── StatutOffreEmploieService.java
+│   │   │               │   ├── StatutPropositionService.java
+│   │   │               │   ├── StatutTacheOnboardingService.java
+│   │   │               │   ├── TempsTravailService.java
+│   │   │               │   ├── TypeContratService.java
+│   │   │               │   ├── TypeDecompteService.java
+│   │   │               │   ├── TypeDocumentService.java
+│   │   │               │   ├── TypeEvaluationService.java
+│   │   │               │   ├── UtilisateurService.java
+│   │   │               │   └── ValidationPropositionService.java
+│   │   │               └── SirhApplication.java
+│   │   └── resources
+│   │       ├── application.properties
+│   │       ├── static
+│   │       │   ├── css
+│   │       │   │   ├── styles.css
+│   │       │   │   ├── styles.css.map
+│   │       │   │   └── styles.scss
+│   │       │   ├── files.zip
+│   │       │   ├── fonts
+│   │       │   │   ├── inter-latin-400-normal.woff2
+│   │       │   │   ├── inter-latin-500-normal.woff2
+│   │       │   │   ├── inter-latin-600-normal.woff2
+│   │       │   │   ├── inter-latin-700-normal.woff2
+│   │       │   │   └── material-symbols-outlined.woff2
+│   │       │   └── js
+│   │       │       ├── chart.umd.js
+│   │       │       ├── custom-select.js
+│   │       │       └── tailwind.js
+│   │       └── templates
+│   │           ├── admin
+│   │           │   └── utilisateurs.html
+│   │           ├── candidats
+│   │           │   └── fiche.html
+│   │           ├── candidatures
+│   │           │   ├── evaluation.html
+│   │           │   ├── liste.html
+│   │           │   └── show.html
+│   │           ├── contrats
+│   │           │   ├── form.html
+│   │           │   ├── historique.html
+│   │           │   └── type-contrat
+│   │           │       ├── form.html
+│   │           │       └── index.html
+│   │           ├── demande
+│   │           │   ├── form.html
+│   │           │   ├── index.html
+│   │           │   ├── show.html
+│   │           │   └── validation.html
+│   │           ├── departement
+│   │           │   ├── form.html
+│   │           │   ├── index.html
+│   │           │   └── show.html
+│   │           ├── dossier
+│   │           │   └── dossier-salarie.html
+│   │           ├── employe
+│   │           │   ├── fiche.html
+│   │           │   └── index.html
+│   │           ├── error.html
+│   │           ├── fragments
+│   │           │   ├── breadcrumb.html
+│   │           │   └── sidebar.html
+│   │           ├── grille
+│   │           │   ├── form.html
+│   │           │   ├── index.html
+│   │           │   └── show.html
+│   │           ├── layout.html
+│   │           ├── login.html
+│   │           ├── offres
+│   │           │   ├── form.html
+│   │           │   └── liste.html
+│   │           ├── onboarding
+│   │           │   └── checklist.html
+│   │           ├── poste
+│   │           │   ├── form.html
+│   │           │   ├── index.html
+│   │           │   └── show.html
+│   │           ├── propositions
+│   │           │   ├── form.html
+│   │           │   ├── liste.html
+│   │           │   └── show.html
+│   │           ├── temps-travail
+│   │           │   ├── plannings
+│   │           │   │   ├── detail.html
+│   │           │   │   ├── form.html
+│   │           │   │   └── index.html
+│   │           │   ├── pointages
+│   │           │   │   ├── form.html
+│   │           │   │   └── index.html
+│   │           │   └── regimes
+│   │           │       ├── form.html
+│   │           │       └── index.html
+│   │           └── utilisateur
+│   │               ├── dashboard.html
+│   │               └── rh.html
+│   └── test
+│       └── java
+│           └── com
+│               └── example
+│                   └── sirh
+│                       ├── service
+│                       │   ├── ContextePaieServiceTest.java
+│                       │   └── ContratServiceTest.java
+│                       └── SirhApplicationTests.java
+├── target
+│   ├── classes
+│   │   ├── application.properties
+│   │   ├── com
+│   │   │   └── example
+│   │   │       └── sirh
+│   │   │           ├── config
+│   │   │           │   ├── BreadcrumbInterceptor.class
+│   │   │           │   ├── CustomUserDetails.class
+│   │   │           │   ├── GlobalModelAttributes.class
+│   │   │           │   ├── SecurityConfig.class
+│   │   │           │   └── WebConfig.class
+│   │   │           ├── constants
+│   │   │           │   ├── ConstantSirh$Action.class
+│   │   │           │   ├── ConstantSirh$Decision.class
+│   │   │           │   ├── ConstantSirh$Role.class
+│   │   │           │   ├── ConstantSirh$Statut.class
+│   │   │           │   ├── ConstantSirh$TypeDecompteCode.class
+│   │   │           │   └── ConstantSirh.class
+│   │   │           ├── controller
+│   │   │           │   ├── AdminUtilisateurController.class
+│   │   │           │   ├── api
+│   │   │           │   │   ├── ApiExceptionHandler.class
+│   │   │           │   │   └── v1
+│   │   │           │   │       ├── JobController.class
+│   │   │           │   │       ├── PublicApplicationController.class
+│   │   │           │   │       ├── PublicAuthController.class
+│   │   │           │   │       └── PublicPropositionController.class
+│   │   │           │   ├── AuthController.class
+│   │   │           │   ├── CandidatureController.class
+│   │   │           │   ├── ContratController.class
+│   │   │           │   ├── DemandeRecrutementController.class
+│   │   │           │   ├── DepartementController.class
+│   │   │           │   ├── DocumentController.class
+│   │   │           │   ├── DossierSalarierControlleur.class
+│   │   │           │   ├── EmployeController.class
+│   │   │           │   ├── EvaluationController.class
+│   │   │           │   ├── GrilleSalarialController.class
+│   │   │           │   ├── OffreEmploiController.class
+│   │   │           │   ├── OnboardingController.class
+│   │   │           │   ├── PosteController.class
+│   │   │           │   ├── PropositionEmbaucheController.class
+│   │   │           │   ├── TempsTravailController.class
+│   │   │           │   ├── TypeContratController.class
+│   │   │           │   └── UtilisateurController.class
+│   │   │           ├── dto
+│   │   │           │   ├── BreadcrumbItem.class
+│   │   │           │   ├── CandidatLoginChangeDTO.class
+│   │   │           │   ├── CandidatPublicDto$CandidatPublicDtoBuilder.class
+│   │   │           │   ├── CandidatPublicDto.class
+│   │   │           │   ├── CandidatureAvecPropositionDTO.class
+│   │   │           │   ├── CandidaturePublicDto$CandidaturePublicDtoBuilder.class
+│   │   │           │   ├── CandidaturePublicDto.class
+│   │   │           │   ├── ChartPointDto.class
+│   │   │           │   ├── ContextePaie$AbsenceInfo.class
+│   │   │           │   ├── ContextePaie$CongeInfo.class
+│   │   │           │   ├── ContextePaie$ContratInfo.class
+│   │   │           │   ├── ContextePaie$HeureSupInfo.class
+│   │   │           │   ├── ContextePaie$PointageInfo.class
+│   │   │           │   ├── ContextePaie$RegimeInfo.class
+│   │   │           │   ├── ContextePaie.class
+│   │   │           │   ├── DashboardDto$DashboardDtoBuilder.class
+│   │   │           │   ├── DashboardDto.class
+│   │   │           │   ├── DemandeRecrutementDTO.class
+│   │   │           │   ├── DemandeRecrutementFilter.class
+│   │   │           │   ├── DemandeRecrutementLib.class
+│   │   │           │   ├── DemandeResumeDto$DemandeResumeDtoBuilder.class
+│   │   │           │   ├── DemandeResumeDto.class
+│   │   │           │   ├── EmployeFilter.class
+│   │   │           │   ├── FunnelStepDto$FunnelStepDtoBuilder.class
+│   │   │           │   ├── FunnelStepDto.class
+│   │   │           │   ├── GrilleSalarialFilter.class
+│   │   │           │   ├── HiringDelayDto.class
+│   │   │           │   ├── LoginChangeDTO.class
+│   │   │           │   ├── LoginRequestDto.class
+│   │   │           │   ├── MessageCandidatRequestDto.class
+│   │   │           │   ├── MessagePubliqueDto$MessagePubliqueDtoBuilder.class
+│   │   │           │   ├── MessagePubliqueDto.class
+│   │   │           │   ├── OffreFilter.class
+│   │   │           │   ├── OffrePublicDto$OffrePublicDtoBuilder.class
+│   │   │           │   ├── OffrePublicDto.class
+│   │   │           │   ├── OnboardingStatutCountDto.class
+│   │   │           │   ├── PointageCalculDto.class
+│   │   │           │   ├── PointageFilter.class
+│   │   │           │   ├── PosteFilter.class
+│   │   │           │   ├── PropositionDetailPubliqueDto$PropositionDetailPubliqueDtoBuilder.class
+│   │   │           │   ├── PropositionDetailPubliqueDto.class
+│   │   │           │   ├── PropositionEmbaucheFilter.class
+│   │   │           │   ├── PropositionPubliqueDto$PropositionPubliqueDtoBuilder.class
+│   │   │           │   ├── PropositionPubliqueDto.class
+│   │   │           │   ├── RegisterRequestDto.class
+│   │   │           │   ├── ReponseCandidatRequestDto.class
+│   │   │           │   ├── RHDashboardDto$RHDashboardDtoBuilder.class
+│   │   │           │   ├── RHDashboardDto.class
+│   │   │           │   └── ValidationPageData.class
+│   │   │           ├── exception
+│   │   │           │   └── ValidationMetierException.class
+│   │   │           ├── model
+│   │   │           │   ├── Affectation$AffectationBuilder.class
+│   │   │           │   ├── Affectation.class
+│   │   │           │   ├── AffectationPlanning$AffectationPlanningBuilder.class
+│   │   │           │   ├── AffectationPlanning.class
+│   │   │           │   ├── Candidat$CandidatBuilder.class
+│   │   │           │   ├── Candidat.class
+│   │   │           │   ├── Candidature$CandidatureBuilder.class
+│   │   │           │   ├── Candidature.class
+│   │   │           │   ├── Contrat$ContratBuilder.class
+│   │   │           │   ├── Contrat.class
+│   │   │           │   ├── CoordonneesEmploye$CoordonneesEmployeBuilder.class
+│   │   │           │   ├── CoordonneesEmploye.class
+│   │   │           │   ├── DemandeRecrutement$DemandeRecrutementBuilder.class
+│   │   │           │   ├── DemandeRecrutement.class
+│   │   │           │   ├── Departement$DepartementBuilder.class
+│   │   │           │   ├── Departement.class
+│   │   │           │   ├── Document$DocumentBuilder.class
+│   │   │           │   ├── Document.class
+│   │   │           │   ├── Employe$EmployeBuilder.class
+│   │   │           │   ├── Employe.class
+│   │   │           │   ├── EtatDemande$EtatDemandeBuilder.class
+│   │   │           │   ├── EtatDemande.class
+│   │   │           │   ├── Evaluation$EvaluationBuilder.class
+│   │   │           │   ├── Evaluation.class
+│   │   │           │   ├── GrilleSalarial$GrilleSalarialBuilder.class
+│   │   │           │   ├── GrilleSalarial.class
+│   │   │           │   ├── HistoriqueCandidatIdentifiants$HistoriqueCandidatIdentifiantsBuilder.class
+│   │   │           │   ├── HistoriqueCandidatIdentifiants.class
+│   │   │           │   ├── HistoriqueDemandeRecrutement$HistoriqueDemandeRecrutementBuilder.class
+│   │   │           │   ├── HistoriqueDemandeRecrutement.class
+│   │   │           │   ├── HistoriqueTypeContrat$HistoriqueTypeContratBuilder.class
+│   │   │           │   ├── HistoriqueTypeContrat.class
+│   │   │           │   ├── HoraireTravail$HoraireTravailBuilder.class
+│   │   │           │   ├── HoraireTravail.class
+│   │   │           │   ├── JourFerie$JourFerieBuilder.class
+│   │   │           │   ├── JourFerie.class
+│   │   │           │   ├── JournalAudit$JournalAuditBuilder.class
+│   │   │           │   ├── JournalAudit.class
+│   │   │           │   ├── Lieu$LieuBuilder.class
+│   │   │           │   ├── Lieu.class
+│   │   │           │   ├── MotifDemande$MotifDemandeBuilder.class
+│   │   │           │   ├── MotifDemande.class
+│   │   │           │   ├── Notification$NotificationBuilder.class
+│   │   │           │   ├── Notification.class
+│   │   │           │   ├── OffreEmploi$OffreEmploiBuilder.class
+│   │   │           │   ├── OffreEmploi.class
+│   │   │           │   ├── Onboarding.class
+│   │   │           │   ├── OnboardingTache.class
+│   │   │           │   ├── Planning$PlanningBuilder.class
+│   │   │           │   ├── Planning.class
+│   │   │           │   ├── Pointage$PointageBuilder.class
+│   │   │           │   ├── Pointage.class
+│   │   │           │   ├── Poste$PosteBuilder.class
+│   │   │           │   ├── Poste.class
+│   │   │           │   ├── PosteMission$PosteMissionBuilder.class
+│   │   │           │   ├── PosteMission.class
+│   │   │           │   ├── PropositionEmbauche$PropositionEmbaucheBuilder.class
+│   │   │           │   ├── PropositionEmbauche.class
+│   │   │           │   ├── PropositionMessage$PropositionMessageBuilder.class
+│   │   │           │   ├── PropositionMessage.class
+│   │   │           │   ├── RegimeTravail$RegimeTravailBuilder.class
+│   │   │           │   ├── RegimeTravail.class
+│   │   │           │   ├── Role$RoleBuilder.class
+│   │   │           │   ├── Role.class
+│   │   │           │   ├── StatutCandidature$StatutCandidatureBuilder.class
+│   │   │           │   ├── StatutCandidature.class
+│   │   │           │   ├── StatutContrat.class
+│   │   │           │   ├── StatutDemandeRecrutement$StatutDemandeRecrutementBuilder.class
+│   │   │           │   ├── StatutDemandeRecrutement.class
+│   │   │           │   ├── StatutEmploye$StatutEmployeBuilder.class
+│   │   │           │   ├── StatutEmploye.class
+│   │   │           │   ├── StatutOffreEmploi$StatutOffreEmploiBuilder.class
+│   │   │           │   ├── StatutOffreEmploi.class
+│   │   │           │   ├── StatutProposition$StatutPropositionBuilder.class
+│   │   │           │   ├── StatutProposition.class
+│   │   │           │   ├── StatutTacheOnboarding.class
+│   │   │           │   ├── TypeContrat$TypeContratBuilder.class
+│   │   │           │   ├── TypeContrat.class
+│   │   │           │   ├── TypeDecompte$TypeDecompteBuilder.class
+│   │   │           │   ├── TypeDecompte.class
+│   │   │           │   ├── TypeDocument$TypeDocumentBuilder.class
+│   │   │           │   ├── TypeDocument.class
+│   │   │           │   ├── TypeEvaluation$TypeEvaluationBuilder.class
+│   │   │           │   ├── TypeEvaluation.class
+│   │   │           │   ├── TypeNotification$TypeNotificationBuilder.class
+│   │   │           │   ├── TypeNotification.class
+│   │   │           │   ├── Utilisateur$UtilisateurBuilder.class
+│   │   │           │   ├── Utilisateur.class
+│   │   │           │   ├── ValidationProposition$ValidationPropositionBuilder.class
+│   │   │           │   └── ValidationProposition.class
+│   │   │           ├── repository
+│   │   │           │   ├── AffectationPlanningRepository.class
+│   │   │           │   ├── AffectationRepository.class
+│   │   │           │   ├── CandidatRepository.class
+│   │   │           │   ├── CandidatureRepository.class
+│   │   │           │   ├── ContratRepository.class
+│   │   │           │   ├── CoordonneesEmployeRepository.class
+│   │   │           │   ├── DemandeRecrutementRepository.class
+│   │   │           │   ├── DepartementRepository.class
+│   │   │           │   ├── DocumentRepository.class
+│   │   │           │   ├── EmployeRepository.class
+│   │   │           │   ├── EtatDemandeRepository.class
+│   │   │           │   ├── EvaluationRepository.class
+│   │   │           │   ├── GrilleSalarialRepository.class
+│   │   │           │   ├── HistoriqueCandidatIdentifiantsRepository.class
+│   │   │           │   ├── HistoriqueDemandeRecrutementRepository.class
+│   │   │           │   ├── HistoriqueTypeContratRepository.class
+│   │   │           │   ├── JourFerieRepository.class
+│   │   │           │   ├── JournalAuditRepository.class
+│   │   │           │   ├── LieuRepository.class
+│   │   │           │   ├── MotifDemandeRepository.class
+│   │   │           │   ├── OffreEmploieRepository.class
+│   │   │           │   ├── OnboardingRepository.class
+│   │   │           │   ├── OnboardingTacheRepository.class
+│   │   │           │   ├── PlanningRepository.class
+│   │   │           │   ├── PointageRepository.class
+│   │   │           │   ├── PosteMissionRepository.class
+│   │   │           │   ├── PosteRepository.class
+│   │   │           │   ├── PropositionEmbaucheRepository.class
+│   │   │           │   ├── PropositionMessageRepository.class
+│   │   │           │   ├── RegimeTravailRepository.class
+│   │   │           │   ├── RoleRepository.class
+│   │   │           │   ├── StatutCandidatureRepository.class
+│   │   │           │   ├── StatutContratRepository.class
+│   │   │           │   ├── StatutDemandeRecrutementRepository.class
+│   │   │           │   ├── StatutEmployeRepository.class
+│   │   │           │   ├── StatutOffreEmploieRepository.class
+│   │   │           │   ├── StatutPropositionRepository.class
+│   │   │           │   ├── StatutTacheOnboardingRepository.class
+│   │   │           │   ├── TypeContractRepository.class
+│   │   │           │   ├── TypeDecompteRepository.class
+│   │   │           │   ├── TypeDocumentRepository.class
+│   │   │           │   ├── TypeEvaluationRepository.class
+│   │   │           │   ├── TypeNotificationRepository.class
+│   │   │           │   ├── UtilisateurRepository.class
+│   │   │           │   └── ValidationPropositionRepository.class
+│   │   │           ├── service
+│   │   │           │   ├── AffectationPlanningService.class
+│   │   │           │   ├── AffectationService.class
+│   │   │           │   ├── AuditService.class
+│   │   │           │   ├── BreadcrumbService.class
+│   │   │           │   ├── CandidatService.class
+│   │   │           │   ├── CandidatureService.class
+│   │   │           │   ├── ContextePaieService.class
+│   │   │           │   ├── ContratService.class
+│   │   │           │   ├── CustomUserDetailsService.class
+│   │   │           │   ├── DashboardService.class
+│   │   │           │   ├── DemandeRecrutementService.class
+│   │   │           │   ├── DepartementService.class
+│   │   │           │   ├── DocumentService.class
+│   │   │           │   ├── EmbaucheService.class
+│   │   │           │   ├── EmployeService.class
+│   │   │           │   ├── EtatDemandeService.class
+│   │   │           │   ├── EvaluationService.class
+│   │   │           │   ├── GrilleSalarialService.class
+│   │   │           │   ├── HistoriqueCandidatIdentifiantsService.class
+│   │   │           │   ├── HistoriqueDemandeRecrutementService.class
+│   │   │           │   ├── JourFerieService.class
+│   │   │           │   ├── LieuService.class
+│   │   │           │   ├── MotifDemandeService.class
+│   │   │           │   ├── OffreEmploieService.class
+│   │   │           │   ├── OnboardingService.class
+│   │   │           │   ├── OnboardingTacheService.class
+│   │   │           │   ├── PlanningService.class
+│   │   │           │   ├── PointageService.class
+│   │   │           │   ├── PosteReferentielService.class
+│   │   │           │   ├── PosteService.class
+│   │   │           │   ├── PropositionMessageService.class
+│   │   │           │   ├── PropositionService.class
+│   │   │           │   ├── RegimeTravailService.class
+│   │   │           │   ├── RHDashboardService$PeriodRange.class
+│   │   │           │   ├── RHDashboardService.class
+│   │   │           │   ├── RoleService.class
+│   │   │           │   ├── StatutCandidatureService.class
+│   │   │           │   ├── StatutContratService.class
+│   │   │           │   ├── StatutEmployeService.class
+│   │   │           │   ├── StatutOffreEmploieService.class
+│   │   │           │   ├── StatutPropositionService.class
+│   │   │           │   ├── StatutTacheOnboardingService.class
+│   │   │           │   ├── TempsTravailService.class
+│   │   │           │   ├── TypeContratService.class
+│   │   │           │   ├── TypeDecompteService.class
+│   │   │           │   ├── TypeDocumentService.class
+│   │   │           │   ├── TypeEvaluationService.class
+│   │   │           │   ├── UtilisateurService.class
+│   │   │           │   └── ValidationPropositionService.class
+│   │   │           └── SirhApplication.class
+│   │   ├── static
+│   │   │   ├── css
+│   │   │   │   ├── styles.css
+│   │   │   │   ├── styles.css.map
+│   │   │   │   └── styles.scss
+│   │   │   ├── files.zip
+│   │   │   ├── fonts
+│   │   │   │   ├── inter-latin-400-normal.woff2
+│   │   │   │   ├── inter-latin-500-normal.woff2
+│   │   │   │   ├── inter-latin-600-normal.woff2
+│   │   │   │   ├── inter-latin-700-normal.woff2
+│   │   │   │   └── material-symbols-outlined.woff2
+│   │   │   └── js
+│   │   │       ├── chart.umd.js
+│   │   │       ├── custom-select.js
+│   │   │       └── tailwind.js
+│   │   └── templates
+│   │       ├── admin
+│   │       │   └── utilisateurs.html
+│   │       ├── candidats
+│   │       │   └── fiche.html
+│   │       ├── candidatures
+│   │       │   ├── evaluation.html
+│   │       │   ├── liste.html
+│   │       │   └── show.html
+│   │       ├── contrats
+│   │       │   ├── form.html
+│   │       │   ├── historique.html
+│   │       │   └── type-contrat
+│   │       │       ├── form.html
+│   │       │       └── index.html
+│   │       ├── demande
+│   │       │   ├── form.html
+│   │       │   ├── index.html
+│   │       │   ├── show.html
+│   │       │   └── validation.html
+│   │       ├── departement
+│   │       │   ├── form.html
+│   │       │   ├── index.html
+│   │       │   └── show.html
+│   │       ├── dossier
+│   │       │   └── dossier-salarie.html
+│   │       ├── employe
+│   │       │   ├── fiche.html
+│   │       │   └── index.html
+│   │       ├── error.html
+│   │       ├── fragments
+│   │       │   ├── breadcrumb.html
+│   │       │   └── sidebar.html
+│   │       ├── grille
+│   │       │   ├── form.html
+│   │       │   ├── index.html
+│   │       │   └── show.html
+│   │       ├── layout.html
+│   │       ├── login.html
+│   │       ├── offres
+│   │       │   ├── form.html
+│   │       │   └── liste.html
+│   │       ├── onboarding
+│   │       │   └── checklist.html
+│   │       ├── poste
+│   │       │   ├── form.html
+│   │       │   ├── index.html
+│   │       │   └── show.html
+│   │       ├── propositions
+│   │       │   ├── form.html
+│   │       │   ├── liste.html
+│   │       │   └── show.html
+│   │       ├── temps-travail
+│   │       │   ├── plannings
+│   │       │   │   ├── detail.html
+│   │       │   │   ├── form.html
+│   │       │   │   └── index.html
+│   │       │   ├── pointages
+│   │       │   │   ├── form.html
+│   │       │   │   └── index.html
+│   │       │   └── regimes
+│   │       │       ├── form.html
+│   │       │       └── index.html
+│   │       └── utilisateur
+│   │           ├── dashboard.html
+│   │           └── rh.html
+│   ├── generated-sources
+│   │   └── annotations
+│   ├── generated-test-sources
+│   │   └── test-annotations
+│   ├── maven-archiver
+│   │   └── pom.properties
+│   ├── maven-status
+│   │   └── maven-compiler-plugin
+│   │       ├── compile
+│   │       │   └── default-compile
+│   │       │       ├── createdFiles.lst
+│   │       │       └── inputFiles.lst
+│   │       └── testCompile
+│   │           └── default-testCompile
+│   │               ├── createdFiles.lst
+│   │               └── inputFiles.lst
+│   ├── sirh-0.0.1-SNAPSHOT.jar
+│   ├── sirh-0.0.1-SNAPSHOT.jar.original
+│   ├── surefire-reports
+│   │   ├── com.example.sirh.service.ContextePaieServiceTest.txt
+│   │   ├── com.example.sirh.service.ContratServiceTest.txt
+│   │   ├── com.example.sirh.SirhApplicationTests.txt
+│   │   ├── TEST-com.example.sirh.service.ContextePaieServiceTest.xml
+│   │   ├── TEST-com.example.sirh.service.ContratServiceTest.xml
+│   │   └── TEST-com.example.sirh.SirhApplicationTests.xml
+│   └── test-classes
+│       └── com
+│           └── example
+│               └── sirh
+│                   ├── service
+│                   │   ├── ContextePaieServiceTest.class
+│                   │   └── ContratServiceTest.class
+│                   └── SirhApplicationTests.class
+└── uploads
+    ├── 9f2425a9-7e2f-4e41-986d-893702bf9c2f_ETU004157.pdf
+    ├── 9fe5ff90-dc27-4955-80ca-7cd52ae56540_8dffabe8-a420-4c98-8a3d-8e16e8fdb5a2-cover.png
+    ├── cv_0ef6baa4-c219-40a9-9a70-4e191d161326_02-archi-modif.pdf
+    ├── cv_533ceb82-6a75-49a8-afee-dddb9d0c185a_02-archi-modif.pdf
+    ├── cv_769ef989-ba1a-4532-b043-4543e147d46c_02-archi-modif.pdf
+    ├── cv_7c93d63d-5de5-49f0-9a58-acce23b13cf9_ci4-mini-exemples.pdf
+    ├── cv_912e5a1f-b0da-4578-ad14-335ff70f98af_SIRH-pages-et-fonctionnalités-attendues.pdf
+    └── cv_a856b0fd-6626-4e0a-a776-e4561135eca4_SIRH-pages-et-fonctionnalités-attendues.pdf
+
+108 directories, 635 files

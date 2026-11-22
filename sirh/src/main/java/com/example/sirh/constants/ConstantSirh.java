@@ -1,5 +1,7 @@
 package com.example.sirh.constants;
 
+import java.math.BigDecimal;
+
 public final class ConstantSirh {
 
     private ConstantSirh() {
@@ -61,5 +63,10 @@ public final class ConstantSirh {
     public static final class TypeDecompteCode {
         public static final String HEURES = "HEURES";
         public static final String JOURS = "JOURS";
+    }
+
+    public static final class Paie {
+        public static final BigDecimal HEURES_PAR_MOIS = new BigDecimal("173.33");
+        public static final BigDecimal JOURS_PAR_MOIS = new BigDecimal("30");
     }
 }

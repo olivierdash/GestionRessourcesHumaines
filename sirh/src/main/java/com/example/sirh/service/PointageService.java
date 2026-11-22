@@ -103,9 +103,8 @@ public class PointageService {
         int minutesPresence = (int) Duration.between(
                 pointage.getHeureEntree(), pointage.getHeureSortie()).toMinutes();
 
-        List<AffectationPlanning> affectations =
-                affectationPlanningService.findActivesForDate(
-                        pointage.getEmploye().getIdEmployer(), pointage.getDatePointage());
+        List<AffectationPlanning> affectations = affectationPlanningService.findActivesForDate(
+                pointage.getEmploye().getIdEmployer(), pointage.getDatePointage());
 
         if (affectations.isEmpty()) {
             result.setMinutesPresence(minutesPresence);
@@ -153,5 +152,11 @@ public class PointageService {
         result.setAnomalie(anomalie);
 
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Pointage> listerEntre(Integer idEmploye, LocalDate debut, LocalDate fin) {
+        return pointageRepository
+                .findByEmployeIdEmployerAndDatePointageBetween(idEmploye, debut, fin);
     }
 }

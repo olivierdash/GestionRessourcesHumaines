@@ -11,23 +11,36 @@ import java.util.Optional;
 
 public interface ContratRepository extends JpaRepository<Contrat, Integer> {
 
-     List<Contrat> findByEmployeIdEmployerOrderByDateDebutDesc(Integer idEmploye);
+        List<Contrat> findByEmployeIdEmployerOrderByDateDebutDesc(Integer idEmploye);
 
-    Optional<Contrat> findFirstByEmployeIdEmployerAndStatutLibelle(Integer idEmploye, String libelle);
+        Optional<Contrat> findFirstByEmployeIdEmployerAndStatutLibelle(Integer idEmploye, String libelle);
 
-    @Query("""
-            SELECT COUNT(c) > 0 FROM Contrat c
-            WHERE c.employe.idEmployer = :idEmploye
-              AND (c.dateFin IS NULL OR c.dateFin >= :debut)
-              AND (CAST(:fin AS date) IS NULL OR c.dateDebut <= :fin)
-            """)
-    boolean existeChevauchement(@Param("idEmploye") Integer idEmploye,
-                                 @Param("debut") LocalDate debut,
-                                 @Param("fin") LocalDate fin);
+        @Query("""
+                        SELECT COUNT(c) > 0 FROM Contrat c
+                        WHERE c.employe.idEmployer = :idEmploye
+                          AND (c.dateFin IS NULL OR c.dateFin >= :debut)
+                          AND (CAST(:fin AS date) IS NULL OR c.dateDebut <= :fin)
+                        """)
+        boolean existeChevauchement(@Param("idEmploye") Integer idEmploye,
+                        @Param("debut") LocalDate debut,
+                        @Param("fin") LocalDate fin);
 
-    List<Contrat> findByEmployeIdEmployer(Integer idEmployer);
-    long countByStatutLibelleAndDateFinBetween(
-        String libelle,
-        LocalDate start,
-        LocalDate end);
+        List<Contrat> findByEmployeIdEmployer(Integer idEmployer);
+
+        long countByStatutLibelleAndDateFinBetween(
+                        String libelle,
+                        LocalDate start,
+                        LocalDate end);
+
+        @Query("""
+                        SELECT c FROM Contrat c
+                        WHERE c.employe.idEmployer = :idEmploye
+                          AND c.dateDebut <= :fin
+                          AND (c.dateFin IS NULL OR c.dateFin >= :debut)
+                        ORDER BY c.dateDebut DESC
+                        """)
+        List<Contrat> findContratsCouvrantPeriode(
+                        @Param("idEmploye") Integer idEmploye,
+                        @Param("debut") LocalDate debut,
+                        @Param("fin") LocalDate fin);
 }
