@@ -82,7 +82,11 @@
                     <li th:each="j : ${justificatifs}"
                         class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 rounded border border-neutral-border bg-slate-50">
                         <div class="min-w-0">
-                            <a th:href="@{/justificatifs/{id}(id=${j.id})}"
+                            <a th:href="@{/justificatifs/{id}/apercu(id=${j.id})}"
+                               target="_blank" rel="noopener"
+                               th:attr="data-preview-title=${j.nomFichier},
+                                        data-preview-download=@{/justificatifs/{id}(id=${j.id})}"
+                               onclick="return openFilePreviewFromLink(this, event)"
                                class="text-sm font-semibold text-cobalt-700 hover:underline break-all"
                                th:text="${j.nomFichier}"></a>
                             <div class="text-[11px] text-slate-500 mt-0.5">

@@ -69,10 +69,15 @@
                     </div>
                     <div>
                         <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">CV</span>
-                        <a th:if="${candidature.candidat.cvUrl != null}" th:href="${candidature.candidat.cvUrl}"
-                            target="_blank"
+                        <a th:if="${candidature.candidat.cvUrl != null}"
+                            th:href="@{/candidats/{id}/cv(id=${candidature.candidat.idCandidat})}"
+                            target="_blank" rel="noopener"
+                            th:attr="data-preview-title=${'CV - ' + candidature.candidat.prenom + ' ' + candidature.candidat.nom},
+                                     data-preview-download=@{/candidats/{id}/cv/telecharger(id=${candidature.candidat.idCandidat})}"
+                            onclick="return openFilePreviewFromLink(this, event)"
                             class="inline-flex items-center gap-1 text-sm font-bold text-cobalt-800 hover:text-cobalt-900 underline">
-                            Consulter le CV ↗
+                            <span class="material-symbols-outlined text-[16px]">visibility</span>
+                            Consulter le CV
                         </a>
                         <span th:if="${candidature.candidat.cvUrl == null}" class="text-sm text-slate-400 italic"
                             th:text="${NO_CV_LABEL}"></span>

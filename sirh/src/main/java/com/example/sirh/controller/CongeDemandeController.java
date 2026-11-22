@@ -86,6 +86,11 @@ public class CongeDemandeController {
                 && accessService.peutApprouver(demande, utilisateur)));
         model.addAttribute("peutAnnuler", accessService.estProprietaire(demande, utilisateur)
                 || accessService.estRhOuDg(utilisateur));
+        model.addAttribute("peutSoumettreJustificatif", 
+                accessService.estProprietaire(demande, utilisateur)
+                        && demande.getCreateur() != null
+                        && demande.getCreateur().getIdUtilisateur() != null
+                        && demande.getCreateur().getIdUtilisateur().equals(utilisateur.getIdUtilisateur()));
         return "conges/demandes/detail";
     }
 
