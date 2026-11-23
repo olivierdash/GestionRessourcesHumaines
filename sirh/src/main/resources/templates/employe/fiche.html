@@ -191,10 +191,22 @@
                             <td class="font-mono text-slate-600"
                                 th:text="${d.dateDepot != null ? #temporals.format(d.dateDepot, 'dd/MM/yyyy HH:mm') : '-'}"></td>
                             <td class="text-right">
-                                <a th:href="@{/documents/{id}/telecharger(id=${d.idDocument})}"
-                                class="inline-flex items-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
-                                    Télécharger
-                                </a>
+                                <div class="inline-flex items-center gap-2">
+                                    <a th:href="@{/documents/{id}/apercu(id=${d.idDocument})}"
+                                       target="_blank" rel="noopener"
+                                       th:attr="data-preview-title=${d.nomFichier},
+                                                data-preview-download=@{/documents/{id}/telecharger(id=${d.idDocument})}"
+                                       onclick="return openFilePreviewFromLink(this, event)"
+                                       class="inline-flex items-center h-7 px-3 rounded bg-cobalt-700 border border-cobalt-700 text-white hover:bg-cobalt-800 text-xs font-semibold">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">visibility</span>
+                                        Consulter
+                                    </a>
+                                    <a th:href="@{/documents/{id}/telecharger(id=${d.idDocument})}"
+                                       class="inline-flex items-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">download</span>
+                                        Télécharger
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>

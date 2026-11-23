@@ -91,7 +91,11 @@
                             <td>
                                 <div class="flex flex-col gap-1">
                                     <a th:each="j : ${justificatifsParAbsence[a.id]}"
-                                       th:href="@{/justificatifs/{id}(id=${j.id})}"
+                                       th:href="@{/justificatifs/{id}/apercu(id=${j.id})}"
+                                       target="_blank" rel="noopener"
+                                       th:attr="data-preview-title=${j.nomFichier},
+                                                data-preview-download=@{/justificatifs/{id}(id=${j.id})}"
+                                       onclick="return openFilePreviewFromLink(this, event)"
                                        class="text-xs text-cobalt-700 font-semibold hover:underline"
                                        th:text="${j.nomFichier + ' (' + j.statut + ')'}"></a>
                                     <span th:if="${#lists.isEmpty(justificatifsParAbsence[a.id])}"

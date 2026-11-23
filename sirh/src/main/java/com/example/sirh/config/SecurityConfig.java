@@ -34,9 +34,13 @@ public class SecurityConfig {
                 // Sans cette ligne, POST /api/public/jobs/{id}/apply renvoie 403.
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/public/**"))
 
+                // Autorise l'aperçu des fichiers dans une iframe de même origine
+                // (visionneuse PDF intégrée aux pages).
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**","/upload/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
@@ -47,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
                         .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
                         .requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
+                        .requestMatchers("/discipline/**").hasAnyRole("RH", "DG", "MANAGER")
+                        .requestMatchers("/offboarding/**").hasAnyRole("RH", "DG")
                         .requestMatchers("/conges/types/**", "/conges/droits/**", "/conges/soldes/**",
                                 "/conges/demandes/**", "/conges/absences/**", "/conges/calendrier/**")
                             .hasAnyRole("RH", "DG")

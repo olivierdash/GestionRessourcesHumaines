@@ -72,12 +72,71 @@
                     <span class="sidebar-text whitespace-nowrap">Demandes</span>
                 </a>
 
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/discipline}" data-path="/discipline"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Discipline">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">gavel</span>
+                    <span class="sidebar-text whitespace-nowrap">Discipline</span>
+                </a>
+
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/offboarding}" data-path="/offboarding"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Ruptures et offboarding">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">logout</span>
+                    <span class="sidebar-text whitespace-nowrap">Ruptures / sorties</span>
+                </a>
+
                 <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/employes}" data-path="/employes"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                     title="Employés">
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">group</span>
                     <span class="sidebar-text whitespace-nowrap">Employés</span>
                 </a>
+
+                <div sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" class="sidebar-submenu-group" data-submenu-group="developpement">
+                    <button type="button"
+                        class="sidebar-nav-link submenu-toggle flex items-center justify-between w-full px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                        data-submenu-target="developpement" title="Développement">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">school</span>
+                            <span class="sidebar-text whitespace-nowrap">Développement</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[18px] text-slate-400 sidebar-text transition-transform duration-200 submenu-chevron">expand_more</span>
+                    </button>
+
+                    <div class="submenu-items hidden" data-submenu="developpement">
+                        <a th:href="@{/developpement/competences}" data-path="/developpement/competences"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Compétences">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">psychology</span>
+                            <span class="sidebar-text whitespace-nowrap">Compétences</span>
+                        </a>
+                        <a th:href="@{/developpement/employes}" data-path="/developpement/employes"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Compétences des employés">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">badge</span>
+                            <span class="sidebar-text whitespace-nowrap">Compétences employés</span>
+                        </a>
+                        <a th:href="@{/developpement/objectifs}" data-path="/developpement/objectifs"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Objectifs">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">flag</span>
+                            <span class="sidebar-text whitespace-nowrap">Objectifs</span>
+                        </a>
+                        <a th:href="@{/developpement/evaluations}" data-path="/developpement/evaluations"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Évaluations">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">fact_check</span>
+                            <span class="sidebar-text whitespace-nowrap">Évaluations</span>
+                        </a>
+                        <a th:href="@{/developpement/formations}" data-path="/developpement/formations"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Formations">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">menu_book</span>
+                            <span class="sidebar-text whitespace-nowrap">Formations</span>
+                        </a>
+                    </div>
+                </div>
 
 
                 <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/departements}" data-path="/departements"

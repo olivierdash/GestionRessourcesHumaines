@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full max-w-3xl flex flex-col gap-6">
+    <div><h1 class="text-2xl font-bold text-cobalt-900">Déclarer un incident</h1></div>
+    <form th:action="@{/discipline/incidents}" method="post" class="bg-white border border-neutral-border rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Salarié</label>
+            <select name="idEmployer" required class="w-full h-10 border border-neutral-border rounded px-3">
+                <option th:each="e : ${employes}" th:value="${e.idEmployer}" th:text="${e.matricule + ' - ' + e.candidature.candidat.prenom + ' ' + e.candidature.candidat.nom}"></option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Date du fait</label>
+            <input type="date" name="dateFait" required class="w-full h-10 border border-neutral-border rounded px-3">
+        </div>
+        <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Gravité</label>
+            <select name="gravite" class="w-full h-10 border border-neutral-border rounded px-3">
+                <option>FAIBLE</option><option>MOYENNE</option><option>GRAVE</option><option>TRES_GRAVE</option>
+            </select>
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Description</label>
+            <textarea name="descriptions" maxlength="500" required rows="5" class="w-full border border-neutral-border rounded p-3"></textarea>
+        </div>
+        <div class="md:col-span-2 flex justify-end gap-2">
+            <a th:href="@{/discipline}" class="h-9 px-4 rounded border border-neutral-border text-sm flex items-center">Annuler</a>
+            <button class="h-9 px-4 rounded bg-cobalt-700 text-white text-sm font-semibold">Déclarer</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

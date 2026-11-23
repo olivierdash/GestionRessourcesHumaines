@@ -17,7 +17,7 @@
                 <span th:text="${demande.typeConge.libelle}"></span>
             </p>
         </div>
-        <a th:href="${actionBase}" class="text-sm text-cobalt-700 font-semibold flex items-center gap-1 self-start md:self-auto">
+        <a th:href="@{${actionBase}}" class="text-sm text-cobalt-700 font-semibold flex items-center gap-1 self-start md:self-auto">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
             Retour à la liste
         </a>
@@ -48,7 +48,7 @@
                         <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Type de congé</dt>
                         <dd class="mt-1 font-semibold text-slate-800" th:text="${demande.typeConge.libelle}"></dd>
                         <dd class="text-xs text-slate-500"
-                            th:text="${demande.typeConge.modeDecompte.name() == 'OUVRES' ? 'Décompte en jours ouvrés' : 'Décompte en jours calendaires'}"></dd>
+                            th:text="${demande.typeConge.modeDecompte?.name() == 'OUVRES' ? 'Décompte en jours ouvrés' : 'Décompte en jours calendaires'}"></dd>
                     </div>
                     <div>
                         <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Période</dt>
@@ -110,7 +110,11 @@
                     <li th:each="j : ${justificatifs}"
                         class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 rounded border border-neutral-border bg-slate-50">
                         <div class="min-w-0">
-                            <a th:href="@{/justificatifs/{id}(id=${j.id})}"
+                            <a th:href="@{/justificatifs/{id}/apercu(id=${j.id})}"
+                               target="_blank" rel="noopener"
+                               th:attr="data-preview-title=${j.nomFichier},
+                                        data-preview-download=@{/justificatifs/{id}(id=${j.id})}"
+                               onclick="return openFilePreviewFromLink(this, event)"
                                class="text-sm font-semibold text-cobalt-700 hover:underline break-all"
                                th:text="${j.nomFichier}"></a>
                             <div class="text-[11px] text-slate-500 mt-0.5">
@@ -122,7 +126,7 @@
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
                             <span th:replace="~{conges/fragments/statut :: badge(${j.statut})}"></span>
-                            <form th:if="${j.statut.name() == 'DEPOSE'}"
+                            <form th:if="${j.statut?.name() == 'DEPOSE'}"
                                   sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')"
                                   th:action="@{/justificatifs/{id}/valider(id=${j.id})}" method="post">
                                 <button type="submit"
@@ -130,7 +134,7 @@
                                     Valider
                                 </button>
                             </form>
-                            <form th:if="${j.statut.name() == 'DEPOSE'}"
+                            <form th:if="${j.statut?.name() == 'DEPOSE'}"
                                   sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')"
                                   th:action="@{/justificatifs/{id}/refuser(id=${j.id})}" method="post"
                                   class="flex items-center gap-1">
@@ -144,8 +148,8 @@
                         </div>
                     </li>
                 </ul>
-                <form th:if="${demande.statut.name() != 'ANNULEE' and demande.statut.name() != 'REFUSEE'}"
-                      th:action="|${actionBase}/${demande.id}/justificatifs|"
+                <form th:if="${demande.statut?.name() != 'ANNULEE' and demande.statut?.name() != 'REFUSEE' and peutSoumettreJustificatif}"
+                      th:action="@{${actionBase} + '/' + ${demande.id} + '/justificatifs'}"
                       method="post" enctype="multipart/form-data"
                       class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2 border-t border-neutral-border pt-4">
                     <input type="file" name="fichier" required accept=".pdf,.jpg,.jpeg,.png"
@@ -214,14 +218,14 @@
             <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-5">
                 <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-3">Actions</h2>
 
-                <form th:if="${peutSoumettre == true}" th:action="|${actionBase}/${demande.id}/soumettre|" method="post" class="mb-2">
+                <form th:if="${peutSoumettre}" th:action="@{${actionBase} + '/' + ${demande.id} + '/soumettre'}" method="post" class="mb-2">
                     <button type="submit"
                             class="w-full h-10 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold shadow-sm">
                         Soumettre au manager
                     </button>
                 </form>
 
-                <form th:if="${peutValider == true}" th:action="|${actionBase}/${demande.id}/valider|" method="post"
+                <form th:if="${peutValider}" th:action="@{${actionBase} + '/' + ${demande.id} + '/valider'}" method="post"
                       class="flex flex-col gap-2 mb-3">
                     <label for="commentaireManager" class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Commentaire manager</label>
                     <textarea id="commentaireManager" name="commentaire" rows="2" maxlength="500"
@@ -232,8 +236,8 @@
                     </button>
                 </form>
 
-                <div th:if="${peutApprouver == true or peutRefuser == true}" class="border-t border-neutral-border pt-3 mt-1">
-                    <form th:if="${peutApprouver == true}" th:action="|${actionBase}/${demande.id}/approuver|" method="post"
+                <div th:if="${peutApprouver or peutRefuser}" class="border-t border-neutral-border pt-3 mt-1">
+                    <form th:if="${peutApprouver}" th:action="@{${actionBase} + '/' + ${demande.id} + '/approuver'}" method="post"
                           class="flex flex-col gap-2 mb-3">
                         <label for="commentaireRh" class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Commentaire RH</label>
                         <textarea id="commentaireRh" name="commentaire" rows="2" maxlength="500"
@@ -249,7 +253,7 @@
                         </button>
                     </form>
 
-                    <form th:if="${peutRefuser == true}" th:action="|${actionBase}/${demande.id}/refuser|" method="post"
+                    <form th:if="${peutRefuser}" th:action="@{${actionBase} + '/' + ${demande.id} + '/refuser'}" method="post"
                           class="flex flex-col gap-2">
                         <label for="commentaireRefus" class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Motif du refus <span class="text-red-500">*</span></label>
                         <textarea id="commentaireRefus" name="commentaire" rows="2" maxlength="500" required
@@ -261,8 +265,8 @@
                     </form>
                 </div>
 
-                <form th:if="${peutAnnuler == true and demande.statut.name() != 'ANNULEE' and demande.statut.name() != 'REFUSEE'}"
-                      th:action="|${actionBase}/${demande.id}/annuler|" method="post"
+                <form th:if="${peutAnnuler and demande.statut?.name() != 'ANNULEE' and demande.statut?.name() != 'REFUSEE'}"
+                      th:action="@{${actionBase} + '/' + ${demande.id} + '/annuler'}" method="post"
                       class="flex flex-col gap-2 border-t border-neutral-border pt-3 mt-3">
                     <label for="motifAnnulation" class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Motif d'annulation</label>
                     <input id="motifAnnulation" type="text" name="motif" maxlength="500"
@@ -273,7 +277,7 @@
                     </button>
                 </form>
 
-                <p th:if="${peutSoumettre != true and peutValider != true and peutApprouver != true and peutRefuser != true and peutAnnuler != true}"
+                <p th:if="${!peutSoumettre and !peutValider and !peutApprouver and !peutRefuser and !peutAnnuler}"
                    class="text-xs text-slate-500 italic">Aucune action disponible pour votre profil.</p>
             </section>
 

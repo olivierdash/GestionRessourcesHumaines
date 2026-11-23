@@ -3,6 +3,7 @@ package com.example.sirh.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate; // <-- IMPORT NÉCESSAIRE
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,6 +35,18 @@ public class Document {
 
     @Column(name = "date_depot")
     private LocalDateTime dateDepot;
+
+    // ==========================================
+    // PARTIE AJOUTÉE POUR LA VALIDITÉ (Bloc 5)
+    // ==========================================
+    
+    @Column(name = "date_expiration")
+    private LocalDate dateExpiration;
+
+    @Column(name = "statut_document", length = 50)
+    private String statutDocument = "VALIDE";
+
+    // ==========================================
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_depose_par", nullable = false)

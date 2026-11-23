@@ -9,8 +9,9 @@
         <div>
             <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Absences</h1>
             <p class="text-sm text-slate-600 mt-1">Saisie, justification et suivi des absences.</p>
+            <p class="text-xs text-slate-500 mt-1.5">Utilisez les filtres ci-dessous pour afficher les absences souhaitées.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center gap-2 self-start md:self-auto shrink-0">
             <a th:href="@{/conges/calendrier}"
                class="h-9 px-4 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm">
                 <span class="material-symbols-outlined text-[16px]">calendar_month</span>
@@ -22,7 +23,7 @@
                 Nouvelle absence
             </a>
         </div>
-    </div>
+    </header>
 
     <!-- Messages -->
     <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
@@ -109,7 +110,7 @@
                 </thead>
                 <tbody>
                     <tr th:if="${#lists.isEmpty(absences)}">
-                        <td colspan="8" class="td-empty py-8 text-center text-slate-500 italic">Aucune absence trouvée pour les filtres appliqués.</td>
+                        <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">Aucune absence trouvée pour les filtres appliqués.</td>
                     </tr>
                     <tr th:each="a : ${absences}">
                         <td>
@@ -156,7 +157,8 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
+
 </main>
 </body>
 </html>

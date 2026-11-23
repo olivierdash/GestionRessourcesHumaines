@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <h2 class="text-2xl font-bold text-cobalt-900">Objectifs d'évaluation</h2>
+    <div th:if="${success}" class="p-3 rounded bg-emerald-50 text-emerald-800 border border-emerald-200" th:text="${success}"></div>
+
+    <form th:action="@{/developpement/objectifs}" method="post"
+          class="bg-white border border-neutral-border rounded-lg p-5 grid md:grid-cols-3 gap-4">
+        <select name="idEmploye" required class="h-10 px-3 border border-neutral-border rounded">
+            <option value="">Employé</option>
+            <option th:each="employe : ${employes}" th:value="${employe.idEmployer}" th:text="${employe.matricule}"></option>
+        </select>
+        <input name="titre" required maxlength="150" placeholder="Titre"
+               class="h-10 px-3 border border-neutral-border rounded">
+        <input name="poids" type="number" min="1" max="100" value="100" placeholder="Poids"
+               class="h-10 px-3 border border-neutral-border rounded">
+        <input name="dateDebut" type="date" required class="h-10 px-3 border border-neutral-border rounded">
+        <input name="dateFin" type="date" required class="h-10 px-3 border border-neutral-border rounded">
+        <button type="submit" class="h-10 px-4 rounded bg-cobalt-700 text-white font-semibold">Ajouter</button>
+        <textarea name="description" maxlength="500" placeholder="Description"
+                  class="md:col-span-3 p-3 border border-neutral-border rounded min-h-20"></textarea>
+    </form>
+
+    <div class="bg-white border border-neutral-border rounded-lg overflow-x-auto">
+        <table class="sirh-table">
+            <thead><tr><th>Employé</th><th>Titre</th><th>Période</th><th>Poids</th><th>Statut</th></tr></thead>
+            <tbody>
+                <tr th:if="${objectifs.isEmpty()}"><td colspan="5" class="td-empty">Aucun objectif.</td></tr>
+                <tr th:each="item : ${objectifs}">
+                    <td th:text="${item.employe.matricule}"></td>
+                    <td class="font-semibold" th:text="${item.titre}"></td>
+                    <td th:text="${#temporals.format(item.dateDebut, 'dd/MM/yyyy') + ' - ' + #temporals.format(item.dateFin, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${item.poids + ' %'}"></td>
+                    <td th:text="${item.statut}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

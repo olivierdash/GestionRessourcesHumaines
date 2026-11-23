@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.sirh.model.Document;
 import com.example.sirh.service.DocumentService;
+import com.example.sirh.service.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +24,16 @@ import lombok.RequiredArgsConstructor;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final FileStorageService fileStorageService;
+
+    /**
+     * Affiche le document dans le navigateur (PDF, image...) sans le télécharger.
+     */
+    @GetMapping("/{id}/apercu")
+    public ResponseEntity<Resource> apercu(@PathVariable Integer id) {
+        Document doc = documentService.getById(id);
+        return fileStorageService.repondre(doc.getFichierUrl(), doc.getNomFichier(), true);
+    }
 
     @GetMapping("/{id}/telecharger")
     public ResponseEntity<Resource> telecharger(@PathVariable Integer id) {

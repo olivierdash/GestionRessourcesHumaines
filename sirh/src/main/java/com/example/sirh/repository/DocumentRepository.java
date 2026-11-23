@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -76,4 +77,6 @@ public interface DocumentRepository extends JpaRepository<Document, Integer> {
     @Modifying
     @Query("delete from Document d where d.tache.id = :idTache")
     int deleteByTacheId(@Param("idTache") Integer idTache);
+
+    List<Document> findByEmployeIdEmployerAndDateExpirationBefore(Integer idEmploye, LocalDate date);
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <h2 class="text-2xl font-bold text-cobalt-900">Évaluations</h2>
+    <div class="bg-white border border-neutral-border rounded-lg overflow-x-auto">
+        <table class="sirh-table">
+            <thead><tr><th>Candidat</th><th>Évaluateur</th><th>Type</th><th>Note</th><th>Date</th><th>Compte-rendu</th></tr></thead>
+            <tbody>
+                <tr th:if="${evaluations.isEmpty()}"><td colspan="6" class="td-empty">Aucune évaluation.</td></tr>
+                <tr th:each="item : ${evaluations}">
+                    <td th:text="${item.candidature.candidat.nom + ' ' + item.candidature.candidat.prenom}"></td>
+                    <td th:text="${item.evaluateur.nom}"></td>
+                    <td th:text="${item.typeEvaluation.libelle}"></td>
+                    <td th:text="${item.note}"></td>
+                    <td th:text="${item.dateEvaluation != null ? #temporals.format(item.dateEvaluation, 'dd/MM/yyyy') : ''}"></td>
+                    <td th:text="${item.evaluation}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

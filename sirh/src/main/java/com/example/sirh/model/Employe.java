@@ -4,6 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+/**
+ * @author moi
+ * Module 11
+ * Employe
+ * ajoute de colonne archive et date d'archivage dans le cas où il y a un employer qui nous quitte 
+ */
+
 @Entity @Table(name = "employer")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Employe {
@@ -26,9 +33,12 @@ public class Employe {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "statut_employe_id", nullable = false)
-    private StatutEmploye statutEmploye;
+    private StatutEmploye statusEmploye;
 
-    // Inverse side of Utilisateur.employe (OneToOne bidirectionnel)
-    @OneToOne(mappedBy = "employe", fetch = FetchType.LAZY)
-    private Utilisateur utilisateur;
+    @Column(nullable = false)
+    private Boolean archive = false;
+
+    @Column(name = "date_archivage")
+    private LocalDate dateArchivage;
+
 }

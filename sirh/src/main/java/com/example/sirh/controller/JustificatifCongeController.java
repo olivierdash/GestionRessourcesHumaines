@@ -19,6 +19,7 @@ import com.example.sirh.exception.ValidationMetierException;
 import com.example.sirh.model.JustificatifConge;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.service.CongeAccessService;
+import com.example.sirh.service.FileStorageService;
 import com.example.sirh.service.JustificatifCongeService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,20 @@ public class JustificatifCongeController {
 
     private final JustificatifCongeService justificatifCongeService;
     private final CongeAccessService accessService;
+    private final FileStorageService fileStorageService;
+
+    /**
+     * Affiche le justificatif dans le navigateur (PDF ou image).
+     * L'accès est vérifié par {@link JustificatifCongeService#charger}.
+     */
+    @GetMapping("/{id}/apercu")
+    public ResponseEntity<Resource> apercu(@PathVariable Integer id) {
+        Utilisateur utilisateur = accessService.utilisateurCourant();
+        JustificatifConge justificatif = justificatifCongeService.getById(id);
+        Resource resource = justificatifCongeService.charger(id, utilisateur);
+        return fileStorageService.repondre(resource, justificatif.getNomFichier(),
+                true, justificatif.getTypeMime());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Resource> telecharger(@PathVariable Integer id) {
