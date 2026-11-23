@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -119,6 +120,7 @@ public class DemandeRecrutementService {
                 .manager(manager)
                 .poste(poste)
                 .typeContrat(typeContrat)
+                .dateCreation(LocalDateTime.now())
                 .dateSouhaitee(dto.getDateSouhaitee())
                 .effectif(dto.getEffectif())
                 .motif(motif)
@@ -149,10 +151,29 @@ public class DemandeRecrutementService {
         if (dto.getIdPoste() != null && !errors.containsKey("idPoste")) {
             poste = posteService.getById(dto.getIdPoste());
         }
+        String actionNormalisee = action == null
+        ? ""
+        : action.trim().toLowerCase(java.util.Locale.ROOT);
 
-        if (Action.SUBMIT.equals(action)) {
+        // Vérification de action repond vide : 
+        if (!Action.SAVE.equalsIgnoreCase(actionNormalisee)
+                && !Action.SUBMIT.equalsIgnoreCase(actionNormalisee)) {
+            errors.put("action", "Action inconnue.");
+            throw new ValidationMetierException(errors);
+        }
+        
+        boolean soumettre = "submit".equals(actionNormalisee);
+
+
+        /*if (Action.SUBMIT.equals(action)) {
+            validerReglesMetier(dto, errors, poste);
+        }*/
+       if (soumettre) {
             validerReglesMetier(dto, errors, poste);
         }
+        String intituleEtat = soumettre
+        ? Statut.CREE
+        : Statut.BROUILLON_DEMANDE;
 
         if (!errors.isEmpty()) {
             throw new ValidationMetierException(errors);
@@ -194,39 +215,69 @@ public class DemandeRecrutementService {
         return demandeRepository.getAllDemandeValide(filter);
     }
 
-    @Transactional
-    public DemandeRecrutement updateStateDemande(Integer idDemande, Utilisateur validateur, String remarque, String action) {
+   @Transactional
+    public DemandeRecrutement updateStateDemande(
+            Integer idDemande,
+            Utilisateur validateur,
+            String remarque,
+            String action) {
+
         DemandeRecrutement demande = getById(idDemande);
-        demande.setCommentaires(remarque);
+
+        String actionNormalisee = action == null
+                ? ""
+                : action.trim().toLowerCase(java.util.Locale.ROOT);
+
 
         String etatActuel = demande.getEtatDemande().getIntitule();
         String role = validateur.getRole().getLibelle();
 
-        EtatDemande nouvelEtat = null;
+        EtatDemande nouvelEtat;
 
-        if (Action.REFUSER.equals(action)) {
-            if (Role.RH.equalsIgnoreCase(role)
-                    || Role.FINANCE.equalsIgnoreCase(role)
-                    || Role.DG.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.REFUSE_DEMANDE);
+        if ("refuser".equals(actionNormalisee)) {
+
+            if (!Role.RH.equalsIgnoreCase(role)
+                    && !Role.FINANCE.equalsIgnoreCase(role)
+                    && !Role.DG.equalsIgnoreCase(role)) {
+                throw new RuntimeException(
+                        "Seul un validateur peut refuser une demande.");
+            }
+
+            nouvelEtat = etatDemandeService
+                    .getByIntitule(Statut.REFUSE_DEMANDE);
+
+        } else if ("valider".equals(actionNormalisee)) {
+
+            if (Statut.CREE.equalsIgnoreCase(etatActuel)
+                    && Role.RH.equalsIgnoreCase(role)) {
+
+                nouvelEtat = etatDemandeService
+                        .getByIntitule(Statut.VALIDE_RH);
+
+            } else if (Statut.VALIDE_RH.equalsIgnoreCase(etatActuel)
+                    && Role.FINANCE.equalsIgnoreCase(role)) {
+
+                nouvelEtat = etatDemandeService
+                        .getByIntitule(Statut.VALIDE_FINANCE);
+
+            } else if (Statut.VALIDE_FINANCE.equalsIgnoreCase(etatActuel)
+                    && Role.DG.equalsIgnoreCase(role)) {
+
+                nouvelEtat = etatDemandeService
+                        .getByIntitule(Statut.VALIDE);
+
             } else {
-                throw new RuntimeException("Seul un validateur peut refuser une demande.");
+                throw new RuntimeException(
+                        "Action impossible pour cet état ou ce rôle.");
             }
+
         } else {
-            if (Statut.CREE.equalsIgnoreCase(etatActuel) && Role.RH.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE_RH);
-            } else if (Statut.VALIDE_RH.equalsIgnoreCase(etatActuel) && Role.FINANCE.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE_FINANCE);
-            } else if (Statut.VALIDE_FINANCE.equalsIgnoreCase(etatActuel) && Role.DG.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE);
-            }
+            throw new RuntimeException("Action inconnue : " + action);
         }
 
-        if (nouvelEtat == null) {
-            throw new RuntimeException("Action impossible pour cet état ou ce rôle.");
-        }
-
+        demande.setCommentaires(remarque);
         demande.setEtatDemande(nouvelEtat);
+
         demandeRepository.save(demande);
         saveHistorique(demande, validateur);
 
@@ -304,5 +355,8 @@ public class DemandeRecrutementService {
         histo.setEtatDemande(demande.getEtatDemande());
         histo.setValidateur(validateur);
         historiqueService.save(histo);
+    }
+    public long countByEtats(List<String> etats) {
+        return demandeRepository.countByEtatDemandeIntituleIn(etats);
     }
 }

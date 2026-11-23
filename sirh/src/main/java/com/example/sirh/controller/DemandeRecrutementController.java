@@ -9,6 +9,7 @@ import com.example.sirh.dto.ValidationPageData;
 import com.example.sirh.exception.ValidationMetierException;
 import com.example.sirh.model.*;
 import com.example.sirh.service.*;
+import java.util.Arrays;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -74,10 +75,27 @@ public class DemandeRecrutementController {
         model.addAttribute("managers", utilisateurService.getByRolesList(List.of(Role.MANAGER)));
         model.addAttribute("postes", posteService.getAllPostes());
         model.addAttribute("motifs", motifDemandeService.getAll());
-        model.addAttribute("enAttente", 0);
-        model.addAttribute("validees", 0);
-        model.addAttribute("refusees", 0);
-
+        // model.addAttribute("enAttente", 0);
+        // model.addAttribute("validees", 0);
+        // model.addAttribute("refusees", 0);
+        // Demandes en attente dans le circuit de validation
+        model.addAttribute("enAttente",
+                demandeRecrutementService.countByEtats(
+                        Arrays.asList("Cree", "ValideRH", "ValideFinance")
+                )
+        );
+        // Demandes entièrement validées
+        model.addAttribute("validees",
+                demandeRecrutementService.countByEtats(
+                        List.of("Valide")
+                )
+        );
+        // Demandes refusées
+        model.addAttribute("refusees",
+                demandeRecrutementService.countByEtats(
+                        List.of("Refuse")
+                )
+        );
         return "demande/index";
     }
 
