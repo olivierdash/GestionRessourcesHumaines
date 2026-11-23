@@ -33,7 +33,7 @@ public interface EmployeRepository extends JpaRepository<Employe, Integer> {
             WHERE dep.idDepartement = COALESCE(:#{#filter.idDepartement}, dep.idDepartement)
               AND e.hiringDate >= COALESCE(:#{#filter.dateMin}, e.hiringDate)
               AND e.hiringDate <= COALESCE(:#{#filter.dateMax}, e.hiringDate)
-              AND (:#{#filter.statusEmployer} IS NULL OR e.statutEmploye.id = :#{#filter.statusEmployer})
+              AND (:#{#filter.statusEmployer} IS NULL OR e.statusEmploye.id = :#{#filter.statusEmployer})
               AND (LOWER(e.matricule) LIKE :#{#filter.recherchePattern}
                    OR LOWER(ca.nom) LIKE :#{#filter.recherchePattern}
                    OR LOWER(ca.prenom) LIKE :#{#filter.recherchePattern})

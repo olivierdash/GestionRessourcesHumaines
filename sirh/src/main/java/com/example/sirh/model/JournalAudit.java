@@ -44,7 +44,7 @@ public class JournalAudit {
     @Column(columnDefinition = "TEXT")
     private String details;
 
-    @Column(nullable = false)
+    @Column
     private boolean sensible;
 
     @CreationTimestamp

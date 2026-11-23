@@ -35,7 +35,7 @@ public class Employe {
     @JoinColumn(name = "statut_employe_id", nullable = false)
     private StatutEmploye statusEmploye;
 
-    @Column(nullable = false)
+    @Column
     private Boolean archive = false;
 
     @Column(name = "date_archivage")

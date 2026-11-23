@@ -24,6 +24,8 @@ class DocumentColumnMappingTest {
                 "nom_fichier",
                 "fichier_url",
                 "date_depot",
+                "date_expiration",
+                "statut_document",
                 "id_depose_par"), mappedColumns());
     }
 
