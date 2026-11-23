@@ -28,6 +28,15 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_utilisateur_employe
     ON utilisateur(id_employe)
     WHERE id_employe IS NOT NULL;
 
+-- Resynchroniser la sequence si des roles ont ete inseres avec des IDs
+-- explicites ou apres une restauration de donnees.
+SELECT setval(
+    pg_get_serial_sequence('roles', 'id_role'),
+    COALESCE(MAX(id_role), 1),
+    MAX(id_role) IS NOT NULL
+)
+FROM roles;
+
 INSERT INTO roles(libelle)
 VALUES ('EMPLOYE')
 ON CONFLICT (libelle) DO NOTHING;
