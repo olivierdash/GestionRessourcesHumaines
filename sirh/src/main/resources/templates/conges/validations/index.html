@@ -58,7 +58,7 @@
                             <span class="text-slate-400 mx-1">→</span>
                             <span th:text="${#temporals.format(demande.dateFin, 'dd/MM/yyyy')}"></span>
                         </td>
-                        <td class="font-semibold" th:text="${#numbers.formatDecimal(demande.nombreJours, 1, 1)}"></td>
+                        <td class="font-semibold" th:text="${@formatDuree.jours(demande.nombreJours)}"></td>
                         <td class="text-xs text-slate-500 whitespace-nowrap"
                             th:text="${demande.dateSoumission != null ? #temporals.format(demande.dateSoumission, 'dd/MM/yyyy HH:mm') : '—'}"></td>
                         <td th:replace="~{conges/fragments/statut :: badge(${demande.statut})}"></td>

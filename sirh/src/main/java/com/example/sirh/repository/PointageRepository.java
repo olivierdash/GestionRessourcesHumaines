@@ -9,12 +9,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface PointageRepository extends JpaRepository<Pointage, Integer> {
 
     @EntityGraph(attributePaths = {"employe", "employe.candidature", "employe.candidature.candidat"})
     Optional<Pointage> findByEmployeIdEmployerAndDatePointage(Integer employeId, LocalDate datePointage);
+
+    List<Pointage> findByEmployeIdEmployerAndDatePointageBetweenOrderByDatePointageAsc(
+            Integer employeId, LocalDate debut, LocalDate fin);
 
     @EntityGraph(attributePaths = {"employe", "employe.candidature", "employe.candidature.candidat"})
     @Query(value = """

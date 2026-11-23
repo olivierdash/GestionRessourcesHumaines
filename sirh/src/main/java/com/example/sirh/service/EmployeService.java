@@ -42,7 +42,6 @@ public class EmployeService {
         Employe employe = Employe.builder()
                 .candidature(candidature)
                 .hiringDate(hiringDate)
-                .statusEmployer("ACTIF") // Valeur par défaut (Q5)
                 .build();
         return employeRepository.save(employe);
     }

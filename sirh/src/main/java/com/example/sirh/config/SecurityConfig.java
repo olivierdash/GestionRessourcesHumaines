@@ -50,10 +50,10 @@ public class SecurityConfig {
                         .requestMatchers("/conges/types/**", "/conges/droits/**", "/conges/soldes/**",
                                 "/conges/demandes/**", "/conges/absences/**", "/conges/calendrier/**")
                             .hasAnyRole("RH", "DG")
-                        .requestMatchers("/conges/variables-paie/**")
-                            .hasAnyRole("RH", "DG", "FINANCE")
                         .requestMatchers("/conges/validations/**")
                             .hasAnyRole("MANAGER", "RH", "DG")
+                        .requestMatchers("/remuneration/**")
+                            .hasAnyRole("RH", "DG", "FINANCE", "MANAGER")
                         .requestMatchers("/conges/**").hasAnyRole("RH", "DG")
                         .requestMatchers("/mes-conges/**", "/justificatifs/**").authenticated()
 

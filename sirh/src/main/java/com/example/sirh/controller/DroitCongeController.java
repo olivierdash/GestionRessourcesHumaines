@@ -88,8 +88,6 @@ public class DroitCongeController {
         form.setAncienneteMaxMois(droit.getAncienneteMaxMois());
         form.setModeAcquisition(droit.getModeAcquisition() == null
                 ? "ANNUEL" : droit.getModeAcquisition().name());
-        form.setJoursParAn(droit.getJoursParAn());
-        form.setProrataAnneeEmbauche(droit.getProrataAnneeEmbauche());
         form.setActif(droit.getActif());
         form.setDescription(droit.getDescription());
         return form;

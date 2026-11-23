@@ -30,6 +30,7 @@ import com.example.sirh.repository.AbsenceRepository;
 import com.example.sirh.repository.DemandeCongeRepository;
 import com.example.sirh.repository.HistoriqueDemandeCongeRepository;
 import com.example.sirh.repository.JustificatifCongeRepository;
+import com.example.sirh.util.DureeFormat;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,7 +53,6 @@ public class DemandeCongeService {
     private final WorkflowCongeService workflowCongeService;
     private final CongeAccessService accessService;
     private final AbsenceService absenceService;
-    private final VariablePaieService variablePaieService;
     private final PlanningCongeService planningCongeService;
     private final AuditService auditService;
 
@@ -102,7 +102,6 @@ public class DemandeCongeService {
                 .createur(utilisateur)
                 .dateDebut(form.getDateDebut())
                 .dateFin(form.getDateFin())
-                .nombreJours(nombreJours)
                 .soldeRequis(Boolean.TRUE.equals(type.getConsommeSolde()))
                 .motif(form.getMotif())
                 .statut(StatutDemandeConge.BROUILLON)
@@ -147,7 +146,6 @@ public class DemandeCongeService {
         }
 
         StatutDemandeConge avant = demande.getStatut();
-        demande.setNombreJours(nombreJours);
         demande.setSoldeRequis(Boolean.TRUE.equals(demande.getTypeConge().getConsommeSolde()));
         demande.setDateSoumission(LocalDateTime.now());
 
@@ -247,7 +245,6 @@ public class DemandeCongeService {
         demande.setCommentaireRh(form == null ? null : form.getCommentaire());
         demandeCongeRepository.save(demande);
 
-        variablePaieService.genererPourDemande(demande);
         historique(demande, avant, StatutDemandeConge.APPROUVEE, utilisateur,
                 form == null || form.getCommentaire() == null
                         || form.getCommentaire().isBlank()
@@ -319,7 +316,6 @@ public class DemandeCongeService {
         } else if (statut == StatutDemandeConge.APPROUVEE) {
             soldeCongeService.annulerConsommation(demande, utilisateur);
             absenceService.annulerDepuisDemande(demande, utilisateur);
-            variablePaieService.annulerPourDemande(demande);
         }
 
         StatutDemandeConge avant = demande.getStatut();
@@ -423,9 +419,9 @@ public class DemandeCongeService {
                                   Map<String, String> erreurs) {
         if (type.getDureeMaxJours() != null
                 && nombreJours.compareTo(type.getDureeMaxJours()) > 0) {
-            erreurs.put("dates", "La durée demandée (" + nombreJours
-                    + " jours) dépasse le maximum autorisé pour ce type ("
-                    + type.getDureeMaxJours() + " jours).");
+            erreurs.put("dates", "La durée demandée (" + DureeFormat.jours(nombreJours)
+                    + ") dépasse le maximum autorisé pour ce type ("
+                    + DureeFormat.jours(type.getDureeMaxJours()) + ").");
         }
     }
 

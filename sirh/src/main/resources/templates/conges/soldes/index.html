@@ -90,13 +90,13 @@
                             <div class="text-[10px] text-slate-400"
                                  th:text="${s.modeAcquisition.name() == 'MENSUEL' ? 'Mensuel' : 'Annuel'}"></div>
                         </td>
-                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursAcquis, 1, 1)}"></td>
-                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursReportes, 1, 1)}"></td>
-                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursAjustes, 1, 1)}"></td>
-                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursUtilises, 1, 1)}"></td>
-                        <td class="text-xs" th:text="${#numbers.formatDecimal(s.joursEnAttente, 1, 1)}"></td>
+                        <td class="text-xs" th:text="${@formatDuree.jours(s.joursAcquis)}"></td>
+                        <td class="text-xs" th:text="${@formatDuree.jours(s.joursReportes)}"></td>
+                        <td class="text-xs" th:text="${@formatDuree.jours(s.joursAjustes)}"></td>
+                        <td class="text-xs" th:text="${@formatDuree.jours(s.joursUtilises)}"></td>
+                        <td class="text-xs" th:text="${@formatDuree.jours(s.joursEnAttente)}"></td>
                         <td class="font-bold text-cobalt-900"
-                            th:text="${#numbers.formatDecimal(disponibles[s.id], 1, 2)}"></td>
+                            th:text="${@formatDuree.jours(disponibles[s.id])}"></td>
                         <td>
                             <span th:if="${s.anneeCloturee}"
                                   class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500">

@@ -108,9 +108,6 @@ public class DroitCongeService {
         cible.setAncienneteMinMois(form.getAncienneteMinMois());
         cible.setAncienneteMaxMois(form.getAncienneteMaxMois());
         cible.setModeAcquisition(mode);
-        cible.setJoursParAn(form.getJoursParAn());
-        cible.setProrataAnneeEmbauche(form.getProrataAnneeEmbauche() == null
-                || form.getProrataAnneeEmbauche());
         cible.setActif(form.getActif() == null || form.getActif());
         cible.setDescription(form.getDescription());
 
@@ -139,11 +136,6 @@ public class DroitCongeService {
                         .comparing((DroitConge d) -> d.getTypeContrat() != null ? 0 : 1)
                         .thenComparing(d -> valeur(d.getAncienneteMinMois()), Comparator.reverseOrder()))
                 .findFirst();
-    }
-
-    public BigDecimal joursParAn(DroitConge droit) {
-        return droit == null || droit.getJoursParAn() == null
-                ? BigDecimal.ZERO : droit.getJoursParAn();
     }
 
     private void verifierChevauchement(DroitConge candidat) {

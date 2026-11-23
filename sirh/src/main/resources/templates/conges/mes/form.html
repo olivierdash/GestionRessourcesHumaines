@@ -99,7 +99,7 @@
                         <div class="font-semibold text-slate-700" th:text="${vue.type.libelle}"></div>
                         <div class="text-[10px] text-slate-400" th:text="${vue.type.modeDecompte}"></div>
                     </div>
-                    <span class="font-bold text-cobalt-900" th:text="${#numbers.formatDecimal(vue.disponible, 1, 1)}"></span>
+                    <span class="font-bold text-cobalt-900" th:text="${@formatDuree.jours(vue.disponible)}"></span>
                 </div>
             </div>
         </aside>

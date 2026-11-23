@@ -58,12 +58,12 @@ public class Absence {
     @Column(name = "demi_jour_fin", length = 10)
     private DemiJournee demiJourFin;
 
-    @Column(name = "nombre_jours", nullable = false, precision = 7, scale = 2)
-    private BigDecimal nombreJours;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatutAbsence statut;
+
+    @Column(name = "nombre_jours", nullable = false, precision = 7, scale = 2)
+    private BigDecimal nombreJours;
 
     @Column(length = 500)
     private String motif;

@@ -116,4 +116,8 @@ public class DemandeConge {
     @Column(nullable = false)
     @Builder.Default
     private Long version = 0L;
+
+    // Inverse side of Absence.demandeConge (OneToOne bidirectionnel)
+    @OneToOne(mappedBy = "demandeConge", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Absence absence;
 }

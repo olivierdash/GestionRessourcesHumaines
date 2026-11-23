@@ -61,7 +61,7 @@
                     <div>
                         <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Nombre de jours</dt>
                         <dd class="mt-1 text-2xl font-bold text-cobalt-900"
-                            th:text="${#numbers.formatDecimal(demande.nombreJours, 1, 1)}"></dd>
+                            th:text="${@formatDuree.jours(demande.nombreJours)}"></dd>
                     </div>
                     <div>
                         <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Créée par</dt>
@@ -182,7 +182,7 @@
                 </ol>
             </section>
 
-            <section th:if="${!#lists.isEmpty(variablesPaie)}"
+            <!-- <section th:if="${!#lists.isEmpty(variablesPaie)}"
                      class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
                 <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Variables de paie générées</h2>
                 <div class="overflow-x-auto">
@@ -200,13 +200,13 @@
                                 <td class="font-mono text-xs" th:text="${v.code}"></td>
                                 <td class="text-xs" th:text="${#temporals.format(v.periode, 'MM/yyyy')}"></td>
                                 <td class="font-semibold"
-                                    th:text="${#numbers.formatDecimal(v.quantite, 1, 1) + ' ' + (v.unite == 'JOUR' ? 'jour(s)' : v.unite)}"></td>
+                                    th:text="${v.unite == 'JOUR' ? @formatDuree.jours(v.quantite) : #numbers.formatDecimal(v.quantite, 1, 1) + ' ' + v.unite}"></td>
                                 <td th:replace="~{conges/fragments/statut :: badge(${v.statut})}"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </section>
+            </section> -->
         </div>
 
         <aside class="flex flex-col gap-6 h-fit">
@@ -311,10 +311,10 @@
                             <span th:if="${s.anneeCloturee}" class="text-[10px] uppercase font-bold text-slate-400">Clôturé</span>
                         </div>
                         <div class="grid grid-cols-2 gap-x-4 text-slate-500 mt-1">
-                            <span>Acquis : <b class="text-slate-700" th:text="${#numbers.formatDecimal(s.joursAcquis, 1, 1)}"></b></span>
-                            <span>Utilisés : <b class="text-slate-700" th:text="${#numbers.formatDecimal(s.joursUtilises, 1, 1)}"></b></span>
-                            <span>Reportés : <b class="text-slate-700" th:text="${#numbers.formatDecimal(s.joursReportes, 1, 1)}"></b></span>
-                            <span>En attente : <b class="text-slate-700" th:text="${#numbers.formatDecimal(s.joursEnAttente, 1, 1)}"></b></span>
+                            <span>Acquis : <b class="text-slate-700" th:text="${@formatDuree.jours(s.joursAcquis)}"></b></span>
+                            <span>Utilisés : <b class="text-slate-700" th:text="${@formatDuree.jours(s.joursUtilises)}"></b></span>
+                            <span>Reportés : <b class="text-slate-700" th:text="${@formatDuree.jours(s.joursReportes)}"></b></span>
+                            <span>En attente : <b class="text-slate-700" th:text="${@formatDuree.jours(s.joursEnAttente)}"></b></span>
                         </div>
                     </div>
                 </div>

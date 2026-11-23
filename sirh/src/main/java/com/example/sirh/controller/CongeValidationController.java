@@ -25,7 +25,6 @@ import com.example.sirh.service.DemandeCongeService;
 import com.example.sirh.service.JustificatifCongeService;
 import com.example.sirh.service.PlanningCongeService;
 import com.example.sirh.service.SoldeCongeService;
-import com.example.sirh.service.VariablePaieService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +38,6 @@ public class CongeValidationController {
     private final JustificatifCongeService justificatifCongeService;
     private final SoldeCongeService soldeCongeService;
     private final PlanningCongeService planningCongeService;
-    private final VariablePaieService variablePaieService;
 
     @GetMapping
     public String index(Model model) {
@@ -62,7 +60,6 @@ public class CongeValidationController {
         model.addAttribute("actionBase", "/conges/validations");
         model.addAttribute("historique", demandeCongeService.historique(id));
         model.addAttribute("justificatifs", justificatifCongeService.listerPourDemande(id));
-        model.addAttribute("variablesPaie", variablePaieService.parDemande(id));
         model.addAttribute("conflitsPlanning", planningCongeService.conflitsPourDemande(demande));
         model.addAttribute("soldes", soldeCongeService.rechercher(null,
                 demande.getEmploye().getIdEmployer(), demande.getTypeConge().getId()));
