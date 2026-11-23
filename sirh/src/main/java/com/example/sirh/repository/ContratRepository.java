@@ -46,4 +46,17 @@ public interface ContratRepository extends JpaRepository<Contrat, Integer> {
         String libelle,
         LocalDate start,
         LocalDate end);
+
+    // NOUVELLE MÉTHODE : contrat actif à une date donnée (pour paie)
+    @Query("""
+            SELECT c FROM Contrat c
+            WHERE c.employe.idEmployer = :employeId
+              AND c.dateDebut <= :dateDebut
+              AND (c.dateFin IS NULL OR c.dateFin >= :dateFin)
+            ORDER BY c.dateDebut DESC
+            """)
+    List<Contrat> findByEmployeIdEmployerAndDateDebutLessThanEqualAndDateFinGreaterThanEqualOrNull(
+            @Param("employeId") Integer employeId,
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
 }

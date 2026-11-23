@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Rémunération</h1>
+            <p class="text-xs text-slate-500 mt-1">
+                <span th:text="${employe.candidature.candidat.prenom + ' ' + employe.candidature.candidat.nom}"></span>
+                <span class="font-mono" th:text="${'· ' + employe.matricule}"></span>
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <form method="get" th:action="@{/remuneration/{id}(id=${employe.idEmployer})}"
+                  class="flex items-center gap-2">
+                <input type="month" name="mois" th:value="${moisValue}"
+                       class="h-9 px-3 bg-white border border-neutral-border rounded text-sm text-slate-900">
+                <button type="submit"
+                        class="inline-flex items-center h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold">
+                    Calculer
+                </button>
+            </form>
+            <a th:href="@{/employes/{id}(id=${employe.idEmployer})}"
+               class="inline-flex items-center h-9 px-4 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                Retour à la fiche
+            </a>
+            <a th:href="@{/remuneration/{id}/bulletin.pdf(id=${employe.idEmployer}, mois=${moisValue})}"
+               class="inline-flex items-center h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold">
+                Bulletin PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border p-4">
+            <p class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Salaire de base</p>
+            <p class="text-xl font-bold text-cobalt-900 mt-1"
+               th:text="${#numbers.formatDecimal(remuneration.salaireBase, 1, 'COMMA', 2, 'POINT')}"></p>
+        </div>
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border p-4">
+            <p class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Retenues</p>
+            <p class="text-xl font-bold text-red-700 mt-1"
+               th:text="${#numbers.formatDecimal(remuneration.totalRetenues, 1, 'COMMA', 2, 'POINT')}"></p>
+        </div>
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border p-4">
+            <p class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Heures supplémentaires</p>
+            <p class="text-xl font-bold text-cobalt-900 mt-1"
+               th:text="${#numbers.formatDecimal(remuneration.totalHeuresSupplementaires, 1, 'COMMA', 2, 'POINT')}"></p>
+        </div>
+        <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border p-4">
+            <p class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Brut</p>
+            <p class="text-xl font-bold text-emerald-700 mt-1"
+               th:text="${#numbers.formatDecimal(remuneration.brut, 1, 'COMMA', 2, 'POINT')}"></p>
+        </div>
+    </div>
+
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-50 text-slate-600">
+            <tr>
+                <th class="text-left px-4 py-2 font-semibold">Période</th>
+                <th class="text-right px-4 py-2 font-semibold">Heures hebdo</th>
+                <th class="text-right px-4 py-2 font-semibold">Heures mensuelles</th>
+                <th class="text-right px-4 py-2 font-semibold">Taux horaire</th>
+                <th class="text-right px-4 py-2 font-semibold">Jours ouvrés</th>
+                <th class="text-left px-4 py-2 font-semibold">Mode</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="border-t border-neutral-border">
+                <td class="px-4 py-2" th:text="${remuneration.periode}"></td>
+                <td class="px-4 py-2 text-right"
+                    th:text="${remuneration.heuresHebdomadaires != null ? #numbers.formatDecimal(remuneration.heuresHebdomadaires, 1, 'COMMA', 2, 'POINT') : '—'}"></td>
+                <td class="px-4 py-2 text-right"
+                    th:text="${#numbers.formatDecimal(remuneration.heuresMensuelles, 1, 'COMMA', 2, 'POINT')}"></td>
+                <td class="px-4 py-2 text-right"
+                    th:text="${#numbers.formatDecimal(remuneration.tauxHoraire, 1, 'COMMA', 4, 'POINT')}"></td>
+                <td class="px-4 py-2 text-right"
+                    th:text="${#numbers.formatDecimal(remuneration.joursOuvresMois, 1, 'COMMA', 2, 'POINT')}"></td>
+                <td class="px-4 py-2"
+                    th:text="${remuneration.forfaitJours ? 'Forfait jours' : 'Horaire'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Lignes</h2>
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-50 text-slate-600">
+            <tr>
+                <th class="text-left px-4 py-2 font-semibold">Libellé</th>
+                <th class="text-left px-4 py-2 font-semibold">Code</th>
+                <th class="text-right px-4 py-2 font-semibold">Base</th>
+                <th class="text-right px-4 py-2 font-semibold">Taux</th>
+                <th class="text-right px-4 py-2 font-semibold">Quantité</th>
+                <th class="text-right px-4 py-2 font-semibold">Montant</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ligne : ${remuneration.lignes}" class="border-t border-neutral-border">
+                <td class="px-4 py-2 font-medium text-cobalt-900" th:text="${ligne.libelle}"></td>
+                <td class="px-4 py-2 text-slate-500 text-xs font-mono" th:text="${ligne.code}"></td>
+                <td class="px-4 py-2 text-right" th:text="${ligne.base != null ? #numbers.formatDecimal(ligne.base, 1, 'COMMA', 2, 'POINT') : '—'}"></td>
+                <td class="px-4 py-2 text-right" th:text="${ligne.taux != null ? #numbers.formatDecimal(ligne.taux, 1, 'COMMA', 4, 'POINT') : '—'}"></td>
+                <td class="px-4 py-2 text-right" th:text="${ligne.quantite != null ? #numbers.formatDecimal(ligne.quantite, 1, 'COMMA', 2, 'POINT') : '—'}"></td>
+                <td class="px-4 py-2 text-right font-semibold"
+                    th:text="${#numbers.formatDecimal(ligne.montant, 1, 'COMMA', 2, 'POINT')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider">Détail par jour</h2>
+    <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-50 text-slate-600">
+            <tr>
+                <th class="text-left px-4 py-2 font-semibold">Date</th>
+                <th class="text-left px-4 py-2 font-semibold">Statut</th>
+                <th class="text-left px-4 py-2 font-semibold">Libellé</th>
+                <th class="text-right px-4 py-2 font-semibold">Prévu</th>
+                <th class="text-right px-4 py-2 font-semibold">Travaillé</th>
+                <th class="text-right px-4 py-2 font-semibold">Sup</th>
+                <th class="text-right px-4 py-2 font-semibold">Retenue</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="jour : ${remuneration.jours}" class="border-t border-neutral-border">
+                <td class="px-4 py-2 font-mono text-xs" th:text="${#temporals.format(jour.date, 'dd/MM/yyyy')}"></td>
+                <td class="px-4 py-2" th:text="${jour.statut}"></td>
+                <td class="px-4 py-2 text-slate-600" th:text="${jour.libelle}"></td>
+                <td class="px-4 py-2 text-right" th:text="${#numbers.formatDecimal(jour.heuresPrevues, 1, 'COMMA', 2, 'POINT')}"></td>
+                <td class="px-4 py-2 text-right" th:text="${#numbers.formatDecimal(jour.heuresTravaillees, 1, 'COMMA', 2, 'POINT')}"></td>
+                <td class="px-4 py-2 text-right" th:text="${#numbers.formatDecimal(jour.heuresSupplementaires, 1, 'COMMA', 2, 'POINT')}"></td>
+                <td class="px-4 py-2 text-right"
+                    th:text="${#numbers.formatDecimal(jour.retenue, 1, 'COMMA', 2, 'POINT')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+</body>
+</html>

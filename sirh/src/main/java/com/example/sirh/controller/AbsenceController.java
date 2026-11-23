@@ -26,7 +26,6 @@ import com.example.sirh.service.CongeAccessService;
 import com.example.sirh.service.EmployeService;
 import com.example.sirh.service.JustificatifCongeService;
 import com.example.sirh.service.TypeCongeService;
-import com.example.sirh.service.VariablePaieService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +38,6 @@ public class AbsenceController {
     private final EmployeService employeService;
     private final TypeCongeService typeCongeService;
     private final JustificatifCongeService justificatifCongeService;
-    private final VariablePaieService variablePaieService;
     private final CongeAccessService accessService;
 
     @GetMapping
@@ -95,7 +93,6 @@ public class AbsenceController {
         Absence absence = absenceService.getById(id);
         model.addAttribute("absence", absence);
         model.addAttribute("justificatifs", justificatifCongeService.listerPourAbsence(id));
-        model.addAttribute("variablesPaie", variablePaieService.parAbsence(id));
         model.addAttribute("aujourdhui", LocalDate.now());
         return "conges/absences/detail";
     }

@@ -40,10 +40,6 @@
             <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Absences en cours</div>
             <div class="text-3xl font-bold text-cobalt-900 mt-2" th:text="${dashboard.absencesEnCours}"></div>
         </div>
-        <div class="bg-surface-card rounded-lg border border-neutral-border p-5 shadow-sm">
-            <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Types de congé disponibles</div>
-            <div class="text-3xl font-bold text-cobalt-900 mt-2" th:text="${#lists.size(dashboard.soldes)}"></div>
-        </div>
     </div>
 
     <div>
@@ -110,14 +106,14 @@
                                 <span class="text-slate-400 mx-1">→</span>
                                 <span th:text="${#temporals.format(demande.dateFin, 'dd/MM/yyyy')}"></span>
                             </td>
-                            <td class="font-semibold" th:text="${#numbers.formatDecimal(demande.nombreJours, 1, 1)}"></td>
+                            <!-- <td class="font-semibold" th:text="${#numbers.formatDecimal(demande.nombreJours, 1, 1)}"></td> -->
                             <td th:replace="~{conges/fragments/statut :: badge(${demande.statut})}"></td>
                             <td class="text-right">
-                                <a th:href="@{/mes-conges/{id}(id=${demande.id})}"
+                                <!-- <a th:href="@{/mes-conges/{id}(id=${demande.id})}"
                                    class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
                                     <span class="material-symbols-outlined text-[14px]">visibility</span>
                                     Détail
-                                </a>
+                                </a> -->
                             </td>
                         </tr>
                     </tbody>

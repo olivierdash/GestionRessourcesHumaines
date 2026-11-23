@@ -262,24 +262,11 @@
                             <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">calendar_month</span>
                             <span class="sidebar-text whitespace-nowrap">Calendrier</span>
                         </a>
-                        <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/soldes}" data-path="/conges/soldes"
-                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                            title="Soldes de congé">
-                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">account_balance_wallet</span>
-                            <span class="sidebar-text whitespace-nowrap">Soldes</span>
-                        </a>
                         <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/droits}" data-path="/conges/droits"
                             class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                             title="Règles de droit">
                             <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">rule</span>
                             <span class="sidebar-text whitespace-nowrap">Règles de droit</span>
-                        </a>
-                        <a sec:authorize="hasAnyRole('RH', 'DG', 'FINANCE')" th:href="@{/conges/variables-paie}"
-                            data-path="/conges/variables-paie"
-                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                            title="Variables de paie">
-                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">receipt_long</span>
-                            <span class="sidebar-text whitespace-nowrap">Variables de paie</span>
                         </a>
                     </div>
                 </div>

@@ -160,7 +160,7 @@ public class OnboardingService {
             onboardingRepository.save(onboarding);
 
             Employe employe = onboarding.getEmploye();
-            employe.setStatusEmploye(statutEmployeService.getByLibelle(Statut.ACTIF_EMPLOYE));
+            employe.setStatutEmploye(statutEmployeService.getByLibelle(Statut.ACTIF_EMPLOYE));
             employeService.save(employe);
         }
     }

@@ -35,6 +35,7 @@ import com.example.sirh.repository.DemandeCongeRepository;
 import com.example.sirh.repository.EmployeRepository;
 import com.example.sirh.repository.MouvementSoldeCongeRepository;
 import com.example.sirh.repository.SoldeCongeRepository;
+import com.example.sirh.util.DureeFormat;
 
 import lombok.RequiredArgsConstructor;
 
@@ -141,8 +142,8 @@ public class SoldeCongeService {
             }
             if (disponible(solde).compareTo(entree.getValue()) < 0) {
                 erreurs.put("solde", "Solde insuffisant pour " + entree.getKey()
-                        + " : disponible " + disponible(solde) + " jour(s), demandé "
-                        + entree.getValue() + " jour(s).");
+                        + " : disponible " + DureeFormat.jours(disponible(solde)) + ", demandé "
+                        + DureeFormat.jours(entree.getValue()) + ".");
             }
         }
 
@@ -172,8 +173,8 @@ public class SoldeCongeService {
             BigDecimal enAttente = nz(solde.getJoursEnAttente());
             if (enAttente.compareTo(entree.getValue()) < 0) {
                 throw new IllegalStateException("Incohérence de réservation pour l'année "
-                        + entree.getKey() + " (en attente " + enAttente + ", demandé "
-                        + entree.getValue() + ").");
+                        + entree.getKey() + " (en attente " + DureeFormat.jours(enAttente)
+                        + ", demandé " + DureeFormat.jours(entree.getValue()) + ").");
             }
             solde.setJoursEnAttente(enAttente.subtract(entree.getValue()));
             solde.setJoursUtilises(nz(solde.getJoursUtilises()).add(entree.getValue()));
@@ -261,7 +262,7 @@ public class SoldeCongeService {
         BigDecimal nouveauDisponible = disponible(solde).add(jours);
         if (nouveauDisponible.signum() < 0 && !forcer) {
             erreurs.put("jours", "L'ajustement rendrait le solde négatif (disponible actuel : "
-                    + disponible(solde) + "). Cochez « forcer » pour l'autoriser.");
+                    + DureeFormat.jours(disponible(solde)) + "). Cochez « forcer » pour l'autoriser.");
             throw new ValidationMetierException(erreurs);
         }
 
@@ -407,18 +408,16 @@ public class SoldeCongeService {
         Optional<DroitConge> regle = droitCongeService.trouverRegle(
                 type, contrat == null ? null : contrat.getTypeContrat(), ancienneteMois);
 
-        BigDecimal taux = regle.map(DroitConge::getJoursParAn).orElse(BigDecimal.ZERO);
+        BigDecimal taux = BigDecimal.ZERO;
         ModeAcquisitionDroit mode = regle.map(DroitConge::getModeAcquisition)
-                .orElse(ModeAcquisitionDroit.ANNUEL);
-        boolean prorata = regle.map(r -> r.getProrataAnneeEmbauche() == null
-                || r.getProrataAnneeEmbauche()).orElse(true);
+                .orElse(ModeAcquisitionDroit.ANNUEL);;
 
         int moisDebut = 1;
         if (employe.getHiringDate() != null && employe.getHiringDate().getYear() == annee) {
             moisDebut = employe.getHiringDate().getMonthValue();
         }
 
-        BigDecimal objectif = objectifAnnuel(taux, annee, employe.getHiringDate(), mode, prorata);
+        BigDecimal objectif = objectifAnnuel(taux, annee, employe.getHiringDate(), mode);
 
         return SoldeConge.builder()
                 .employe(employe)
@@ -441,7 +440,7 @@ public class SoldeCongeService {
     }
 
     private BigDecimal objectifAnnuel(BigDecimal taux, Integer annee, LocalDate hiringDate,
-                                      ModeAcquisitionDroit mode, boolean prorata) {
+                                      ModeAcquisitionDroit mode) {
         if (taux == null || taux.signum() <= 0 || hiringDate == null) {
             return ZERO;
         }
@@ -455,7 +454,7 @@ public class SoldeCongeService {
         }
 
         int moisRestants = 13 - hiringDate.getMonthValue();
-        if (mode == ModeAcquisitionDroit.MENSUEL || prorata) {
+        if (mode == ModeAcquisitionDroit.MENSUEL) {
             BigDecimal brut = taux.multiply(BigDecimal.valueOf(moisRestants))
                     .divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP);
             return arrondirDemi(brut);

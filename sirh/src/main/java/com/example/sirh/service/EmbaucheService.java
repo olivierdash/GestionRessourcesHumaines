@@ -66,7 +66,7 @@ public class EmbaucheService {
         Employe employe = employeService.save(Employe.builder()
                 .candidature(candidature)
                 .hiringDate(dateDebut)
-                .statusEmploye(statutEmployeService.getByLibelle(Statut.EN_ONBOARDING))
+                .statutEmploye(statutEmployeService.getByLibelle(Statut.EN_ONBOARDING))
                 .build());
 
         contratService.creer(Contrat.builder()

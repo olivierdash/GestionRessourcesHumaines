@@ -17,13 +17,17 @@ public class Employe {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_employer")
     private Integer idEmployer;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_candidature", nullable = false, unique = true)
     private Candidature candidature;
+
     @Column(nullable = false, unique = true)
     private String matricule;
+
     @Column(name = "hiring_date", nullable = false)
     private LocalDate hiringDate;
+
     @Column(name = "status_employer")
     private String statusEmployer;
 

@@ -59,7 +59,7 @@
                         <td class="text-xs font-semibold"
                             th:text="${d.modeAcquisition.name() == 'MENSUEL' ? 'Mensuelle' : 'Annuelle'}"></td>
                         <td class="font-semibold text-cobalt-900"
-                            th:text="${#numbers.formatDecimal(d.joursParAn, 1, 2) + ' j/an'}"></td>
+                            th:text="${@formatDuree.jours(d.joursParAn) + ' / an'}"></td>
                         <td class="text-xs">
                             <span th:if="${d.prorataAnneeEmbauche}" class="text-emerald-700 font-semibold">Oui</span>
                             <span th:unless="${d.prorataAnneeEmbauche}" class="text-slate-400">Non</span>

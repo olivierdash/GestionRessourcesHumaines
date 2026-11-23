@@ -46,7 +46,6 @@ public class AbsenceService {
     private final JustificatifCongeRepository justificatifRepository;
     private final TypeCongeService typeCongeService;
     private final CalculDureeCongeService calculDureeCongeService;
-    private final VariablePaieService variablePaieService;
     private final CongeAccessService accessService;
     private final AuditService auditService;
 
@@ -69,7 +68,6 @@ public class AbsenceService {
                 .dateFin(demande.getDateFin())
                 .demiJourDebut(demande.getDemiJourDebut())
                 .demiJourFin(demande.getDemiJourFin())
-                .nombreJours(demande.getNombreJours())
                 .statut(StatutAbsence.JUSTIFIEE)
                 .motif(demande.getMotif())
                 .createur(validateur)
@@ -156,11 +154,9 @@ public class AbsenceService {
                 .source(SourceAbsence.SAISIE_MANUELLE)
                 .dateDebut(form.getDateDebut())
                 .dateFin(form.getDateFin())
-                .nombreJours(nombreJours)
                 .statut(StatutAbsence.DECLAREE)
                 .motif(form.getMotif())
                 .createur(utilisateur)
-                .dateLimiteJustificatif(dateLimite)
                 .build();
 
         absence = absenceRepository.save(absence);
@@ -194,7 +190,6 @@ public class AbsenceService {
 
         absence.setStatut(StatutAbsence.JUSTIFIEE);
         absenceRepository.save(absence);
-        variablePaieService.genererPourAbsence(absence);
         audit(utilisateur, "JUSTIFICATION_ABSENCE", absence.getId(),
                 "Absence justifiée");
         return absence;
@@ -211,7 +206,6 @@ public class AbsenceService {
         }
         absence.setStatut(StatutAbsence.NON_JUSTIFIEE);
         absenceRepository.save(absence);
-        variablePaieService.genererPourAbsence(absence);
         audit(utilisateur, "ABSENCE_NON_JUSTIFIEE", absence.getId(),
                 "Absence marquée non justifiée");
         return absence;
@@ -226,7 +220,6 @@ public class AbsenceService {
         if (absence.getStatut() == StatutAbsence.ANNULEE) {
             return absence;
         }
-        variablePaieService.annulerPourAbsence(absence);
         absence.setStatut(StatutAbsence.ANNULEE);
         absenceRepository.save(absence);
         audit(utilisateur, "ANNULATION_ABSENCE", absence.getId(),

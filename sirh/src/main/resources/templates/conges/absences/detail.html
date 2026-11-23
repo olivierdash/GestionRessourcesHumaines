@@ -4,30 +4,36 @@
 <body>
 <main th:fragment="mainContent" class="w-full flex flex-col gap-6">
 
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+    <!-- En-tête -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight" th:text="${absence.typeConge.libelle}"></h1>
                 <span th:replace="~{conges/fragments/statut :: badge(${absence.statut})}"></span>
             </div>
             <p class="text-sm text-slate-600 mt-1">
                 <span th:text="${absence.employe.candidature.candidat.prenom + ' ' + absence.employe.candidature.candidat.nom}"></span>
                 <span class="text-slate-400 mx-1">·</span>
-                <span th:text="${absence.employe.matricule}"></span>
+                <span class="font-mono" th:text="${absence.employe.matricule}"></span>
             </p>
         </div>
-        <a th:href="@{/conges/absences}" class="text-sm text-cobalt-700 font-semibold flex items-center gap-1 self-start md:self-auto">
+        <a th:href="@{/conges/absences}"
+           class="h-9 px-4 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm self-start sm:self-auto">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
             Retour
         </a>
     </div>
 
+    <!-- Messages -->
     <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
     <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 flex flex-col gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
+        <!-- Colonne principale -->
+        <div class="lg:col-span-2 flex flex-col gap-6 min-w-0">
+
+            <!-- Informations -->
             <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
                 <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Informations</h2>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
@@ -42,7 +48,7 @@
                     <div>
                         <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Nombre de jours</dt>
                         <dd class="mt-1 text-2xl font-bold text-cobalt-900"
-                            th:text="${#numbers.formatDecimal(absence.nombreJours, 1, 1)}"></dd>
+                            th:text="${@formatDuree.jours(absence.nombreJours)}"></dd>
                     </div>
                     <div>
                         <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Source</dt>
@@ -67,7 +73,7 @@
                         <dd class="mt-1 text-slate-700"
                             th:text="${absence.dateLimiteJustificatif != null ? #temporals.format(absence.dateLimiteJustificatif, 'dd/MM/yyyy') : '—'}"></dd>
                     </div>
-                    <div class="sm:col-span-2">
+                    <div class="sm:col-span-2 pt-4 border-t border-neutral-border">
                         <dt class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Motif</dt>
                         <dd class="mt-1 text-slate-700 whitespace-pre-line"
                             th:text="${absence.motif != null and !absence.motif.isEmpty() ? absence.motif : 'Aucun motif renseigné.'}"></dd>
@@ -75,10 +81,13 @@
                 </dl>
             </section>
 
+            <!-- Justificatifs -->
             <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
                 <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Justificatifs</h2>
+
                 <div th:if="${#lists.isEmpty(justificatifs)}" class="text-sm text-slate-500 italic">Aucun justificatif déposé.</div>
-                <ul class="flex flex-col gap-3">
+
+                <ul th:unless="${#lists.isEmpty(justificatifs)}" class="flex flex-col gap-3">
                     <li th:each="j : ${justificatifs}"
                         class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 rounded border border-neutral-border bg-slate-50">
                         <div class="min-w-0">
@@ -96,10 +105,10 @@
                             <div th:if="${j.commentaire != null and !j.commentaire.isEmpty()}"
                                  class="text-xs text-slate-600 mt-1" th:text="${j.commentaire}"></div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0">
+                        <div class="flex flex-wrap items-center gap-2 md:justify-end">
                             <span th:replace="~{conges/fragments/statut :: badge(${j.statut})}"></span>
                             <form th:if="${j.statut.name() == 'DEPOSE'}" sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')"
-                                  th:action="@{/justificatifs/{id}/valider(id=${j.id})}" method="post">
+                                  th:action="@{/justificatifs/{id}/valider(id=${j.id})}" method="post" class="m-0">
                                 <button type="submit"
                                         class="h-7 px-3 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold">
                                     Valider
@@ -107,9 +116,9 @@
                             </form>
                             <form th:if="${j.statut.name() == 'DEPOSE'}" sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')"
                                   th:action="@{/justificatifs/{id}/refuser(id=${j.id})}" method="post"
-                                  class="flex items-center gap-1">
+                                  class="m-0 flex items-center gap-1">
                                 <input type="text" name="commentaire" maxlength="500" placeholder="Motif du refus"
-                                       class="h-7 w-32 border border-neutral-border rounded px-2 text-[11px]">
+                                       class="h-7 w-32 border border-neutral-border rounded px-2 text-[11px] bg-white focus:outline-none focus:border-cobalt-700">
                                 <button type="submit"
                                         class="h-7 px-3 rounded bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold">
                                     Refuser
@@ -118,71 +127,82 @@
                         </div>
                     </li>
                 </ul>
+
                 <form th:if="${absence.statut.name() != 'ANNULEE'}"
                       th:action="@{/conges/absences/{id}/justificatifs(id=${absence.id})}"
                       method="post" enctype="multipart/form-data"
                       class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2 border-t border-neutral-border pt-4">
-                    <input type="file" name="fichier" required accept=".pdf,.jpg,.jpeg,.png" class="text-xs flex-1">
+                    <input type="file" name="fichier" required accept=".pdf,.jpg,.jpeg,.png"
+                           class="text-xs flex-1 min-w-0 border border-neutral-border rounded bg-white p-1.5">
                     <button type="submit"
-                            class="h-9 px-4 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">
+                            class="h-9 px-4 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[16px]">upload_file</span>
                         Déposer un justificatif
                     </button>
                 </form>
             </section>
 
-            <section th:if="${!#lists.isEmpty(variablesPaie)}"
-                     class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
-                <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Variables de paie générées</h2>
+            <!-- Variables de paie (toujours affichée) -->
+            <!-- <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+                <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider px-6 pt-6 pb-4">Variables de paie générées</h2>
                 <div class="overflow-x-auto">
-                    <table class="sirh-table">
+                    <table class="sirh-table w-full">
                         <thead>
                             <tr>
                                 <th>Code</th>
                                 <th>Période</th>
-                                <th>Quantité</th>
+                                <th class="text-right">Quantité</th>
                                 <th>Statut</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <tr th:if="${variablesPaie == null or #lists.isEmpty(variablesPaie)}">
+                                <td colspan="4" class="td-empty py-8 text-center text-slate-500 italic">Aucune variable de paie générée pour cette absence.</td>
+                            </tr>
                             <tr th:each="v : ${variablesPaie}">
                                 <td class="font-mono text-xs" th:text="${v.code}"></td>
-                                <td class="text-xs" th:text="${#temporals.format(v.periode, 'MM/yyyy')}"></td>
-                                <td class="font-semibold"
-                                    th:text="${#numbers.formatDecimal(v.quantite, 1, 1) + ' ' + (v.unite == 'JOUR' ? 'jour(s)' : v.unite)}"></td>
-                                <td th:replace="~{conges/fragments/statut :: badge(${v.statut})}"></td>
+                                <td class="text-xs whitespace-nowrap" th:text="${#temporals.format(v.periode, 'MM/yyyy')}"></td>
+                                <td class="text-right font-semibold whitespace-nowrap"
+                                    th:text="${v.unite == 'JOUR' ? @formatDuree.jours(v.quantite) : #numbers.formatDecimal(v.quantite, 1, 1) + ' ' + v.unite}"></td>
+                                <td><span th:replace="~{conges/fragments/statut :: badge(${v.statut})}"></span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </section>
+            </section> -->
         </div>
 
-        <aside class="flex flex-col gap-6 h-fit">
+        <!-- Colonne latérale -->
+        <aside class="flex flex-col gap-6 lg:sticky lg:top-6">
             <section class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-5">
                 <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-3">Actions</h2>
 
-                <form th:if="${absence.statut.name() == 'DECLAREE'}"
-                      th:action="@{/conges/absences/{id}/justifier(id=${absence.id})}" method="post" class="mb-2">
-                    <button type="submit"
-                            class="w-full h-10 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm">
-                        Marquer comme justifiée
-                    </button>
-                </form>
+                <div class="flex flex-col gap-2">
+                    <form th:if="${absence.statut.name() == 'DECLAREE'}"
+                          th:action="@{/conges/absences/{id}/justifier(id=${absence.id})}" method="post" class="m-0">
+                        <button type="submit"
+                                class="w-full h-10 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm inline-flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">check</span>
+                            Marquer comme justifiée
+                        </button>
+                    </form>
 
-                <form th:if="${absence.statut.name() == 'DECLAREE' or absence.statut.name() == 'JUSTIFIEE'}"
-                      th:action="@{/conges/absences/{id}/non-justifiee(id=${absence.id})}" method="post" class="mb-2">
-                    <button type="submit"
-                            class="w-full h-10 rounded bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold">
-                        Marquer non justifiée
-                    </button>
-                </form>
+                    <form th:if="${absence.statut.name() == 'DECLAREE' or absence.statut.name() == 'JUSTIFIEE'}"
+                          th:action="@{/conges/absences/{id}/non-justifiee(id=${absence.id})}" method="post" class="m-0">
+                        <button type="submit"
+                                class="w-full h-10 rounded bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold inline-flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">close</span>
+                            Marquer non justifiée
+                        </button>
+                    </form>
+                </div>
 
                 <form th:if="${absence.statut.name() != 'ANNULEE'}"
                       th:action="@{/conges/absences/{id}/annuler(id=${absence.id})}" method="post"
                       class="flex flex-col gap-2 border-t border-neutral-border pt-3 mt-3">
                     <label for="motifAnnulation" class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Motif d'annulation</label>
                     <input id="motifAnnulation" type="text" name="motif" maxlength="500"
-                           class="w-full h-9 border border-neutral-border rounded px-3 text-sm">
+                           class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
                     <button type="submit"
                             class="w-full h-9 rounded bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold">
                         Annuler l'absence

@@ -25,19 +25,19 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
             <div class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Acquis</div>
-            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${#numbers.formatDecimal(solde.joursAcquis, 1, 1)}"></div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(solde.joursAcquis)}"></div>
         </div>
         <div class="bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
             <div class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Reportés</div>
-            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${#numbers.formatDecimal(solde.joursReportes, 1, 1)}"></div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(solde.joursReportes)}"></div>
         </div>
         <div class="bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
             <div class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Utilisés</div>
-            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${#numbers.formatDecimal(solde.joursUtilises, 1, 1)}"></div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(solde.joursUtilises)}"></div>
         </div>
         <div class="bg-surface-card rounded-lg border border-cobalt-200 p-4 shadow-sm bg-cobalt-50">
             <div class="text-[10px] font-bold uppercase text-cobalt-700 tracking-wider">Disponible</div>
-            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${#numbers.formatDecimal(disponible, 1, 2)}"></div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(disponible)}"></div>
         </div>
     </div>
 
@@ -64,7 +64,7 @@
                             <td class="text-xs font-semibold" th:text="${m.typeMouvement}"></td>
                             <td class="text-xs font-bold"
                                 th:classappend="${m.jours.signum() < 0 ? 'text-red-600' : 'text-emerald-700'}"
-                                th:text="${(m.jours.signum() > 0 ? '+' : '') + #numbers.formatDecimal(m.jours, 1, 2)}"></td>
+                                th:text="${@formatDuree.joursSigne(m.jours)}"></td>
                             <td class="text-xs">
                                 <a th:if="${m.demandeConge != null}"
                                    th:href="@{/conges/demandes/{id}(id=${m.demandeConge.id})}"
@@ -85,11 +85,11 @@
             <div class="text-xs text-slate-600 mb-4">
                 <div class="flex justify-between py-1 border-b border-slate-100">
                     <span>En attente</span>
-                    <span class="font-semibold" th:text="${#numbers.formatDecimal(solde.joursEnAttente, 1, 2)}"></span>
+                    <span class="font-semibold" th:text="${@formatDuree.jours(solde.joursEnAttente)}"></span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-100">
                     <span>Ajustés</span>
-                    <span class="font-semibold" th:text="${#numbers.formatDecimal(solde.joursAjustes, 1, 2)}"></span>
+                    <span class="font-semibold" th:text="${@formatDuree.jours(solde.joursAjustes)}"></span>
                 </div>
                 <div class="flex justify-between py-1">
                     <span>Statut année</span>
