@@ -26,6 +26,13 @@ public class OnboardingTache {
     @Column(name = "date_echeance")
     private LocalDate dateEcheance;
 
+    @Column(name = "ordre", nullable = false)
+    private Integer ordre = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_type_document_requis")
+    private TypeDocument typeDocumentRequis;
+
     @Column(name = "est_obligatoire", nullable = false)
     private Boolean obligatoire = true;
 
@@ -71,6 +78,22 @@ public class OnboardingTache {
 
     public void setDateEcheance(LocalDate dateEcheance) {
         this.dateEcheance = dateEcheance;
+    }
+
+    public Integer getOrdre() {
+        return ordre;
+    }
+
+    public void setOrdre(Integer ordre) {
+        this.ordre = ordre;
+    }
+
+    public TypeDocument getTypeDocumentRequis() {
+        return typeDocumentRequis;
+    }
+
+    public void setTypeDocumentRequis(TypeDocument typeDocumentRequis) {
+        this.typeDocumentRequis = typeDocumentRequis;
     }
 
     public Boolean getObligatoire() {

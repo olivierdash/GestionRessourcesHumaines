@@ -33,7 +33,7 @@ public class OnboardingTacheService {
 
     @Transactional(readOnly = true)
     public List<OnboardingTache> findByOnboarding(Integer idOnboarding) {
-        return onboardingTacheRepository.findByOnboardingIdOrderByDateEcheanceAsc(idOnboarding);
+        return onboardingTacheRepository.findByOnboardingIdOrderByOrdreAscDateEcheanceAsc(idOnboarding);
     }
 
     @Transactional(readOnly = true)

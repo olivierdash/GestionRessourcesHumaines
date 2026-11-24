@@ -202,6 +202,12 @@
                     </button>
 
                     <div class="submenu-items hidden" data-submenu="configuration">
+                        <a sec:authorize="hasRole('RH')" th:href="@{/onboarding/modeles}" data-path="/onboarding/modeles"
+                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                            title="Modèles d'onboarding">
+                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">route</span>
+                            <span class="sidebar-text whitespace-nowrap">Onboarding</span>
+                        </a>
                         <a sec:authorize="hasRole('RH')" th:href="@{/types-contrat}" data-path="/types-contrat"
                             class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
                             title="Types de contrat">

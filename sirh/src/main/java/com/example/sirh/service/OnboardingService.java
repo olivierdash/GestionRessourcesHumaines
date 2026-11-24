@@ -13,12 +13,16 @@ import com.example.sirh.model.OnboardingTache;
 import com.example.sirh.model.StatutTacheOnboarding;
 import com.example.sirh.model.Utilisateur;
 import com.example.sirh.repository.OnboardingRepository;
+import com.example.sirh.repository.ModeleOnboardingRepository;
+import com.example.sirh.repository.ModeleTacheOnboardingRepository;
 import com.example.sirh.constants.ConstantSirh.Statut;
 
 @Service
 public class OnboardingService {
 
     private final OnboardingRepository onboardingRepository;
+    private final ModeleOnboardingRepository modeleOnboardingRepository;
+    private final ModeleTacheOnboardingRepository modeleTacheOnboardingRepository;
     private final OnboardingTacheService onboardingTacheService;
     private final StatutTacheOnboardingService statutTacheOnboardingService;
     private final EmployeService employeService;
@@ -28,6 +32,8 @@ public class OnboardingService {
     // + le paramètre correspondant dans le constructeur et son this.xxx = xxx
 
     public OnboardingService(OnboardingRepository onboardingRepository,
+            ModeleOnboardingRepository modeleOnboardingRepository,
+            ModeleTacheOnboardingRepository modeleTacheOnboardingRepository,
             OnboardingTacheService onboardingTacheService,
             StatutTacheOnboardingService statutTacheOnboardingService,
             UtilisateurService utilisateurService,
@@ -35,6 +41,8 @@ public class OnboardingService {
             DocumentService documentService,
             StatutEmployeService statutEmployeService) {
         this.onboardingRepository = onboardingRepository;
+        this.modeleOnboardingRepository = modeleOnboardingRepository;
+        this.modeleTacheOnboardingRepository = modeleTacheOnboardingRepository;
         this.onboardingTacheService = onboardingTacheService;
         this.statutTacheOnboardingService = statutTacheOnboardingService;
         this.utilisateurService = utilisateurService;
@@ -44,29 +52,24 @@ public class OnboardingService {
 
     }
 
-    private void creerTache(Onboarding onboarding, String titre, String roleLibelle, int jours) {
-        Utilisateur responsable = utilisateurService.findFirstByRoleLibelle(roleLibelle);
-
+    private void creerTache(Onboarding onboarding, com.example.sirh.model.ModeleTacheOnboarding definition) {
+        Utilisateur responsable = utilisateurService.findFirstByRoleLibelle(
+                definition.getRoleResponsable().getLibelle());
         StatutTacheOnboarding aFaire = statutTacheOnboardingService.getByLibelle("à faire");
 
         OnboardingTache tache = new OnboardingTache();
         tache.setOnboarding(onboarding);
-        tache.setTitre(titre);
+        tache.setTitre(definition.getTitre());
         tache.setResponsable(responsable);
-        tache.setDateEcheance(onboarding.getDateDebut().plusDays(jours));
-        tache.setObligatoire(true);
+        tache.setDateEcheance(onboarding.getDateDebut().plusDays(definition.getDelaiJours()));
+        tache.setOrdre(definition.getOrdre());
+        tache.setObligatoire(definition.getObligatoire());
+        tache.setTypeDocumentRequis(definition.getTypeDocumentRequis());
         tache.setStatut(aFaire);
 
         onboardingTacheService.save(tache);
     }
 
-    private String documentExige(String titreTache) {
-        return switch (titreTache) {
-            case "Contrat signé" -> "Contrat signé";
-            case "Inscription à la paie" -> "RIB";
-            default -> null;
-        };
-    }
 
     @Transactional(readOnly = true)
     public List<OnboardingTache> taches(Integer idOnboarding) {
@@ -91,12 +94,16 @@ public class OnboardingService {
         onboarding.setDateDebut(LocalDate.now());
         onboarding = onboardingRepository.save(onboarding);
 
-        creerTache(onboarding, "Contrat signé", "RH", 3);
-        // creerTache(onboarding, "Badge", "RESPONSABLE_IT", 5);
-        // creerTache(onboarding, "Compte informatique", "RESPONSABLE_IT", 5);
-        // creerTache(onboarding, "Matériel", "RESPONSABLE_IT", 7);
-        creerTache(onboarding, "Formation", "RH", 14);
-        creerTache(onboarding, "Inscription à la paie", "RH", 14);
+        var modeleActif = modeleOnboardingRepository.findByActifTrue()
+                .orElseThrow(() -> new IllegalStateException("Aucun modèle d'onboarding actif."));
+        List<com.example.sirh.model.ModeleTacheOnboarding> definitions =
+                modeleTacheOnboardingRepository.findByModele_IdOrderByOrdreAsc(modeleActif.getId());
+        if (definitions.isEmpty()) {
+            throw new IllegalStateException("Le modèle d'onboarding actif ne contient aucune tâche.");
+        }
+        for (var definition : definitions) {
+            creerTache(onboarding, definition);
+        }
 
         return onboarding;
     }
@@ -107,11 +114,12 @@ public class OnboardingService {
 
         StatutTacheOnboarding terminee = statutTacheOnboardingService.getByLibelle("terminée");
 
-        String typeExige = documentExige(tache.getTitre());
-        if (typeExige != null
-                && !documentService.existsByTacheIdAndTypeDocumentLibelle(tache.getId(), typeExige)) {
+        var typeDocumentRequis = tache.getTypeDocumentRequis();
+        if (typeDocumentRequis != null
+                && !documentService.existsByTacheIdAndTypeDocumentLibelle(
+                        tache.getId(), typeDocumentRequis.getLibelle())) {
             throw new IllegalStateException(
-                    "Déposez d'abord le document requis : " + typeExige);
+                    "Déposez d'abord le document requis : " + typeDocumentRequis.getLibelle());
         }
         tache.setStatut(terminee);
         onboardingTacheService.saveAndFlush(tache);

@@ -60,12 +60,17 @@
                         <tr th:each="t : ${taches}">
                             <!-- Formulaire de dépôt de document -->
                             <td class="align-top min-w-[240px] py-3">
+                                <p th:if="${t.typeDocumentRequis != null}" class="mb-1 text-[11px] font-semibold text-amber-700">
+                                    Document requis : <span th:text="${t.typeDocumentRequis.libelle}"></span>
+                                </p>
                                 <form th:action="@{/onboarding/taches/{id}/documents(id=${t.id})}" method="post" enctype="multipart/form-data" class="flex flex-col gap-2 m-0">
                                     <input type="hidden" name="idEmploye" th:value="${idEmploye}">
 
                                     <select name="idTypeDocument" required
                                             class="w-full h-8 px-2 bg-white border border-neutral-border rounded text-xs text-slate-800 focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors cursor-pointer">
-                                        <option th:each="td : ${typesDocument}" th:value="${td.idTypeDocument}" th:text="${td.libelle}"></option>
+                                        <option th:each="td : ${typesDocument}" th:value="${td.idTypeDocument}"
+                                                th:selected="${t.typeDocumentRequis != null and t.typeDocumentRequis.idTypeDocument == td.idTypeDocument}"
+                                                th:text="${td.libelle}"></option>
                                     </select>
 
                                     <input type="file" name="fichier" required
