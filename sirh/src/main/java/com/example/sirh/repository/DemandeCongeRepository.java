@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,15 +23,31 @@ public interface DemandeCongeRepository extends JpaRepository<DemandeConge, Inte
     List<DemandeConge> findByStatutOrderByDateCreationAsc(StatutDemandeConge statut);
 
     @EntityGraph(attributePaths = {"employe", "typeConge", "createur", "managerAttendu"})
+    Page<DemandeConge> findByStatutOrderByDateCreationAsc(
+            StatutDemandeConge statut, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"employe", "typeConge", "createur", "managerAttendu"})
     List<DemandeConge> findByStatutInOrderByDateCreationAsc(Collection<StatutDemandeConge> statuts);
+
+    @EntityGraph(attributePaths = {"employe", "typeConge", "createur", "managerAttendu"})
+    Page<DemandeConge> findByStatutInOrderByDateCreationAsc(
+            Collection<StatutDemandeConge> statuts, Pageable pageable);
 
     @EntityGraph(attributePaths = {"employe", "typeConge", "createur", "managerAttendu"})
     List<DemandeConge> findByStatutAndManagerAttenduIdUtilisateurOrderByDateCreationAsc(
             StatutDemandeConge statut, Integer managerId);
 
     @EntityGraph(attributePaths = {"employe", "typeConge", "createur", "managerAttendu"})
+    Page<DemandeConge> findByStatutAndManagerAttenduIdUtilisateurOrderByDateCreationAsc(
+            StatutDemandeConge statut, Integer managerId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"employe", "typeConge", "createur", "managerAttendu"})
     List<DemandeConge> findByManagerAttenduIdUtilisateurAndStatutInOrderByDateCreationAsc(
             Integer managerId, Collection<StatutDemandeConge> statuts);
+
+    @EntityGraph(attributePaths = {"employe", "typeConge", "createur", "managerAttendu"})
+    Page<DemandeConge> findByManagerAttenduIdUtilisateurAndStatutInOrderByDateCreationAsc(
+            Integer managerId, Collection<StatutDemandeConge> statuts, Pageable pageable);
 
     long countByStatut(StatutDemandeConge statut);
 

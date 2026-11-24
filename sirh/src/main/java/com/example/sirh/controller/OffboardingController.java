@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller("offboardingMvcController")
 @RequestMapping("/offboarding")
@@ -33,8 +34,15 @@ public class OffboardingController {
     private final AuditService auditService;
 
     @GetMapping
-    public String liste(Model model) {
-        model.addAttribute("ruptures", ruptureService.listerActifs());
+    public String liste(@RequestParam(required = false) String statut, Model model) {
+        List<RuptureContrat> ruptures = ruptureService.listerActifs();
+        if (statut != null && !statut.isBlank()) {
+            ruptures = ruptures.stream()
+                    .filter(rupture -> statut.equals(rupture.getStatutRupture()))
+                    .toList();
+        }
+        model.addAttribute("ruptures", ruptures);
+        model.addAttribute("statutFiltre", statut);
         model.addAttribute("employes", employeRepository.findAll());
         model.addAttribute("contrats", contratRepository.findAll());
         return "offboarding/index";

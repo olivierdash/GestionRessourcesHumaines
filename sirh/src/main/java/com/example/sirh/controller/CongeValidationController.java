@@ -2,6 +2,9 @@ package com.example.sirh.controller;
 
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,9 +43,23 @@ public class CongeValidationController {
     private final PlanningCongeService planningCongeService;
 
     @GetMapping
-    public String index(Model model) {
+    public String index(@RequestParam(required = false) StatutDemandeConge statut,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size,
+                        Model model) {
         Utilisateur utilisateur = accessService.utilisateurCourant();
-        model.addAttribute("demandes", demandeCongeService.fileValidation(utilisateur));
+        int pageSize = Math.min(Math.max(size, 1), 100);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), pageSize);
+        Page<DemandeConge> demandesPage = demandeCongeService.fileValidation(
+                utilisateur, statut, pageable);
+        if (demandesPage.getTotalPages() > 0
+                && pageable.getPageNumber() >= demandesPage.getTotalPages()) {
+            pageable = PageRequest.of(demandesPage.getTotalPages() - 1, pageSize);
+            demandesPage = demandeCongeService.fileValidation(utilisateur, statut, pageable);
+        }
+
+        model.addAttribute("demandes", demandesPage);
+        model.addAttribute("filtreStatut", statut);
         model.addAttribute("enAttente", demandeCongeService.compterEnAttente(utilisateur));
         return "conges/validations/index";
     }
@@ -58,6 +75,7 @@ public class CongeValidationController {
 
         model.addAttribute("demande", demande);
         model.addAttribute("actionBase", "/conges/validations");
+        model.addAttribute("filtreStatutBase", "/conges/validations");
         model.addAttribute("historique", demandeCongeService.historique(id));
         model.addAttribute("justificatifs", justificatifCongeService.listerPourDemande(id));
         model.addAttribute("conflitsPlanning", planningCongeService.conflitsPourDemande(demande));

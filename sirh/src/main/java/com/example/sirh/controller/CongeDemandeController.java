@@ -67,6 +67,7 @@ public class CongeDemandeController {
         }
         model.addAttribute("demande", demande);
         model.addAttribute("actionBase", "/conges/demandes");
+        model.addAttribute("filtreStatutBase", "/conges/demandes");
         model.addAttribute("historique", demandeCongeService.historique(id));
         model.addAttribute("justificatifs", justificatifCongeService.listerPourDemande(id));
         model.addAttribute("conflitsPlanning", planningCongeService.conflitsPourDemande(demande));

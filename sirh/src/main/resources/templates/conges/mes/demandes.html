@@ -9,11 +9,17 @@
             <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Mes demandes</h1>
             <p class="text-sm text-slate-600 mt-1">Suivez vos demandes de congé et leur avancement.</p>
         </div>
-        <a th:href="@{/mes-conges/nouveau}"
-           class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm self-start md:self-auto">
-            <span class="material-symbols-outlined text-[16px]">add</span>
-            Nouvelle demande
-        </a>
+        <div class="flex items-center gap-2 self-start md:self-auto">
+            <a th:if="${filtreStatut != null}" th:href="@{/mes-conges/demandes}"
+               class="h-9 px-3 rounded bg-white border border-neutral-border text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center">
+                Tous les statuts
+            </a>
+            <a th:href="@{/mes-conges/nouveau}"
+               class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                Nouvelle demande
+            </a>
+        </div>
     </div>
 
     <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
@@ -32,7 +38,8 @@
                 </thead>
                 <tbody>
                     <tr th:if="${#lists.isEmpty(demandes)}">
-                        <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">Aucune demande enregistrée.</td>
+                        <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic"
+                            th:text="${filtreStatut != null ? 'Aucune demande avec ce statut.' : 'Aucune demande enregistrée.'}"></td>
                     </tr>
                     <tr th:each="demande : ${demandes}">
                         <td class="font-mono text-xs text-slate-600" th:text="${demande.reference}"></td>
@@ -45,7 +52,13 @@
                         <td class="font-semibold" th:text="${@formatDuree.jours(demande.nombreJours)}"></td>
                         <td class="text-xs text-slate-500 whitespace-nowrap"
                             th:text="${demande.dateSoumission != null ? #temporals.format(demande.dateSoumission, 'dd/MM/yyyy') : '—'}"></td>
-                        <td th:replace="~{conges/fragments/statut :: badge(${demande.statut})}"></td>
+                        <td>
+                            <a th:href="@{/mes-conges/demandes(statut=${demande.statut})}"
+                               class="inline-flex rounded hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-cobalt-700"
+                               th:attr="aria-label=|Filtrer mes demandes par statut ${demande.statut}|">
+                                <span th:replace="~{conges/fragments/statut :: badge(${demande.statut})}"></span>
+                            </a>
+                        </td>
                         <td class="text-right">
                             <a th:href="@{/mes-conges/{id}(id=${demande.id})}"
                                class="inline-flex items-center gap-1.5 h-7 px-3 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold">

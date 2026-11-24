@@ -158,87 +158,60 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
-            const toggleBtn = document.getElementById('sidebar-toggle');
             const body = document.body;
+            const currentPath = window.location.pathname;
 
-            if (localStorage.getItem('sidebarState') === 'collapsed') {
-                body.classList.add('sidebar-collapsed');
+            if (localStorage.getItem('sidebarState') === 'collapsed') body.classList.add('sidebar-collapsed');
+
+            document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+                body.classList.toggle('sidebar-collapsed');
+                localStorage.setItem('sidebarState', body.classList.contains('sidebar-collapsed') ? 'collapsed' : 'expanded');
+            });
+
+            // 2. Gestion intelligente des liens actifs et des sous-menus
+            let activeLink = null;
+            let longestMatch = 0;
+
+            document.querySelectorAll('.sidebar-nav-link[data-path]').forEach(link => {
+                const path = link.getAttribute('data-path');
+
+                const isMatch = (currentPath === '/' && path === '/utilisateur') ||
+                    currentPath === path ||
+                    currentPath.startsWith(path + '/');
+
+                if (isMatch && path.length > longestMatch) {
+                    longestMatch = path.length;
+                    activeLink = link;
+                }
+            });
+
+            if (activeLink) {
+                activeLink.classList.add('nav-link-active');
+
+                const submenu = activeLink.closest('[data-submenu]');
+                if (submenu) {
+                    submenu.classList.remove('hidden');
+                    const toggle = document.querySelector(`[data-submenu-target="${submenu.dataset.submenu}"]`);
+                    toggle?.classList.add('submenu-open');
+                }
             }
 
-            toggleBtn.addEventListener('click', () => {
-                body.classList.toggle('sidebar-collapsed');
-                if (body.classList.contains('sidebar-collapsed')) {
-                    localStorage.setItem('sidebarState', 'collapsed');
-                } else {
-                    localStorage.setItem('sidebarState', 'expanded');
-                }
-            });
-
-            const currentPath = window.location.pathname;
-            const links = document.querySelectorAll('.sidebar-nav-link');
-
-            links.forEach(link => {
-                const path = link.getAttribute('data-path');
-                if (!path) return;
-
-                let isActive = false;
-
-                if (currentPath === '/' && path === '/utilisateur') {
-                    isActive = true;
-                }
-                else if (path === '/demandes' && currentPath.startsWith('/demandes/validations')) {
-                    isActive = false;
-                }
-                else if (currentPath.startsWith(path)) {
-                    isActive = true;
-                }
-
-                if (isActive) {
-                    link.classList.add('nav-link-active');
-                }
-            });
-
-            (function autoOpenSubmenu() {
-                const currentPath = window.location.pathname;
-
-                document.querySelectorAll('[data-submenu]').forEach(function (submenu) {
-                    const subLinks = submenu.querySelectorAll('.sidebar-nav-link[data-path]');
-                    let shouldOpen = false;
-
-                    subLinks.forEach(function (link) {
-                        const path = link.getAttribute('data-path');
-                        if (path && currentPath.startsWith(path)) {
-                            shouldOpen = true;
-                        }
-                    });
-
-                    if (shouldOpen) {
-                        submenu.classList.remove('hidden');
-                        const toggle = document.querySelector(
-                            '[data-submenu-target="' + submenu.dataset.submenu + '"]'
-                        );
-                        if (toggle) toggle.classList.add('submenu-open');
-                    }
-                });
-            })();
-
-            document.querySelectorAll('[data-submenu-target]').forEach(function (toggle) {
+            document.querySelectorAll('[data-submenu-target]').forEach(toggle => {
                 toggle.addEventListener('click', function (e) {
                     e.preventDefault();
-
-                    const targetId = this.dataset.submenuTarget;
-                    const items = document.querySelector('[data-submenu="' + targetId + '"]');
+                    const items = document.querySelector(`[data-submenu="${this.dataset.submenuTarget}"]`);
                     if (!items) return;
 
-                    if (document.body.classList.contains('sidebar-collapsed')) {
-                        document.body.classList.remove('sidebar-collapsed');
+                    // Si la sidebar est repliée, on la déplie et on ouvre le menu
+                    if (body.classList.contains('sidebar-collapsed')) {
+                        body.classList.remove('sidebar-collapsed');
                         localStorage.setItem('sidebarState', 'expanded');
                         this.classList.add('submenu-open');
                         items.classList.remove('hidden');
                         return;
                     }
 
+                    // Sinon, on bascule normalement
                     const isOpen = this.classList.toggle('submenu-open');
                     items.classList.toggle('hidden', !isOpen);
                 });

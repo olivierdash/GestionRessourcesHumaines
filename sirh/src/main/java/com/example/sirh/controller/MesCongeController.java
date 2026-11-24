@@ -26,6 +26,8 @@ import com.example.sirh.model.Absence;
 import com.example.sirh.model.DemandeConge;
 import com.example.sirh.model.SoldeConge;
 import com.example.sirh.model.Utilisateur;
+import com.example.sirh.model.enums.StatutAbsence;
+import com.example.sirh.model.enums.StatutDemandeConge;
 import com.example.sirh.service.AbsenceService;
 import com.example.sirh.service.CongeAccessService;
 import com.example.sirh.service.CongeDashboardService;
@@ -69,15 +71,20 @@ public class MesCongeController {
     }
 
     @GetMapping("/demandes")
-    public String demandes(Model model) {
+    public String demandes(@RequestParam(required = false) StatutDemandeConge statut, Model model) {
         Utilisateur utilisateur = accessService.utilisateurCourant();
+        model.addAttribute("filtreStatut", statut);
         if (utilisateur.getEmploye() == null) {
             model.addAttribute("demandes", List.of());
             model.addAttribute("erreur", "Votre compte n'est lié à aucun salarié.");
             return "conges/mes/demandes";
         }
-        model.addAttribute("demandes", demandeCongeService.listerMesDemandes(
-                utilisateur.getEmploye().getIdEmployer()));
+        List<DemandeConge> demandes = demandeCongeService.listerMesDemandes(
+                utilisateur.getEmploye().getIdEmployer());
+        if (statut != null) {
+            demandes = demandes.stream().filter(demande -> demande.getStatut() == statut).toList();
+        }
+        model.addAttribute("demandes", demandes);
         return "conges/mes/demandes";
     }
 
@@ -119,6 +126,7 @@ public class MesCongeController {
         verifierAcces(demande);
         model.addAttribute("demande", demande);
         model.addAttribute("actionBase", "/mes-conges");
+        model.addAttribute("filtreStatutBase", "/mes-conges/demandes");
         model.addAttribute("historique", demandeCongeService.historique(id));
         model.addAttribute("justificatifs", justificatifCongeService.listerPourDemande(id));
         model.addAttribute("conflitsPlanning", planningCongeService.conflitsPourDemande(demande));
@@ -185,8 +193,10 @@ public class MesCongeController {
     // ------------------------------------------------------------------
 
     @GetMapping("/absences")
-    public String absences(@ModelAttribute("absence") AbsenceForm absence, Model model) {
+    public String absences(@ModelAttribute("absence") AbsenceForm absence,
+                           @RequestParam(required = false) StatutAbsence statut, Model model) {
         Utilisateur utilisateur = accessService.utilisateurCourant();
+        model.addAttribute("filtreStatut", statut);
         if (utilisateur.getEmploye() == null) {
             model.addAttribute("erreur", "Votre compte n'est lié à aucun salarié.");
             model.addAttribute("absences", List.of());
@@ -195,6 +205,9 @@ public class MesCongeController {
         }
         Integer employeId = utilisateur.getEmploye().getIdEmployer();
         List<Absence> absences = absenceService.absencesDe(employeId);
+        if (statut != null) {
+            absences = absences.stream().filter(absenceLignee -> absenceLignee.getStatut() == statut).toList();
+        }
         absence.setIdEmploye(employeId);
 
         Map<Integer, List<com.example.sirh.model.JustificatifConge>> justificatifs =

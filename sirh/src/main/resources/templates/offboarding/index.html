@@ -29,15 +29,30 @@
     </section>
 
     <section class="bg-white border border-neutral-border rounded-lg overflow-hidden">
+        <div th:if="${statutFiltre != null}"
+             class="flex items-center justify-between px-5 pt-4 text-xs text-slate-600">
+            <span th:text="|Filtre statut : ${statutFiltre}|"></span>
+            <a th:href="@{/offboarding}" class="font-semibold text-cobalt-700 hover:underline">
+                Toutes les ruptures actives
+            </a>
+        </div>
         <table class="sirh-table">
             <thead><tr><th>Salarié</th><th>Motif</th><th>Sortie</th><th>Statut</th><th class="text-right">Action</th></tr></thead>
             <tbody>
-            <tr th:if="${#lists.isEmpty(ruptures)}"><td colspan="5" class="td-empty text-center py-8 text-slate-500">Aucune rupture active.</td></tr>
+            <tr th:if="${#lists.isEmpty(ruptures)}">
+                <td colspan="5" class="td-empty text-center py-8 text-slate-500"
+                    th:text="${statutFiltre != null ? 'Aucune rupture active avec ce statut.' : 'Aucune rupture active.'}"></td>
+            </tr>
             <tr th:each="r : ${ruptures}">
                 <td class="font-semibold" th:text="${r.employe.candidature.candidat.prenom + ' ' + r.employe.candidature.candidat.nom}"></td>
                 <td th:text="${r.motifRupture}"></td>
                 <td th:text="${#temporals.format(r.dateSortie,'dd/MM/yyyy')}"></td>
-                <td><span class="px-2 py-1 rounded bg-slate-100 text-xs font-bold" th:text="${r.statutRupture}"></span></td>
+                <td>
+                    <a th:href="@{/offboarding(statut=${r.statutRupture})}"
+                       class="inline-flex rounded px-2 py-1 bg-slate-100 text-xs font-bold hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-cobalt-700"
+                       th:attr="aria-label=|Filtrer les ruptures par statut ${r.statutRupture}|"
+                       th:text="${r.statutRupture}"></a>
+                </td>
                 <td class="text-right"><a th:href="@{/offboarding/ruptures/{id}(id=${r.idRupture})}" class="text-cobalt-700 text-xs font-bold">Ouvrir</a></td>
             </tr>
             </tbody>

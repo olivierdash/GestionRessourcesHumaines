@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -354,14 +356,34 @@ public class DemandeCongeService {
     }
 
     @Transactional(readOnly = true)
-    public List<DemandeConge> fileValidation(Utilisateur utilisateur) {
+    public Page<DemandeConge> fileValidation(Utilisateur utilisateur,
+                                             StatutDemandeConge statut,
+                                             Pageable pageable) {
         if (accessService.estRhOuDg(utilisateur)) {
-            return demandeCongeRepository.findByStatutInOrderByDateCreationAsc(
-                    List.of(StatutDemandeConge.SOUMISE, StatutDemandeConge.VALIDEE_MANAGER));
+            if (statut == null) {
+                return demandeCongeRepository.findByStatutInOrderByDateCreationAsc(
+                        List.of(StatutDemandeConge.SOUMISE, StatutDemandeConge.VALIDEE_MANAGER),
+                        pageable);
+            }
+            if (statut == StatutDemandeConge.SOUMISE
+                    || statut == StatutDemandeConge.VALIDEE_MANAGER) {
+                return demandeCongeRepository.findByStatutOrderByDateCreationAsc(statut, pageable);
+            }
+            return Page.empty(pageable);
         }
-        return demandeCongeRepository
-                .findByManagerAttenduIdUtilisateurAndStatutInOrderByDateCreationAsc(
-                        utilisateur.getIdUtilisateur(), List.of(StatutDemandeConge.SOUMISE));
+
+        Integer managerId = utilisateur.getIdUtilisateur();
+        if (statut == null) {
+            return demandeCongeRepository
+                    .findByManagerAttenduIdUtilisateurAndStatutInOrderByDateCreationAsc(
+                            managerId, List.of(StatutDemandeConge.SOUMISE), pageable);
+        }
+        if (statut == StatutDemandeConge.SOUMISE) {
+            return demandeCongeRepository
+                    .findByStatutAndManagerAttenduIdUtilisateurOrderByDateCreationAsc(
+                            statut, managerId, pageable);
+        }
+        return Page.empty(pageable);
     }
 
     @Transactional(readOnly = true)

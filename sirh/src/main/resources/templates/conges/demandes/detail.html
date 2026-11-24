@@ -9,7 +9,11 @@
             <div class="flex items-center gap-2">
                 <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight"
                     th:text="${demande.reference != null ? demande.reference : 'Demande #' + demande.id}"></h1>
-                <span th:replace="~{conges/fragments/statut :: badge(${demande.statut})}"></span>
+                <a th:href="@{${filtreStatutBase}(statut=${demande.statut})}"
+                   class="inline-flex rounded hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-cobalt-700"
+                   th:attr="aria-label=|Filtrer les demandes par statut ${demande.statut}|">
+                    <span th:replace="~{conges/fragments/statut :: badge(${demande.statut})}"></span>
+                </a>
             </div>
             <p class="text-sm text-slate-600 mt-1">
                 <span th:text="${demande.employe.candidature.candidat.prenom + ' ' + demande.employe.candidature.candidat.nom}"></span>
