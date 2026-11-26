@@ -9,7 +9,6 @@
         <div>
             <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Absences</h1>
             <p class="text-sm text-slate-600 mt-1">Saisie, justification et suivi des absences.</p>
-            <p class="text-xs text-slate-500 mt-1.5">Utilisez les filtres ci-dessous pour afficher les absences souhaitées.</p>
         </div>
         <div class="flex items-center gap-2 self-start md:self-auto shrink-0">
             <a th:href="@{/conges/calendrier}"
@@ -23,7 +22,7 @@
                 Nouvelle absence
             </a>
         </div>
-    </header>
+    </div>
 
     <!-- Messages -->
     <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
@@ -71,24 +70,21 @@
         </div>
 
         <!-- Barre d'actions du formulaire -->
-        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-t border-neutral-border">
-            <p class="text-xs text-slate-500">Utilisez les filtres pour afficher les absences souhaitées.</p>
-            <div class="flex flex-wrap items-center gap-2">
-                <a th:href="@{/absences/export-csv}"
-                   class="h-8 px-3 rounded bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold inline-flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[16px]">download</span>
-                    Export CSV
-                </a>
-                <a th:href="@{/conges/absences}"
-                   class="h-8 px-3 rounded bg-white border border-neutral-border text-slate-600 hover:bg-slate-50 text-xs font-semibold inline-flex items-center">
-                    Réinitialiser
-                </a>
-                <button type="submit"
-                        class="h-8 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold inline-flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[16px]">filter_alt</span>
-                    Filtrer
-                </button>
-            </div>
+        <div class="flex flex-wrap items-center justify-start sm:justify-end gap-2 px-4 py-3 border-t border-neutral-border">
+            <a th:href="@{/absences/export-csv}"
+               class="h-8 px-3 rounded bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">download</span>
+                Export CSV
+            </a>
+            <a th:href="@{/conges/absences}"
+               class="h-8 px-3 rounded bg-white border border-neutral-border text-slate-600 hover:bg-slate-50 text-xs font-semibold inline-flex items-center">
+                Réinitialiser
+            </a>
+            <button type="submit"
+                    class="h-8 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">filter_alt</span>
+                Filtrer
+            </button>
         </div>
     </form>
 
@@ -110,7 +106,7 @@
                 </thead>
                 <tbody>
                     <tr th:if="${#lists.isEmpty(absences)}">
-                        <td colspan="7" class="td-empty py-8 text-center text-slate-500 italic">Aucune absence trouvée pour les filtres appliqués.</td>
+                        <td colspan="8" class="td-empty py-8 text-center text-slate-500 italic">Aucune absence trouvée pour les filtres appliqués.</td>
                     </tr>
                     <tr th:each="a : ${absences}">
                         <td>
@@ -157,7 +153,7 @@
                 </tbody>
             </table>
         </div>
-    </section>
+    </div>
 
 </main>
 </body>

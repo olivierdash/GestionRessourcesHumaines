@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface OnboardingTacheRepository extends JpaRepository<OnboardingTache, Integer> {
 
-    List<OnboardingTache> findByOnboardingIdOrderByDateEcheanceAsc(Integer idOnboarding);
+    List<OnboardingTache> findByOnboardingIdOrderByOrdreAscDateEcheanceAsc(Integer idOnboarding);
 
     long countByOnboardingId(Integer idOnboarding);
 

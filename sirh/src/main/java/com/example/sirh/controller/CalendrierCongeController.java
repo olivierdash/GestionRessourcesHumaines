@@ -36,7 +36,9 @@ public class CalendrierCongeController {
     private final PlanningCongeService planningCongeService;
 
     @GetMapping
-    public String calendrier(@RequestParam(required = false) String periode, Model model) {
+    public String calendrier(@RequestParam(required = false) String periode,
+                             @RequestParam(required = false) Integer employeId,
+                             Model model) {
         YearMonth mois = periode == null || periode.isBlank()
                 ? YearMonth.now() : YearMonth.parse(periode);
         LocalDate debut = mois.atDay(1);
@@ -44,7 +46,14 @@ public class CalendrierCongeController {
 
         Utilisateur utilisateur = accessService.utilisateurCourant();
         List<Employe> employes = employesVisibles(utilisateur);
-        List<Integer> employeIds = employes.stream().map(Employe::getIdEmployer).toList();
+        Integer filtreEmployeId = employeId != null && employes.stream()
+                .anyMatch(employe -> employeId.equals(employe.getIdEmployer()))
+                        ? employeId : null;
+        List<Integer> employeIds = employes.stream()
+                .filter(employe -> filtreEmployeId == null
+                        || filtreEmployeId.equals(employe.getIdEmployer()))
+                .map(Employe::getIdEmployer)
+                .toList();
 
         List<Absence> absences = absenceService.absencesPeriode(employeIds, debut, fin);
         List<DemandeConge> demandes = planningCongeService.demandesEnAttentePeriode(debut, fin)
@@ -53,18 +62,20 @@ public class CalendrierCongeController {
                         && employeIds.contains(d.getEmploye().getIdEmployer()))
                 .toList();
 
-        Map<LocalDate, List<Absence>> absencesParJour = new LinkedHashMap<>();
+        Map<Integer, List<Absence>> absencesParJour = new LinkedHashMap<>();
+        List<LocalDate> jours = new ArrayList<>();
         for (LocalDate jour = debut; !jour.isAfter(fin); jour = jour.plusDays(1)) {
+            jours.add(jour);
             List<Absence> duJour = new ArrayList<>();
             for (Absence absence : absences) {
                 if (!absence.getDateDebut().isAfter(jour) && !absence.getDateFin().isBefore(jour)) {
                     duJour.add(absence);
                 }
             }
-            absencesParJour.put(jour, duJour);
+            absencesParJour.put(jour.getDayOfMonth(), duJour);
         }
 
-        Map<LocalDate, List<DemandeConge>> demandesParJour = new LinkedHashMap<>();
+        Map<Integer, List<DemandeConge>> demandesParJour = new LinkedHashMap<>();
         for (LocalDate jour = debut; !jour.isAfter(fin); jour = jour.plusDays(1)) {
             List<DemandeConge> duJour = new ArrayList<>();
             for (DemandeConge demande : demandes) {
@@ -72,7 +83,7 @@ public class CalendrierCongeController {
                     duJour.add(demande);
                 }
             }
-            demandesParJour.put(jour, duJour);
+            demandesParJour.put(jour.getDayOfMonth(), duJour);
         }
 
         int offset = debut.getDayOfWeek().getValue() - 1;
@@ -86,10 +97,11 @@ public class CalendrierCongeController {
         model.addAttribute("offset", offset);
         model.addAttribute("joursDansMois", joursDansMois);
         model.addAttribute("semaines", semaines);
-        model.addAttribute("jours", absencesParJour.keySet());
+        model.addAttribute("jours", jours);
         model.addAttribute("absencesParJour", absencesParJour);
         model.addAttribute("demandesParJour", demandesParJour);
         model.addAttribute("employes", employes);
+        model.addAttribute("filtreEmployeId", filtreEmployeId);
         model.addAttribute("precedent", mois.minusMonths(1).toString());
         model.addAttribute("suivant", mois.plusMonths(1).toString());
         return "conges/calendrier";
