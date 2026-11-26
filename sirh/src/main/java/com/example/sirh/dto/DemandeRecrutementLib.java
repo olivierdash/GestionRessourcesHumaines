@@ -1,6 +1,5 @@
 package com.example.sirh.dto;
 
-import com.example.sirh.model.MotifDemande;
 import java.time.LocalDateTime;
 
 public record DemandeRecrutementLib(
@@ -11,5 +10,6 @@ public record DemandeRecrutementLib(
     String motifLibelle,
     String managerNom,
     String posteIntitule,
-    String departementTitre
+    String departementTitre,
+    String dernierEtatLibelle
 ) {}

@@ -69,54 +69,6 @@
                 <span class="text-cobalt-900 font-bold">Aujourd'hui</span>
             </div>
         </div>
-
-        <!-- Tableau Haute Précision : Console Analytique -->
-        <div class="bg-surface-card border border-neutral-border shadow-sm flex flex-col rounded-lg overflow-hidden">
-            <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-neutral-border">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-base font-bold text-cobalt-900 tracking-tight">Demandes de recrutement récentes</h2>
-                    <span class="bg-slate-100 border border-slate-300 text-cobalt-900 text-[10px] px-2 py-0.5 font-bold uppercase tracking-wider rounded-sm">
-                        <span th:text="${#lists.size(dashboard.dernieresDemandes)}"></span> en attente
-                    </span>
-                </div>
-            </div>
-            
-            <div class="w-full overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100 border-b border-neutral-border text-slate-700">
-                            <th class="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider">Réf.</th>
-                            <th class="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider">Intitulé du Poste</th>
-                            <th class="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider">Département</th>
-                            <th class="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider">Date dépôt</th>
-                            <th class="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider">Statut</th>
-                            <th class="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-border">
-                        <tr th:if="${#lists.isEmpty(dashboard.dernieresDemandes)}">
-                            <td colspan="6" class="py-6 text-center text-slate-500 italic">Aucune demande enregistrée.</td>
-                        </tr>
-                        <tr th:each="dem : ${dashboard.dernieresDemandes}" class="hover:bg-slate-50 transition-colors h-11">
-                            <td class="py-2 px-4 text-xs font-mono text-cobalt-800 font-bold" th:text="${dem.reference}"></td>
-                            <td class="py-2 px-4 text-xs text-cobalt-900 font-bold" th:text="${dem.poste}"></td>
-                            <td class="py-2 px-4 text-xs text-slate-600" th:text="${dem.departement}"></td>
-                            <td class="py-2 px-4 text-xs font-mono text-slate-600" th:text="${#temporals.format(dem.dateCreation, 'dd/MM/yyyy')}"></td>
-                            <td class="py-2 px-4">
-                                <span class="bg-slate-100 border border-slate-300 text-cobalt-900 text-[10px] px-2 py-0.5 font-bold uppercase tracking-wider inline-block rounded-sm" 
-                                      th:text="${dem.statut}">
-                                </span>
-                            </td>
-                            <td class="py-2 px-4 text-right">
-                                <div class="inline-flex gap-1.5">
-                                    <a th:href="@{/demandes/{id}(id=${dem.id})}" class="h-7 px-3 bg-cobalt-800 text-white text-xs hover:bg-cobalt-900 font-semibold transition-colors shadow-sm flex items-center rounded-sm">Examiner</a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
      <!-- Script Chart.js -->
     <script th:src="@{/js/chart.umd.js}"></script>
     <script th:inline="javascript">

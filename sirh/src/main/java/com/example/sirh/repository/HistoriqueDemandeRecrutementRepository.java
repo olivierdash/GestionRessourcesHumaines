@@ -1,3 +1,4 @@
+
 package com.example.sirh.repository;
 
 import com.example.sirh.model.HistoriqueDemandeRecrutement;
@@ -9,12 +10,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface HistoriqueDemandeRecrutementRepository extends JpaRepository<HistoriqueDemandeRecrutement, Integer> {
+public interface HistoriqueDemandeRecrutementRepository
+        extends JpaRepository<HistoriqueDemandeRecrutement, Integer> {
 
     @Query("""
-        SELECT h FROM HistoriqueDemandeRecrutement h 
-        WHERE h.demandeRecrutement.idDemandeRecrutement = :idDemande 
-        ORDER BY h.dateChangement DESC
+        SELECT h FROM HistoriqueDemandeRecrutement h
+        WHERE h.demandeRecrutement.idDemandeRecrutement = :idDemande
+        ORDER BY h.dateChangement ASC, h.id ASC
     """)
-    List<HistoriqueDemandeRecrutement> getByIdDemandeRecrutement(@Param("idDemande") Integer idDemande);
+    List<HistoriqueDemandeRecrutement> getByIdDemandeRecrutement(
+            @Param("idDemande") Integer idDemande);
 }

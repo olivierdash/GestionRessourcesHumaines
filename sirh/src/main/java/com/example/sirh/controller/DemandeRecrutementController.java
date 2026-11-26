@@ -133,9 +133,11 @@ public class DemandeRecrutementController {
     }
 
     @GetMapping("/update/{id}")
-    public String edit(@PathVariable Integer id,
+    public String edit(
+            @PathVariable Integer id,
             @ModelAttribute("demandeRecrutementForm") DemandeRecrutementDTO flashForm,
             Model model,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
 
         model.addAttribute("isBrouillon", true);
@@ -147,7 +149,11 @@ public class DemandeRecrutementController {
 
         // 2. Chargement initial (premier accès à la page d'édition)
         try {
-            DemandeRecrutementDTO dto = demandeRecrutementService.getDtoForEdit(id);
+            //DemandeRecrutementDTO dto = demandeRecrutementService.getDtoForEdit(id);
+            DemandeRecrutementDTO dto = demandeRecrutementService.getDtoForEdit(
+                    id,
+                    userDetails.getUtilisateur()
+            );
             model.addAttribute("demandeRecrutementForm", dto);
             return "demande/form";
         } catch (Exception e) {

@@ -27,7 +27,8 @@ public interface DemandeRecrutementRepository
                             d.motif.libelle,
                             m.nom,
                             p.intitule,
-                            dep.titre
+                            dep.titre,
+                            d.etatDemande.intitule
                         )
                         FROM DemandeRecrutement d
                         JOIN d.manager m
