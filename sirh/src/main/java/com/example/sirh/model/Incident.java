@@ -22,6 +22,7 @@ public class Incident {
     @JoinColumn(name = "id_declarant", nullable = false)
     private Utilisateur declarant;
 
+
     @Column(name = "date_fait", nullable = false)
     private LocalDate dateFait;
 
