@@ -18,8 +18,9 @@
                 <span class="material-symbols-outlined text-[16px]">tune</span>
                 <span>Filtrer</span>
             </button>
-            <a th:href="@{/demandes/create}"
-               class="flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
+            <a sec:authorize="hasRole('MANAGER')"
+                th:href="@{/demandes/create}"
+                class="flex items-center gap-1.5 px-4 h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs shadow-sm transition-colors">
                 <span class="material-symbols-outlined text-[16px]">add_circle</span>
                 <span>Créer une demande</span>
             </a>
@@ -61,9 +62,8 @@
             <table class="sirh-table">
                 <thead>
                     <tr>
-                        <th scope="col">Référence</th>
                         <th scope="col">Poste demandé</th>
-                        <th scope="col">Type de contrat</th>
+                        <th scope="col">Dernier état</th>
                         <th scope="col">Département</th>
                         <th scope="col">Manager demandeur</th>
                         <th scope="col">Date de soumission</th>
@@ -79,18 +79,33 @@
                     </tr>
 
                     <tr th:each="demande : ${demandes.content}">
-                        <td class="font-mono text-cobalt-800 font-bold whitespace-nowrap">
-                            #<span th:text="${demande.idDemandeRecrutement()}"></span>
-                        </td>
                         <td class="font-bold text-cobalt-900" th:text="${demande.posteIntitule()}"></td>
                         <td>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider bg-blue-50 border-blue-200 text-blue-700 whitespace-nowrap"
-                                  th:text="${demande.typeContratLibelle() != null ? demande.typeContratLibelle() : '—'}"></span>
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+                                th:text="${demande.dernierEtatLibelle() != null ? demande.dernierEtatLibelle() : '—'}"
+                                th:classappend="${
+                                    demande.dernierEtatLibelle() == 'Brouillon'
+                                        ? ' bg-gray-50 border-gray-200 text-gray-700'
+                                    : demande.dernierEtatLibelle() == 'Cree'
+                                        ? ' bg-blue-50 border-blue-200 text-blue-700'
+                                    : demande.dernierEtatLibelle() == 'ValideRH'
+                                        ? ' bg-purple-50 border-purple-200 text-purple-700'
+                                    : demande.dernierEtatLibelle() == 'ValideFinance'
+                                        ? ' bg-orange-50 border-orange-200 text-orange-700'
+                                    : demande.dernierEtatLibelle() == 'Valide'
+                                        ? ' bg-green-50 border-green-200 text-green-700'
+                                    : demande.dernierEtatLibelle() == 'Refuse'
+                                        ? ' bg-red-50 border-red-200 text-red-700'
+                                    : ' bg-gray-50 border-gray-200 text-gray-700'
+                                }">
+                            </span>
                         </td>
                         <td class="text-slate-600" th:text="${demande.departementTitre()}"></td>
                         <td class="text-slate-600" th:text="${demande.managerNom()}"></td>
                         <td class="whitespace-nowrap text-slate-600 font-mono"
-                            th:text="${#temporals.format(demande.dateCreation(), 'dd/MM/yyyy')}"></td>
+                            th:text="${#temporals.format(demande.dateCreation(), 'dd/MM/yyyy')}">
+                        </td>
 
                         <td class="text-center whitespace-nowrap">
                             <div class="relative inline-flex justify-center items-center group">

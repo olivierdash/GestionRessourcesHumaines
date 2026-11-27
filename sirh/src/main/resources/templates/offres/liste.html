@@ -34,10 +34,10 @@
                 <table class="sirh-table">
                     <thead>
                         <tr>
-                            <th scope="col">ID</th>
                             <th scope="col">Titre</th>
                             <th scope="col">Statut</th>
                             <th scope="col">Date de publication</th>
+                            <th scope="col">Date de clôture</th>
                             <th scope="col" class="text-right">Actions</th>
                         </tr>
                     </thead>
@@ -49,7 +49,7 @@
                             </td>
                         </tr>
                         <tr th:each="offre : ${offres.content}">
-                            <td class="font-mono text-cobalt-800 font-bold whitespace-nowrap" th:text="${offre.idOffre}"></td>
+                            <!--<td class="font-mono text-cobalt-800 font-bold whitespace-nowrap" th:text="${offre.idOffre}"></td>-->
                             <td class="font-bold text-cobalt-900" th:text="${offre.titre}"></td>
                             <td>
                                 <span class="inline-flex items-center px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider"
@@ -57,10 +57,19 @@
                                       th:text="${offre.statut.libelle}">
                                 </span>
                             </td>
-                            <td class="font-mono text-slate-600" 
+                            
+                            <!-- Date de publication -->
+                            <td class="font-mono text-slate-600"
                                 th:classappend="${offre.datePublication == null} ? 'text-slate-400 italic' : ''"
                                 th:text="${offre.datePublication != null ? #temporals.format(offre.datePublication, 'dd/MM/yyyy HH:mm') : 'En attente'}">
                             </td>
+
+                            <!-- Date de clôture -->
+                            <td class="font-mono text-slate-600"
+                                th:classappend="${offre.dateCloture == null} ? 'text-slate-400 italic' : ''"
+                                th:text="${offre.dateCloture != null ? #temporals.format(offre.dateCloture, 'dd/MM/yyyy HH:mm') : 'En attente'}">
+                            </td>
+
                             <td class="text-right whitespace-nowrap">
                                 <!-- Bouton Publier -->
                                 <form th:if="${offre.statut.id == 1}" 

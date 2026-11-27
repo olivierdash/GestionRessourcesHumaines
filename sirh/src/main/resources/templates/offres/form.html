@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr" 
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
       th:replace="~{layout :: layout(content=~{::mainContent})}">
 <body>
 
@@ -14,76 +14,237 @@
         <div class="w-full">
             <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
                 <div class="p-6 md:p-8">
-
                     <!-- Bandeau d'erreur global -->
                     <div th:if="${errorMessage}" class="p-4 mb-6 rounded bg-red-50 text-red-800 border border-red-200 text-sm font-semibold shadow-sm flex items-center gap-2">
                         <span class="material-symbols-outlined text-[20px]">error</span>
                         <span th:text="${errorMessage}"></span>
                     </div>
+                    <form th:action="@{/offres/creer}"
+                        th:object="${offre}"
+                        method="post"
+                        id="formOffre">
 
-                    <form th:action="@{/offres/creer}" th:object="${offre}" method="post">
-
-                        <!-- Demande liée -->
+                        <!-- 1. Demande de recrutement liée -->
                         <div class="mb-6">
-                            <label for="idDemande" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Demande de recrutement liée <span class="text-red-500">*</span></label>
-                            <select th:field="*{demandeRecrutement.idDemandeRecrutement}" id="idDemande" 
+                            <label for="idDemande"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                                Demande de recrutement liée
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <select th:field="*{demandeRecrutement.idDemandeRecrutement}"
+                                    id="idDemande"
+                                    required
                                     class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors cursor-pointer"
-                                    th:classappend="${errors != null and errors['demandeRecrutement.idDemandeRecrutement'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
+                                    th:classappend="${errors != null and errors['demandeRecrutement.idDemandeRecrutement'] != null} ? 'border-red-500' : 'border-neutral-border'">
+
                                 <option value="">-- Sélectionnez une demande --</option>
-                                <option th:each="dem : ${demandes}" 
-                                        th:value="${dem.idDemandeRecrutement}" 
+
+                                <option th:each="dem : ${demandes}"
+                                        th:value="${dem.idDemandeRecrutement}"
                                         th:text="${'Demande #' + dem.idDemandeRecrutement + ' - ' + dem.poste.intitule}">
                                 </option>
                             </select>
-                            <p th:if="${errors != null and errors['demandeRecrutement.idDemandeRecrutement'] != null}" 
-                               th:text="${errors['demandeRecrutement.idDemandeRecrutement']}" 
-                               class="mt-1 text-xs text-red-500 font-semibold"></p>
+
+                            <p th:if="${errors != null and errors['demandeRecrutement.idDemandeRecrutement'] != null}"
+                            th:text="${errors['demandeRecrutement.idDemandeRecrutement']}"
+                            class="mt-1 text-xs text-red-500 font-semibold">
+                            </p>
                         </div>
 
-                        <!-- Titre -->
+
+                        <!-- 2. Titre de l'offre -->
                         <div class="mb-6">
-                            <label for="titre" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Titre de l'offre <span class="text-red-500">*</span></label>
-                            <input type="text" th:field="*{titre}" id="titre" required placeholder="Ex: Développeur Java Senior"
-                                   class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
-                                   th:classappend="${errors != null and errors['titre'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'">
-                            <p th:if="${errors != null and errors['titre'] != null}" 
-                               th:text="${errors['titre']}" 
-                               class="mt-1 text-xs text-red-500 font-semibold"></p>
+                            <label for="titre"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                                Titre de l'offre
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <input type="text"
+                                th:field="*{titre}"
+                                id="titre"
+                                required
+                                placeholder="Ex : Développeur Java Senior"
+                                class="w-full h-11 px-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                                th:classappend="${errors != null and errors['titre'] != null} ? 'border-red-500' : 'border-neutral-border'">
+
+                            <p th:if="${errors != null and errors['titre'] != null}"
+                            th:text="${errors['titre']}"
+                            class="mt-1 text-xs text-red-500 font-semibold">
+                            </p>
                         </div>
 
-                        <!-- Date de publication -->
+
+                        <!-- 3. Date et heure de début de publication -->
                         <div class="mb-6">
-                            <label for="datePublication" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Date de publication</label>
-                            <input type="datetime-local" th:field="*{datePublication}" id="datePublication"
-                                   class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+                            <label for="datePublication"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                                Date et heure de début de publication
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <input type="datetime-local"
+                                th:field="*{datePublication}"
+                                id="datePublication"
+                                required
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+
+                            <p th:if="${errors != null and errors['datePublication'] != null}"
+                            th:text="${errors['datePublication']}"
+                            class="mt-1 text-xs text-red-500 font-semibold">
+                            </p>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                L'offre sera visible à partir de cette date si elle est publiée.
+                            </p>
                         </div>
 
-                        <!-- Description -->
+
+                        <!-- 4. Date et heure de clôture -->
+                        <div class="mb-6">
+                            <label for="dateCloture"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                                Date et heure de clôture
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <input type="datetime-local"
+                                th:field="*{dateCloture}"
+                                id="dateCloture"
+                                required
+                                class="w-full h-11 px-3 bg-white border border-neutral-border rounded text-sm text-body-text focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700 transition-colors">
+
+                            <p th:if="${errors != null and errors['dateCloture'] != null}"
+                            th:text="${errors['dateCloture']}"
+                            class="mt-1 text-xs text-red-500 font-semibold">
+                            </p>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                L'offre sera automatiquement clôturée à cette date et heure.
+                            </p>
+                        </div>
+
+
+                        <!-- 5. Description -->
                         <div class="mb-8">
-                            <label for="description" class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">Description <span class="text-red-500">*</span></label>
-                            <textarea th:field="*{description}" id="description" rows="5" required placeholder="Missions, profil recherché..."
-                                      class="w-full p-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
-                                      th:classappend="${errors != null and errors['description'] != null} ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-neutral-border focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700'"></textarea>
-                            <p th:if="${errors != null and errors['description'] != null}" 
-                               th:text="${errors['description']}" 
-                               class="mt-1 text-xs text-red-500 font-semibold"></p>
+                            <label for="description"
+                                class="block text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+                                Description
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <textarea th:field="*{description}"
+                                    id="description"
+                                    rows="5"
+                                    required
+                                    placeholder="Missions, profil recherché..."
+                                    class="w-full p-3 bg-white border rounded text-sm text-body-text focus:outline-none transition-colors"
+                                    th:classappend="${errors != null and errors['description'] != null} ? 'border-red-500' : 'border-neutral-border'">
+                            </textarea>
+
+                            <p th:if="${errors != null and errors['description'] != null}"
+                            th:text="${errors['description']}"
+                            class="mt-1 text-xs text-red-500 font-semibold">
+                            </p>
                         </div>
 
-                        <!-- Actions -->
+
+                        <!-- 6. Première étape : Annuler / Valider -->
                         <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-border">
-                            <a th:href="@{/offres}" class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
+
+                            <a th:href="@{/offres}"
+                            class="h-9 px-4 rounded bg-surface-card border border-neutral-border text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors shadow-sm flex items-center">
                                 Annuler
                             </a>
-                            <button type="submit" class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
-                                Enregistrer en brouillon
+
+                            <button type="button"
+                                    id="btnValider"
+                                    class="h-9 px-5 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                                Valider
                             </button>
                         </div>
-                    </form>
 
+
+                        <!-- 7. Deuxième étape : choix du mode d'enregistrement -->
+                        <div id="choixEnregistrement"
+                            class="hidden mt-6 p-5 border border-neutral-border rounded-lg bg-surface-card">
+
+                            <h3 class="text-sm font-bold text-slate-800 mb-2">
+                                Choisir le mode d'enregistrement
+                            </h3>
+
+                            <p class="text-xs text-slate-500 mb-5">
+                                Les informations et les dates ont été vérifiées.
+                                Choisissez maintenant le mode d'enregistrement de l'offre.
+                            </p>
+
+                            <div class="flex flex-wrap items-center justify-end gap-3">
+
+                                <!-- Enregistrer en brouillon -->
+                                <button type="submit"
+                                        name="action"
+                                        value="brouillon"
+                                        class="h-10 px-5 rounded border border-neutral-border bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs transition-colors">
+                                    Enregistrer en brouillon
+                                </button>
+
+                                <!-- Publier maintenant -->
+                                <button type="submit"
+                                        name="action"
+                                        value="publier"
+                                        class="h-10 px-5 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white font-semibold text-xs transition-colors shadow-sm">
+                                    Publier maintenant
+                                </button>
+
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
             </div>
         </div>
 
+        <!-- Vérification des champs avant d'afficher les deux choix -->
+    <script>
+        const form = document.getElementById("formOffre");
+        const btnValider = document.getElementById("btnValider");
+        const choixEnregistrement = document.getElementById("choixEnregistrement");
+
+        const dateDebut = document.getElementById("datePublication");
+        const dateFin = document.getElementById("dateCloture");
+
+        btnValider.addEventListener("click", function () {
+
+            // Vérifier les champs obligatoires
+            if (!form.reportValidity()) {
+                return;
+            }
+
+            // Vérifier les deux dates
+            if (!dateDebut.value || !dateFin.value) {
+                alert("Veuillez renseigner les deux dates.");
+                return;
+            }
+
+            // La date de début doit être antérieure à la date de clôture
+            if (new Date(dateDebut.value) >= new Date(dateFin.value)) {
+                alert("La date de début doit être antérieure à la date de clôture.");
+                dateFin.focus();
+                return;
+            }
+
+            // Afficher le choix du mode d'enregistrement
+            choixEnregistrement.classList.remove("hidden");
+
+            // Faire défiler vers les choix
+            choixEnregistrement.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        });
+    </script>
     </main>
+
 </body>
 </html>

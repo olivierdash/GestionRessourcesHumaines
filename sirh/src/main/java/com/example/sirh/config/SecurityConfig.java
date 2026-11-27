@@ -2,11 +2,10 @@ package com.example.sirh.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -15,68 +14,103 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // Mots de passe en clair dans la base (projet de cours uniquement)
     @Bean
     public PasswordEncoder passwordEncoder() {
-       return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
-
-    /*@Bean
-    @SuppressWarnings("deprecation")
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }*/
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
-                // API publique (site carrière) : pas de session, pas de token CSRF.
-                // Sans cette ligne, POST /api/public/jobs/{id}/apply renvoie 403.
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/public/**"))
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/public/**")
+            )
 
-                // Autorise l'aperçu des fichiers dans une iframe de même origine
-                // (visionneuse PDF intégrée aux pages).
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+            .authorizeHttpRequests(auth -> auth
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/departements/**", "/postes/**", "/grilles/**").hasAnyRole("RH", "FINANCE", "DG")
-                        .requestMatchers("/propositions/**").hasAnyRole("RH", "FINANCE", "DG")
-                        .requestMatchers("/offres/**").hasAnyRole("RH", "DG")
-                        .requestMatchers("/candidatures/**").hasAnyRole("RH", "MANAGER")
-                        .requestMatchers("/employes/**").hasAnyRole("MANAGER", "RH", "DG")
-                        .requestMatchers("/demandes/validations").hasAnyRole("FINANCE", "DG", "RH")
-                        .requestMatchers("/temps-travail/**").hasAnyRole("RH", "DG")
-                        .requestMatchers("/dossier/**").hasAnyRole("RH", "ADMIN","DG")
-                        .requestMatchers("/discipline/**").hasAnyRole("RH", "DG", "MANAGER")
-                        .requestMatchers("/offboarding/**").hasAnyRole("RH", "DG")
-                        .requestMatchers("/conges/types/**", "/conges/droits/**", "/conges/soldes/**",
-                                "/conges/demandes/**", "/conges/absences/**", "/conges/calendrier/**")
-                            .hasAnyRole("RH", "DG")
-                        .requestMatchers("/conges/validations/**")
-                            .hasAnyRole("MANAGER", "RH", "DG")
-                        .requestMatchers("/remuneration/**")
-                            .hasAnyRole("RH", "DG", "FINANCE", "MANAGER")
-                        .requestMatchers("/conges/**").hasAnyRole("RH", "DG")
-                        .requestMatchers("/mes-conges/**", "/justificatifs/**").authenticated()
+                // Ressources publiques
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers(
+                    "/css/**", "/js/**", "/fonts/**", "/images/**"
+                ).permitAll()
+                .requestMatchers("/login").permitAll()
 
-                        .anyRequest().authenticated())
+                // Administration
+                .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("email")
-                        .passwordParameter("motDePasse")
-                        .defaultSuccessUrl("/utilisateur", true)
-                        .permitAll())
+                // Gestion des départements, postes et grilles
+                .requestMatchers(
+                    "/departements/**", "/postes/**", "/grilles/**"
+                ).hasAnyRole("RH", "FINANCE", "DG")
 
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll());
+                // Propositions d'embauche
+                .requestMatchers("/propositions/**")
+                    .hasAnyRole("RH", "FINANCE", "DG")
+
+                // Offres d'emploi
+                .requestMatchers("/offres/**").hasAnyRole("RH", "DG")
+
+                // Candidatures
+                .requestMatchers("/candidatures/**")
+                    .hasAnyRole("RH", "MANAGER")
+
+                // Employés
+                .requestMatchers("/employes/**")
+                    .hasAnyRole("MANAGER", "RH", "DG")
+
+                // Création : MANAGER uniquement
+                .requestMatchers(HttpMethod.GET, "/demandes/create")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.POST, "/demandes/create")
+                    .hasRole("MANAGER")
+
+                // Modification des brouillons : MANAGER uniquement
+                .requestMatchers(HttpMethod.GET, "/demandes/update/**")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.POST, "/demandes/update")
+                    .hasRole("MANAGER")
+
+                // Validation / refus : selon le rôle et l'étape
+                .requestMatchers(HttpMethod.POST, "/demandes/update/*")
+                    .hasAnyRole("RH", "FINANCE", "DG")
+
+                // Consultation des demandes
+                .requestMatchers(HttpMethod.GET, "/demandes")
+                    .hasAnyRole("MANAGER", "RH")
+                .requestMatchers(HttpMethod.GET, "/demandes/*")
+                    .hasAnyRole("MANAGER", "RH", "FINANCE", "DG")
+
+                // Page de validation
+                .requestMatchers("/demandes/validations")
+                    .hasAnyRole("FINANCE", "DG", "RH")
+
+                // Temps de travail
+                .requestMatchers("/temps-travail/**")
+                    .hasAnyRole("RH", "DG")
+
+                // Dossiers
+                .requestMatchers("/dossier/**")
+                    .hasAnyRole("RH", "ADMIN", "DG")
+
+                // Toutes les autres routes nécessitent une connexion
+                .anyRequest().authenticated()
+            )
+
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .usernameParameter("email")
+                .passwordParameter("motDePasse")
+                .defaultSuccessUrl("/utilisateur", true)
+                .permitAll()
+            )
+
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            );
 
         return http.build();
     }

@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -106,6 +107,7 @@ public class DemandeRecrutementService {
         }
 
         Utilisateur manager = utilisateurService.getById(dto.getIdManager());
+        
         if (poste == null) {
             poste = posteService.getById(dto.getIdPoste());
         }
@@ -119,6 +121,7 @@ public class DemandeRecrutementService {
                 .manager(manager)
                 .poste(poste)
                 .typeContrat(typeContrat)
+                .dateCreation(LocalDateTime.now())
                 .dateSouhaitee(dto.getDateSouhaitee())
                 .effectif(dto.getEffectif())
                 .motif(motif)
@@ -130,18 +133,37 @@ public class DemandeRecrutementService {
     }
 
     @Transactional
-    public DemandeRecrutement updateDemande(DemandeRecrutementDTO dto, Utilisateur validateur, String action) {
+    public DemandeRecrutement updateDemande(
+            DemandeRecrutementDTO dto,
+            Utilisateur validateur,
+            String action) {
+
         DemandeRecrutement demande = getById(dto.getIdDemandeRecrutement());
         Map<String, String> errors = new LinkedHashMap<>();
 
         String etatActuel = demande.getEtatDemande().getIntitule();
         String role = validateur.getRole().getLibelle();
 
-        if (!Statut.BROUILLON_DEMANDE.equalsIgnoreCase(etatActuel)
-                || !Role.MANAGER.equalsIgnoreCase(role)) {
-            errors.put("global", "Modification Impossible : seul le manager peut modifier un brouillon.");
+        // 1. Seul un MANAGER peut modifier
+        if (!Role.MANAGER.equalsIgnoreCase(role)) {
+            errors.put("global", "Seul un manager peut modifier une demande.");
             throw new ValidationMetierException(errors);
         }
+
+        // 2. Seul un brouillon peut être modifié
+        if (!Statut.BROUILLON_DEMANDE.equalsIgnoreCase(etatActuel)) {
+            errors.put("global", "Cette demande n'est plus modifiable.");
+            throw new ValidationMetierException(errors);
+        }
+
+        // 3. Vérifier que le manager connecté est le propriétaire
+        if (demande.getManager() == null
+                || !demande.getManager().getIdUtilisateur()
+                        .equals(validateur.getIdUtilisateur())) {
+
+            errors.put("global", "Vous ne pouvez modifier que vos propres demandes.");
+            throw new ValidationMetierException(errors);
+    }
 
         validerChampsObligatoires(dto, errors);
 
@@ -149,10 +171,29 @@ public class DemandeRecrutementService {
         if (dto.getIdPoste() != null && !errors.containsKey("idPoste")) {
             poste = posteService.getById(dto.getIdPoste());
         }
+        String actionNormalisee = action == null
+        ? ""
+        : action.trim().toLowerCase(java.util.Locale.ROOT);
 
-        if (Action.SUBMIT.equals(action)) {
+        // Vérification de action repond vide : 
+        if (!Action.SAVE.equalsIgnoreCase(actionNormalisee)
+                && !Action.SUBMIT.equalsIgnoreCase(actionNormalisee)) {
+            errors.put("action", "Action inconnue.");
+            throw new ValidationMetierException(errors);
+        }
+        
+        boolean soumettre = "submit".equals(actionNormalisee);
+
+
+        /*if (Action.SUBMIT.equals(action)) {
+            validerReglesMetier(dto, errors, poste);
+        }*/
+       if (soumettre) {
             validerReglesMetier(dto, errors, poste);
         }
+        String intituleEtat = soumettre
+        ? Statut.CREE
+        : Statut.BROUILLON_DEMANDE;
 
         if (!errors.isEmpty()) {
             throw new ValidationMetierException(errors);
@@ -165,7 +206,7 @@ public class DemandeRecrutementService {
         MotifDemande motif = motifDemandeService.getById(dto.getMotif().getIdMotifDemande());
         TypeContrat typeContrat = typeContratService.getById(dto.getIdTypeContrat());
 
-        demande.setManager(manager);
+        //demande.setManager(manager);
         demande.setPoste(poste);
         demande.setTypeContrat(typeContrat);
         demande.setDateSouhaitee(dto.getDateSouhaitee());
@@ -173,7 +214,7 @@ public class DemandeRecrutementService {
         demande.setMotif(motif);
         demande.setCommentaires(dto.getRemarque());
 
-        if (Action.SUBMIT.equals(action)) {
+        if (soumettre) {
             EtatDemande nouvelEtat = etatDemandeService.getByIntitule(Statut.CREE);
             demande.setEtatDemande(nouvelEtat);
             demandeRepository.save(demande);
@@ -194,55 +235,102 @@ public class DemandeRecrutementService {
         return demandeRepository.getAllDemandeValide(filter);
     }
 
+   
     @Transactional
-    public DemandeRecrutement updateStateDemande(Integer idDemande, Utilisateur validateur, String remarque, String action) {
+    public DemandeRecrutement updateStateDemande(
+            Integer idDemande,
+            Utilisateur validateur,
+            String remarque,
+            String action) {
+
         DemandeRecrutement demande = getById(idDemande);
-        demande.setCommentaires(remarque);
+
+        String actionNormalisee = action == null
+                ? ""
+                : action.trim().toLowerCase(java.util.Locale.ROOT);
 
         String etatActuel = demande.getEtatDemande().getIntitule();
         String role = validateur.getRole().getLibelle();
 
-        EtatDemande nouvelEtat = null;
+        // Vérifier que le rôle correspond à l'étape actuelle
+        if (!canValidate(etatActuel, role)) {
+            throw new RuntimeException(
+                    "Vous n'êtes pas autorisé à effectuer cette action pour cet état.");
+        }
 
-        if (Action.REFUSER.equals(action)) {
-            if (Role.RH.equalsIgnoreCase(role)
-                    || Role.FINANCE.equalsIgnoreCase(role)
-                    || Role.DG.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.REFUSE_DEMANDE);
+        EtatDemande nouvelEtat;
+
+        if ("refuser".equals(actionNormalisee)) {
+
+            // Refus autorisé uniquement à l'étape du validateur concerné
+            nouvelEtat = etatDemandeService
+                    .getByIntitule(Statut.REFUSE_DEMANDE);
+
+        } else if ("valider".equals(actionNormalisee)) {
+
+            if (Statut.CREE.equalsIgnoreCase(etatActuel)
+                    && Role.RH.equalsIgnoreCase(role)) {
+
+                nouvelEtat = etatDemandeService
+                        .getByIntitule(Statut.VALIDE_RH);
+
+            } else if (Statut.VALIDE_RH.equalsIgnoreCase(etatActuel)
+                    && Role.FINANCE.equalsIgnoreCase(role)) {
+
+                nouvelEtat = etatDemandeService
+                        .getByIntitule(Statut.VALIDE_FINANCE);
+
+            } else if (Statut.VALIDE_FINANCE.equalsIgnoreCase(etatActuel)
+                    && Role.DG.equalsIgnoreCase(role)) {
+
+                nouvelEtat = etatDemandeService
+                        .getByIntitule(Statut.VALIDE);
+
             } else {
-                throw new RuntimeException("Seul un validateur peut refuser une demande.");
+                throw new RuntimeException(
+                        "Action impossible pour cet état ou ce rôle.");
             }
+
         } else {
-            if (Statut.CREE.equalsIgnoreCase(etatActuel) && Role.RH.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE_RH);
-            } else if (Statut.VALIDE_RH.equalsIgnoreCase(etatActuel) && Role.FINANCE.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE_FINANCE);
-            } else if (Statut.VALIDE_FINANCE.equalsIgnoreCase(etatActuel) && Role.DG.equalsIgnoreCase(role)) {
-                nouvelEtat = etatDemandeService.getByIntitule(Statut.VALIDE);
-            }
+            throw new RuntimeException("Action inconnue : " + action);
         }
 
-        if (nouvelEtat == null) {
-            throw new RuntimeException("Action impossible pour cet état ou ce rôle.");
-        }
-
+        demande.setCommentaires(remarque);
         demande.setEtatDemande(nouvelEtat);
+
         demandeRepository.save(demande);
+
+        // Enregistrer l'historique de la validation ou du refus
         saveHistorique(demande, validateur);
 
         return demande;
     }
+
 
     @Transactional(readOnly = true)
     public Page<DemandeRecrutementLib> findAllLib(DemandeRecrutementFilter filter, Pageable pageable) {
         return demandeRepository.findAllLib(filter, pageable);
     }
 
-    public DemandeRecrutementDTO getDtoForEdit(Integer id) {
+    public DemandeRecrutementDTO getDtoForEdit(Integer id, Utilisateur utilisateur) {
+
         DemandeRecrutement demande = getById(id);
-        if (!Statut.BROUILLON_DEMANDE.equalsIgnoreCase(demande.getEtatDemande().getIntitule())) {
+
+        if (!Role.MANAGER.equalsIgnoreCase(utilisateur.getRole().getLibelle())) {
+            throw new RuntimeException("Seul un manager peut modifier une demande.");
+        }
+
+        if (!Statut.BROUILLON_DEMANDE.equalsIgnoreCase(
+                demande.getEtatDemande().getIntitule())) {
             throw new RuntimeException("Cette demande n'est plus modifiable.");
         }
+
+        if (demande.getManager() == null
+                || !demande.getManager().getIdUtilisateur()
+                        .equals(utilisateur.getIdUtilisateur())) {
+            throw new RuntimeException("Vous ne pouvez modifier que vos propres demandes.");
+        }
+
         return toDto(demande);
     }
 
@@ -303,6 +391,10 @@ public class DemandeRecrutementService {
         histo.setDemandeRecrutement(demande);
         histo.setEtatDemande(demande.getEtatDemande());
         histo.setValidateur(validateur);
+        histo.setDateChangement(LocalDateTime.now());
         historiqueService.save(histo);
+    }
+    public long countByEtats(List<String> etats) {
+        return demandeRepository.countByEtatDemandeIntituleIn(etats);
     }
 }

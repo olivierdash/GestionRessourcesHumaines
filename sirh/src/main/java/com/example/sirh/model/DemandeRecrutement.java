@@ -27,7 +27,8 @@ public class DemandeRecrutement {
     @JoinColumn(name = "id_poste", nullable = false)
     private Poste poste;
 
-    @Column(name = "date_creation", updatable = false, insertable = false)
+    //@Column(name = "date_creation", updatable = false, insertable = false)
+    @Column(name = "date_creation", updatable = false)
     private LocalDateTime dateCreation;
 
     @Column(name = "date_souhaitee")

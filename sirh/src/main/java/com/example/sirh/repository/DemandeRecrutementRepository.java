@@ -27,7 +27,8 @@ public interface DemandeRecrutementRepository
                             d.motif.libelle,
                             m.nom,
                             p.intitule,
-                            dep.titre
+                            dep.titre,
+                            d.etatDemande.intitule
                         )
                         FROM DemandeRecrutement d
                         JOIN d.manager m
@@ -35,8 +36,10 @@ public interface DemandeRecrutementRepository
                         JOIN p.departement dep
                         JOIN d.motif mo
                         JOIN d.typeContrat tc
-                        WHERE d.dateCreation >= COALESCE(:#{#filter.dateMin?.atStartOfDay()}, d.dateCreation)
-                          AND d.dateCreation <= COALESCE(:#{#filter.dateMax?.atTime(T(java.time.LocalTime).MAX)}, d.dateCreation)
+                        WHERE (:#{#filter.dateMin} IS NULL
+                                OR d.dateCreation >= :#{#filter.dateMin?.atStartOfDay()})
+                          AND (:#{#filter.dateMax} IS NULL
+                              OR d.dateCreation <= :#{#filter.dateMax?.atTime(T(java.time.LocalTime).MAX)})
                           AND p.idPoste = COALESCE(:#{#filter.idPoste}, p.idPoste)
                           AND d.effectif >= COALESCE(:#{#filter.effectifMin}, d.effectif)
                           AND d.effectif <= COALESCE(:#{#filter.effectifMax}, d.effectif)
@@ -50,8 +53,11 @@ public interface DemandeRecrutementRepository
                         JOIN d.poste p
                         JOIN p.departement dep
                         JOIN d.motif mo
-                        WHERE d.dateCreation >= COALESCE(:#{#filter.dateMin?.atStartOfDay()}, d.dateCreation)
-                          AND d.dateCreation <= COALESCE(:#{#filter.dateMax?.atTime(T(java.time.LocalTime).MAX)}, d.dateCreation)
+                        JOIN d.typeContrat tc
+                        WHERE (:#{#filter.dateMin} IS NULL
+                                OR d.dateCreation >= :#{#filter.dateMin?.atStartOfDay()})
+                          AND (:#{#filter.dateMax} IS NULL
+                              OR d.dateCreation <= :#{#filter.dateMax?.atTime(T(java.time.LocalTime).MAX)})
                           AND p.idPoste = COALESCE(:#{#filter.idPoste}, p.idPoste)
                           AND d.effectif >= COALESCE(:#{#filter.effectifMin}, d.effectif)
                           AND d.effectif <= COALESCE(:#{#filter.effectifMax}, d.effectif)

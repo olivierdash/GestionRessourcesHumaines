@@ -1,0 +1,62 @@
+
+services:
+  # ==========================================
+  # BASE DE DONNEES POSTGRESQL
+  # ==========================================
+  db:
+    image: postgres:16
+    container_name: sirh-db
+
+    environment:
+      POSTGRES_DB: sirh
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+      # Scripts SQL d'initialisation
+      - ./table.sql:/docker-entrypoint-initdb.d/01-table.sql:ro
+      - ./sql/20261023-00000-utilisateurs.sql:/docker-entrypoint-initdb.d/02-utilisateurs.sql:ro
+      - ./sql/20261022-00001-insertposte.sql:/docker-entrypoint-initdb.d/03-insertposte.sql:ro
+      - ./sql/20261023-00001-bloc3.sql:/docker-entrypoint-initdb.d/04-bloc3.sql:ro
+      - ./sql/20261023-00000-reference.sql:/docker-entrypoint-initdb.d/04b-reference.sql:ro
+      - ./sql/20261023-00002-bloc3-statuts.sql:/docker-entrypoint-initdb.d/05-bloc3-statuts.sql:ro
+      - ./sql/20261023-00003-postes.sql:/docker-entrypoint-initdb.d/06-postes.sql:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d sirh"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ==========================================
+  # BACKEND SPRING BOOT
+  # ==========================================
+  app:
+    build:
+      context: ./sirh
+      dockerfile: Dockerfile
+
+    container_name: sirh-app
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/sirh
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+
+    ports:
+      - "8080:8080"
+
+# ==========================================
+# VOLUMES PERSISTANTS
+# ==========================================
+volumes:
+  pgdata:

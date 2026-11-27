@@ -64,28 +64,60 @@ public class OffreEmploiController {
 
     // TÂCHE 9 : Enregistrement de l'offre
     @PostMapping("/creer")
-    public String creerOffre(@ModelAttribute OffreEmploi offre,
+    public String creerOffre(
+            @ModelAttribute("offre") OffreEmploi offre,
+            @RequestParam("action") String action,
             RedirectAttributes redirectAttributes) {
+
         try {
-            offreService.createNewOffer(offre, 2); // 2 = BROUILLON (en dur pour l'instant)
-            redirectAttributes.addFlashAttribute("success", "Offre créée avec succès");
+
+            // 1. Déterminer le statut selon le choix de RH
+            Integer idStatut;
+
+            if ("brouillon".equals(action)) {
+                idStatut = 1; // BROUILLON
+            } else if ("publier".equals(action)) {
+                idStatut = 2; // PUBLIEE
+            } else {
+                throw new IllegalArgumentException(
+                        "Action inconnue. Choisissez brouillon ou publier.");
+            }
+
+            // 2. Créer l'offre avec le statut choisi
+            offreService.createNewOffer(offre, idStatut);
+
+            // 3. Message de confirmation
+            if (idStatut == 1) {
+                redirectAttributes.addFlashAttribute(
+                        "success",
+                        "Offre enregistrée en brouillon avec succès !");
+            } else {
+                redirectAttributes.addFlashAttribute(
+                        "success",
+                        "Offre publiée avec succès ! Elle sera visible à sa date de début.");
+            }
+
             return "redirect:/offres";
-            
+
         } catch (ValidationMetierException e) {
+
             redirectAttributes.addFlashAttribute("errors", e.getErrors());
-            redirectAttributes.addFlashAttribute("errorMessage", "Veuillez corriger les erreurs ci-dessous.");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Veuillez corriger les erreurs du formulaire.");
+
             redirectAttributes.addFlashAttribute("offre", offre);
+
             return "redirect:/offres/creer";
-            
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erreur : Une offre existe déjà pour cette demande.");
-            redirectAttributes.addFlashAttribute("offre", offre);
-            return "redirect:/offres/creer";
-            
+
         } catch (Exception e) {
-            // Erreur technique inattendue (500), on laisse Spring la gérer ou on redirige
-            redirectAttributes.addFlashAttribute("errorMessage", "Erreur inattendue : " + e.getMessage());
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Erreur lors de la création : " + e.getMessage());
+
             redirectAttributes.addFlashAttribute("offre", offre);
+
             return "redirect:/offres/creer";
         }
     }

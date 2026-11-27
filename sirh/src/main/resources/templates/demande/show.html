@@ -58,16 +58,18 @@
 
                 <div class="p-6 flex flex-col gap-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                        <div class="flex items-start gap-3">
-                            <span class="material-symbols-outlined text-[20px] text-cobalt-700 bg-slate-100 rounded p-1.5">person</span>
-                            <div>
-                                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                                    Manager demandeur
-                                </span>
-                                <div class="text-sm font-semibold text-slate-800"
-                                     th:text="${demande.manager != null ? demande.manager.nom : 'Inconnu'}"></div>
+                        <!--
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-[20px] text-cobalt-700 bg-slate-100 rounded p-1.5">person</span>
+                                <div>
+                                    <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                        Manager demandeur
+                                    </span>
+                                    <div class="text-sm font-semibold text-slate-800"
+                                        th:text="${demande.manager != null ? demande.manager.nom : 'Inconnu'}"></div>
+                                </div>
                             </div>
-                        </div>
+                        -->
                         <div class="flex items-start gap-3">
                             <span class="material-symbols-outlined text-[20px] text-cobalt-700 bg-slate-100 rounded p-1.5">groups</span>
                             <div>
@@ -77,26 +79,6 @@
                                 <div class="text-sm font-bold text-cobalt-900">
                                     <span th:text="${demande.effectif}"></span> personne(s)
                                 </div>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <span class="material-symbols-outlined text-[20px] text-cobalt-700 bg-slate-100 rounded p-1.5">event</span>
-                            <div>
-                                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                                    Date de création
-                                </span>
-                                <div class="text-sm font-mono text-slate-600"
-                                     th:text="${#temporals.format(demande.dateCreation, 'dd MMMM yyyy à HH:mm')}"></div>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <span class="material-symbols-outlined text-[20px] text-cobalt-700 bg-slate-100 rounded p-1.5">event_available</span>
-                            <div>
-                                <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                                    Date d'entrée souhaitée
-                                </span>
-                                <div class="text-sm font-mono text-slate-600"
-                                     th:text="${demande.dateSouhaitee != null ? #temporals.format(demande.dateSouhaitee, 'dd/MM/yyyy') : 'Non spécifiée'}"></div>
                             </div>
                         </div>
                     </div>
@@ -158,42 +140,132 @@
                     <span th:text="${demande.etatDemande != null ? demande.etatDemande.intitule : 'Brouillon'}"></span>
                 </div>
             </div>
-
+            <!-- Historique de demande--> 
             <div class="bg-surface-card rounded-lg shadow-sm border border-neutral-border overflow-hidden">
                 <div class="px-5 py-4 border-b border-neutral-border bg-slate-50 flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px] text-cobalt-800">history</span>
                     <h3 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider m-0">
-                        Historique de la demande
+                        Historique
                     </h3>
                 </div>
                 <div class="p-6">
                     <ul class="relative border-l border-slate-200 ml-3 space-y-6 list-none p-0"
-                        th:if="${not #lists.isEmpty(historique)}">
-                        <li class="relative pl-6" th:each="hist : ${historique}">
-                            <div class="absolute -left-[5px] top-1.5 w-[9px] h-[9px] rounded-full bg-cobalt-800 border border-white"></div>
+                        th:if="${demande.dateCreation != null or not #lists.isEmpty(historique)}">
+
+                        <!-- Création initiale de la demande par le Manager -->
+                        <li class="relative pl-6" th:if="${demande.dateCreation != null}">
+                            <div class="absolute -left-[5px] top-1.5 w-[9px] h-[9px] rounded-full bg-green-600 border border-white"></div>
 
                             <div class="bg-slate-50 border border-neutral-border rounded p-3">
                                 <div class="flex flex-col gap-1 mb-1">
-                                    <span class="text-xs font-bold text-cobalt-800 uppercase tracking-wider"
-                                          th:text="${hist.etatDemande != null ? hist.etatDemande.intitule : 'BROUILLON'}">
+                                    <span class="text-xs font-bold text-green-700 uppercase tracking-wider">
+                                        CRÉATION DE LA DEMANDE
                                     </span>
+
                                     <span class="text-[11px] text-slate-500 font-mono"
-                                          th:text="${#temporals.format(hist.dateChangement, 'dd/MM/yyyy HH:mm')}">
+                                        th:text="${#temporals.format(demande.dateCreation, 'dd/MM/yyyy HH:mm')}">
                                     </span>
+                                </div>
+
+                                <p class="text-sm text-slate-600 m-0">
+                                    Demande créée par
+                                    <span class="font-bold text-slate-800"
+                                        th:text="${demande.manager != null ? demande.manager.nom : 'Manager inconnu'}">
+                                    </span>
+                                </p>
+                            </div>
+                        </li>
+                        
+                        <li class="relative pl-6" th:each="hist : ${historique}">
+
+                            <!-- Point de la timeline -->
+                            <div class="absolute -left-[5px] top-1.5 w-[9px] h-[9px] rounded-full border border-white"
+                                th:classappend="${
+                                    hist.etatDemande != null and hist.etatDemande.intitule == 'Brouillon'
+                                        ? ' bg-gray-500'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'Cree'
+                                        ? ' bg-blue-600'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'ValideRH'
+                                        ? ' bg-purple-600'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'ValideFinance'
+                                        ? ' bg-orange-500'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'Valide'
+                                        ? ' bg-green-600'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'Refuse'
+                                        ? ' bg-red-600'
+                                    : ' bg-slate-500'
+                                }">
+                            </div>
+
+                            <!-- Carte de l'historique -->
+                            <div class="border rounded p-3"
+                                th:classappend="${
+                                    hist.etatDemande != null and hist.etatDemande.intitule == 'Brouillon'
+                                        ? ' bg-gray-50 border-gray-200'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'Cree'
+                                        ? ' bg-blue-50 border-blue-200'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'ValideRH'
+                                        ? ' bg-purple-50 border-purple-200'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'ValideFinance'
+                                        ? ' bg-orange-50 border-orange-200'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'Valide'
+                                        ? ' bg-green-50 border-green-200'
+                                    : hist.etatDemande != null and hist.etatDemande.intitule == 'Refuse'
+                                        ? ' bg-red-50 border-red-200'
+                                    : ' bg-slate-50 border-slate-200'
+                                }">
+
+                                <div class="flex flex-col gap-1 mb-1">
+
+                                    <!-- Libellé coloré -->
+                                    <span class="text-xs font-bold uppercase tracking-wider"
+                                        th:classappend="${
+                                            hist.etatDemande != null and hist.etatDemande.intitule == 'Brouillon'
+                                                ? ' text-gray-700'
+                                            : hist.etatDemande != null and hist.etatDemande.intitule == 'Cree'
+                                                ? ' text-blue-700'
+                                            : hist.etatDemande != null and hist.etatDemande.intitule == 'ValideRH'
+                                                ? ' text-purple-700'
+                                            : hist.etatDemande != null and hist.etatDemande.intitule == 'ValideFinance'
+                                                ? ' text-orange-700'
+                                            : hist.etatDemande != null and hist.etatDemande.intitule == 'Valide'
+                                                ? ' text-green-700'
+                                            : hist.etatDemande != null and hist.etatDemande.intitule == 'Refuse'
+                                                ? ' text-red-700'
+                                            : ' text-slate-700'
+                                        }"
+                                        th:text="${hist.etatDemande != null ? hist.etatDemande.intitule : 'BROUILLON'}">
+                                    </span>
+
+                                    <!-- Date disponible -->
+                                    <span class="text-[11px] text-slate-500 font-mono"
+                                        th:if="${hist.dateChangement != null}"
+                                        th:text="${#temporals.format(hist.dateChangement, 'dd/MM/yyyy HH:mm')}">
+                                    </span>
+
+                                    <!-- Ancienne action sans date -->
+                                    <span class="text-[11px] text-amber-600 italic"
+                                        th:if="${hist.dateChangement == null}">
+                                        Date non disponible (ancienne action)
+                                    </span>
+
                                 </div>
 
                                 <p class="text-sm text-slate-600 m-0">
                                     Action effectuée par
                                     <span class="font-bold text-slate-800"
-                                          th:text="${hist.validateur != null ? hist.validateur.nom : 'Système'}">
+                                        th:text="${hist.validateur != null ? hist.validateur.nom : 'Système'}">
                                     </span>
                                 </p>
+
                             </div>
                         </li>
+
                     </ul>
 
-                    <p class="text-sm text-slate-500 italic m-0" th:if="${#lists.isEmpty(historique)}">
-                        Aucun historique disponible pour cette demande.
+                    <p class="text-sm text-slate-500 italic m-0"
+                        th:if="${demande.dateCreation == null and #lists.isEmpty(historique)}">
+                        Aucun historique disponible.
                     </p>
                 </div>
             </div>

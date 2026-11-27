@@ -19,8 +19,10 @@ public class HistoriqueDemandeRecrutement {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_validateur", nullable = false)
     private Utilisateur validateur;
-    @Column(name = "date_changement", insertable = false, updatable = false)
+    
+    @Column(name = "date_changement", nullable = false)
     private LocalDateTime dateChangement;
+    
     @Column(columnDefinition = "TEXT")
     private String commentaires;
 }

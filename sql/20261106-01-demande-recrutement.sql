@@ -1,2 +1,2 @@
 ALTER TABLE demande_recrutement
-DROP COLUMN id_statut_demande_recrutement;
+DROP COLUMN IF EXISTS id_statut_demande_recrutement;
