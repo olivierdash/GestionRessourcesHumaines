@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <h2 class="text-2xl font-bold text-cobalt-900">Compétences</h2>
+    <div th:if="${success}" class="p-3 rounded bg-emerald-50 text-emerald-800 border border-emerald-200" th:text="${success}"></div>
+
+    <form th:action="@{/developpement/competences}" th:object="${competence}" method="post"
+          class="bg-white border border-neutral-border rounded-lg p-5 grid md:grid-cols-4 gap-4">
+        <input th:field="*{code}" required maxlength="30" placeholder="Code"
+               class="h-10 px-3 border border-neutral-border rounded">
+        <input th:field="*{libelle}" required maxlength="150" placeholder="Libellé"
+               class="h-10 px-3 border border-neutral-border rounded">
+        <input th:field="*{niveauMax}" type="number" min="2" max="10" value="5"
+               class="h-10 px-3 border border-neutral-border rounded">
+        <button type="submit" class="h-10 px-4 rounded bg-cobalt-700 text-white font-semibold">Ajouter</button>
+        <textarea th:field="*{description}" maxlength="500" placeholder="Description"
+                  class="md:col-span-4 p-3 border border-neutral-border rounded min-h-20"></textarea>
+    </form>
+
+    <div class="bg-white border border-neutral-border rounded-lg overflow-x-auto">
+        <table class="sirh-table">
+            <thead><tr><th>Code</th><th>Libellé</th><th>Description</th><th>Niveau maximum</th><th>Statut</th></tr></thead>
+            <tbody>
+                <tr th:if="${competences.isEmpty()}"><td colspan="5" class="td-empty">Aucune compétence.</td></tr>
+                <tr th:each="item : ${competences}">
+                    <td class="font-bold text-cobalt-900" th:text="${item.code}"></td>
+                    <td th:text="${item.libelle}"></td>
+                    <td th:text="${item.description}"></td>
+                    <td th:text="${item.niveauMax}"></td>
+                    <td th:text="${item.actif ? 'Active' : 'Inactive'}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

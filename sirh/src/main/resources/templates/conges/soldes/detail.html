@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Solde de congé</h1>
+            <p class="text-sm text-slate-600 mt-1">
+                <span th:text="${solde.employe.candidature.candidat.prenom + ' ' + solde.employe.candidature.candidat.nom}"></span>
+                <span class="text-slate-400 mx-1">·</span>
+                <span th:text="${solde.typeConge.libelle + ' · ' + solde.annee}"></span>
+            </p>
+        </div>
+        <a th:href="@{/conges/soldes(annee=${solde.annee})}" class="text-sm text-cobalt-700 font-semibold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Retour
+        </a>
+    </div>
+
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
+            <div class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Acquis</div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(solde.joursAcquis)}"></div>
+        </div>
+        <div class="bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
+            <div class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Reportés</div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(solde.joursReportes)}"></div>
+        </div>
+        <div class="bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
+            <div class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Utilisés</div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(solde.joursUtilises)}"></div>
+        </div>
+        <div class="bg-surface-card rounded-lg border border-cobalt-200 p-4 shadow-sm bg-cobalt-50">
+            <div class="text-[10px] font-bold uppercase text-cobalt-700 tracking-wider">Disponible</div>
+            <div class="text-2xl font-bold text-cobalt-900 mt-1" th:text="${@formatDuree.jours(disponible)}"></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
+            <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Mouvements</h2>
+            <div th:if="${#lists.isEmpty(mouvements)}" class="text-sm text-slate-500 italic">Aucun mouvement enregistré.</div>
+            <div class="overflow-x-auto">
+                <table class="sirh-table" th:unless="${#lists.isEmpty(mouvements)}">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mouvement</th>
+                            <th>Jours</th>
+                            <th>Demande</th>
+                            <th>Par</th>
+                            <th>Motif</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="m : ${mouvements}">
+                            <td class="text-xs text-slate-500 whitespace-nowrap"
+                                th:text="${#temporals.format(m.dateMouvement, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td class="text-xs font-semibold" th:text="${m.typeMouvement}"></td>
+                            <td class="text-xs font-bold"
+                                th:classappend="${m.jours.signum() < 0 ? 'text-red-600' : 'text-emerald-700'}"
+                                th:text="${@formatDuree.joursSigne(m.jours)}"></td>
+                            <td class="text-xs">
+                                <a th:if="${m.demandeConge != null}"
+                                   th:href="@{/conges/demandes/{id}(id=${m.demandeConge.id})}"
+                                   class="text-cobalt-700 font-semibold hover:underline"
+                                   th:text="${m.demandeConge.reference}"></a>
+                                <span th:if="${m.demandeConge == null}" class="text-slate-400">—</span>
+                            </td>
+                            <td class="text-xs" th:text="${m.utilisateur != null ? m.utilisateur.nom : 'Système'}"></td>
+                            <td class="text-xs text-slate-600" th:text="${m.motif != null ? m.motif : '—'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <aside class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-5 h-fit">
+            <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-3">Ajustement RH</h2>
+            <div class="text-xs text-slate-600 mb-4">
+                <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span>En attente</span>
+                    <span class="font-semibold" th:text="${@formatDuree.jours(solde.joursEnAttente)}"></span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span>Ajustés</span>
+                    <span class="font-semibold" th:text="${@formatDuree.jours(solde.joursAjustes)}"></span>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span>Statut année</span>
+                    <span class="font-semibold" th:text="${solde.anneeCloturee ? 'Clôturée' : 'Ouverte'}"></span>
+                </div>
+            </div>
+            <form th:action="@{/conges/soldes/{id}/ajuster(id=${solde.id})}" method="post" class="flex flex-col gap-3">
+                <div>
+                    <label for="jours" class="block text-[10px] font-bold uppercase text-slate-500 tracking-wider mb-1">Jours (positif ou négatif)</label>
+                    <input id="jours" type="number" step="0.5" name="jours" required
+                           class="w-full h-9 border border-neutral-border rounded px-3 text-sm">
+                </div>
+                <div>
+                    <label for="motif" class="block text-[10px] font-bold uppercase text-slate-500 tracking-wider mb-1">Motif <span class="text-red-500">*</span></label>
+                    <input id="motif" type="text" name="motif" required maxlength="500"
+                           class="w-full h-9 border border-neutral-border rounded px-3 text-sm">
+                </div>
+                <label class="flex items-center gap-2 text-xs text-amber-800 font-semibold">
+                    <input type="checkbox" name="forcer" value="true">
+                    Forcer même si l'année est clôturée
+                </label>
+                <button type="submit"
+                        class="h-9 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold shadow-sm">
+                    Appliquer l'ajustement
+                </button>
+            </form>
+        </aside>
+    </div>
+</main>
+</body>
+</html>

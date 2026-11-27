@@ -94,8 +94,19 @@
                         </td>
                     </tr>
                     <tr th:each="affectation : ${affectations}">
-                        <td class="font-bold text-cobalt-900"
-                            th:text="${affectation.employe.candidature.candidat.prenom + ' ' + affectation.employe.candidature.candidat.nom}"></td>
+                        <td>
+                            <div class="font-bold text-cobalt-900"
+                                 th:text="${affectation.employe.candidature.candidat.prenom + ' ' + affectation.employe.candidature.candidat.nom}"></div>
+                            <div th:if="${absencesParAffectation[affectation.id] != null and !#lists.isEmpty(absencesParAffectation[affectation.id])}"
+                                 class="flex flex-wrap gap-1 mt-1">
+                                <span th:each="a : ${absencesParAffectation[affectation.id]}"
+                                      class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold bg-red-50 border-red-200 text-red-700"
+                                      th:title="${#temporals.format(a.dateDebut, 'dd/MM/yyyy') + ' → ' + #temporals.format(a.dateFin, 'dd/MM/yyyy')}">
+                                    <span class="material-symbols-outlined text-[10px]">sick</span>
+                                    <span th:text="${a.typeConge.libelle}"></span>
+                                </span>
+                            </div>
+                        </td>
                         <td>
                             <span class="font-mono text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded"
                                   th:text="${affectation.employe.matricule}"></span>

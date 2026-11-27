@@ -5,12 +5,17 @@ import com.example.sirh.model.Candidat;
 import com.example.sirh.service.CandidatService;
 import com.example.sirh.service.CandidatureService;
 import com.example.sirh.service.EvaluationService;
+import com.example.sirh.service.FileStorageService;
 import com.example.sirh.service.OffreEmploieService;
 import com.example.sirh.service.StatutCandidatureService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -22,6 +27,7 @@ public class CandidatureController {
     private final CandidatService candidatService; // Injection du Service
     private final EvaluationService evaluationService;
     private final StatutCandidatureService statutCandidatureService;
+    private final FileStorageService fileStorageService;
 
     // TÂCHE 10 : Candidatures d'une offre
     @GetMapping("/offres/{idOffre}")
@@ -52,6 +58,47 @@ public class CandidatureController {
         model.addAttribute("candidature", candidatureService.getCandidatureById(id));
         model.addAttribute("evaluations", evaluationService.listerEvaluationsParCandidature(id));
         return "candidatures/show";
+    }
+
+    /**
+     * Affiche le CV dans le navigateur (PDF ou image) au lieu de le télécharger.
+     */
+    @GetMapping("/candidats/{idCandidat}/cv")
+    public ResponseEntity<Resource> consulterCv(@PathVariable Integer idCandidat) {
+        return reponseCv(idCandidat, true);
+    }
+
+    @GetMapping("/candidats/{idCandidat}/cv/telecharger")
+    public ResponseEntity<Resource> telechargerCv(@PathVariable Integer idCandidat) {
+        return reponseCv(idCandidat, false);
+    }
+
+    private ResponseEntity<Resource> reponseCv(Integer idCandidat, boolean apercu) {
+        Candidat candidat = candidatService.getCandidatById(idCandidat);
+        String cvUrl = candidat.getCvUrl();
+
+        if (cvUrl == null || cvUrl.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Aucun CV n'est associé à ce candidat.");
+        }
+
+        return fileStorageService.repondre(cvUrl, nomCv(candidat, cvUrl), apercu);
+    }
+
+    /**
+     * Les CV sont stockés sous la forme {@code cv_<uuid>_<nom-original>.pdf}.
+     * On restitue le nom d'origine pour le navigateur.
+     */
+    private String nomCv(Candidat candidat, String cvUrl) {
+        String nomStocke = cvUrl.substring(cvUrl.lastIndexOf('/') + 1);
+        String nomOriginal = nomStocke.replaceFirst(
+                "^cv_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}_",
+                "");
+
+        if (nomOriginal.isBlank() || nomOriginal.equals(nomStocke)) {
+            nomOriginal = "CV - " + candidat.getPrenom() + " " + candidat.getNom() + ".pdf";
+        }
+        return nomOriginal;
     }
 
     @PostMapping("/candidatures/{id}/retenir")

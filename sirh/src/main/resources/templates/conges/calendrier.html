@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Calendrier des congés</h1>
+            <p class="text-sm text-slate-600 mt-1">Absences et demandes en attente sur le mois.</p>
+        </div>
+        <div class="flex items-center gap-2 self-start md:self-auto">
+            <a th:href="@{/conges/calendrier(periode=${precedent}, employeId=${filtreEmployeId})}"
+               class="h-9 w-9 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 flex items-center justify-center shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+            </a>
+            <span class="h-9 px-4 rounded bg-white border border-neutral-border text-sm font-semibold text-cobalt-900 flex items-center min-w-[10rem] justify-center"
+                  th:text="${#temporals.format(debut, 'MMMM yyyy')}"></span>
+            <a th:href="@{/conges/calendrier(periode=${suivant}, employeId=${filtreEmployeId})}"
+               class="h-9 w-9 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 flex items-center justify-center shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </a>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/conges/calendrier}"
+          class="flex flex-wrap items-end gap-3 bg-surface-card rounded-lg border border-neutral-border p-4 shadow-sm">
+        <input type="hidden" name="periode" th:value="${periode}">
+        <div class="flex flex-col gap-1.5">
+            <label for="filtre-employe" class="text-xs font-semibold text-slate-600">Salarié</label>
+            <select id="filtre-employe" name="employeId"
+                    class="h-9 min-w-64 rounded border border-neutral-border bg-white px-3 text-sm text-slate-700">
+                <option value="" th:selected="${filtreEmployeId == null}">Tous les salariés</option>
+                <option th:each="e : ${employes}" th:value="${e.idEmployer}"
+                        th:selected="${filtreEmployeId != null and filtreEmployeId == e.idEmployer}"
+                        th:text="${e.candidature.candidat.prenom + ' ' + e.candidature.candidat.nom}"></option>
+            </select>
+        </div>
+        <button type="submit"
+                class="h-9 rounded bg-cobalt-700 px-4 text-xs font-semibold text-white hover:bg-cobalt-800">
+            Filtrer
+        </button>
+        <a th:if="${filtreEmployeId != null}" th:href="@{/conges/calendrier(periode=${periode})}"
+           class="h-9 inline-flex items-center rounded border border-neutral-border bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+            Effacer le filtre
+        </a>
+    </form>
+
+    <div class="flex flex-wrap items-center gap-4 text-[11px] text-slate-600">
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Absence</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Demande en attente</span>
+        <span class="text-slate-400">·</span>
+        <span th:if="${filtreEmployeId == null}"
+              th:text="${#lists.size(employes)} + ' salarié(s) dans votre périmètre'"></span>
+        <span th:unless="${filtreEmployeId == null}">Calendrier filtré sur un salarié · <span
+                th:text="${#lists.size(employes)} + ' salarié(s) dans votre périmètre'"></span></span>
+    </div>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+        <table class="w-full table-fixed border-collapse">
+            <thead>
+                <tr class="bg-slate-50 border-b border-neutral-border">
+                    <th class="py-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Lun</th>
+                    <th class="py-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Mar</th>
+                    <th class="py-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Mer</th>
+                    <th class="py-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Jeu</th>
+                    <th class="py-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Ven</th>
+                    <th class="py-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Sam</th>
+                    <th class="py-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Dim</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="semaine : ${#numbers.sequence(0, semaines - 1)}"
+                    class="border-b border-neutral-border last:border-0">
+                    <td th:each="jourSemaine : ${#numbers.sequence(1, 7)}"
+                        class="align-top p-1.5 h-20 border-r border-neutral-border last:border-r-0"
+                        th:with="numeroJour=${semaine * 7 + jourSemaine - offset}">
+                        <div th:if="${numeroJour >= 1 and numeroJour <= joursDansMois}"
+                             th:with="jour=${debut.plusDays(numeroJour - 1)}"
+                             class="h-full flex flex-col gap-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-700" th:text="${numeroJour}"></span>
+                                <span th:if="${jour.dayOfWeek.value > 5}" class="text-[9px] uppercase font-bold text-slate-300">WE</span>
+                            </div>
+                            <div th:with="totalEvenements=${#lists.size(absencesParJour[__${numeroJour}__]) + #lists.size(demandesParJour[__${numeroJour}__])}">
+                                <div th:if="${totalEvenements > 0}" class="flex flex-wrap items-center gap-1">
+                                    <span th:if="${!#lists.isEmpty(absencesParJour[__${numeroJour}__])}"
+                                          th:attr="aria-label=|${#lists.size(absencesParJour[__${numeroJour}__])} absence(s)|"
+                                          class="rounded bg-red-50 px-1 py-0.5 text-[9px] font-semibold text-red-700"
+                                          th:text="|Abs. ${#lists.size(absencesParJour[__${numeroJour}__])}|"></span>
+                                    <span th:if="${!#lists.isEmpty(demandesParJour[__${numeroJour}__])}"
+                                          th:attr="aria-label=|${#lists.size(demandesParJour[__${numeroJour}__])} demande(s) en attente|"
+                                          class="rounded bg-amber-50 px-1 py-0.5 text-[9px] font-semibold text-amber-700"
+                                          th:text="|Att. ${#lists.size(demandesParJour[__${numeroJour}__])}|"></span>
+                                </div>
+                                <button th:if="${totalEvenements > 0}" type="button"
+                                        th:attr="data-calendar-dialog=|dialog-${jour}|"
+                                        class="w-full rounded px-1 py-0.5 text-left text-[9px] font-semibold text-cobalt-700 hover:bg-blue-50"
+                                        th:text="|Voir tout (${totalEvenements})|">
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:each="jour : ${jours}"
+         th:with="totalEvenements=${#lists.size(absencesParJour[__${jour.dayOfMonth}__]) + #lists.size(demandesParJour[__${jour.dayOfMonth}__])}">
+        <dialog th:if="${totalEvenements > 0}" th:id="|dialog-${jour}|" data-calendar-day-dialog
+                class="m-auto w-[calc(100%-2rem)] max-w-xl max-h-[85vh] rounded-lg border border-neutral-border bg-white p-0 shadow-xl backdrop:bg-slate-900/50">
+            <div class="flex items-center justify-between border-b border-neutral-border bg-slate-50 px-5 py-4">
+                <div>
+                    <h2 class="font-bold text-cobalt-900"
+                        th:text="${#temporals.format(jour, 'EEEE d MMMM yyyy')}"></h2>
+                    <p class="mt-0.5 text-xs text-slate-500"
+                       th:text="|${totalEvenements} événement(s)|"></p>
+                </div>
+                <form method="dialog">
+                    <button type="submit" aria-label="Fermer la liste"
+                            class="flex h-8 w-8 items-center justify-center rounded text-slate-500 hover:bg-slate-200 hover:text-slate-800">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </form>
+            </div>
+            <div class="max-h-[65vh] space-y-4 overflow-y-auto p-5">
+                <section th:if="${!#lists.isEmpty(absencesParJour[__${jour.dayOfMonth}__])}" class="space-y-2">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-red-700">Absences</h3>
+                    <div th:each="a : ${absencesParJour[__${jour.dayOfMonth}__]}"
+                         class="rounded border border-red-200 bg-red-50 px-3 py-2">
+                        <div class="text-sm font-semibold text-red-900"
+                             th:text="${a.employe.candidature.candidat.prenom + ' ' + a.employe.candidature.candidat.nom}"></div>
+                        <div class="text-xs text-red-700"
+                             th:text="${a.typeConge.libelle + ' · ' + a.statut}"></div>
+                        <div class="mt-1 text-[11px] text-red-600"
+                             th:text="${#temporals.format(a.dateDebut, 'dd/MM/yyyy') + ' – ' + #temporals.format(a.dateFin, 'dd/MM/yyyy')}"></div>
+                    </div>
+                </section>
+                <section th:if="${!#lists.isEmpty(demandesParJour[__${jour.dayOfMonth}__])}" class="space-y-2">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-amber-700">Demandes en attente</h3>
+                    <div th:each="d : ${demandesParJour[__${jour.dayOfMonth}__]}"
+                         class="rounded border border-amber-200 bg-amber-50 px-3 py-2">
+                        <div class="text-sm font-semibold text-amber-900"
+                             th:text="${d.employe.candidature.candidat.prenom + ' ' + d.employe.candidature.candidat.nom}"></div>
+                        <div class="text-xs text-amber-700" th:text="${d.typeConge.libelle}"></div>
+                        <div class="mt-1 text-[11px] text-amber-600"
+                             th:text="${#temporals.format(d.dateDebut, 'dd/MM/yyyy') + ' – ' + #temporals.format(d.dateFin, 'dd/MM/yyyy')}"></div>
+                    </div>
+                </section>
+            </div>
+        </dialog>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a th:href="@{/conges/validations}"
+           class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-5 hover:border-cobalt-700 transition-colors">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-cobalt-700">fact_check</span>
+                <div>
+                    <div class="font-bold text-cobalt-900">File de validation</div>
+                    <div class="text-xs text-slate-500">Traiter les demandes en attente.</div>
+                </div>
+            </div>
+        </a>
+        <a th:href="@{/conges/absences}"
+           class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-5 hover:border-cobalt-700 transition-colors">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-cobalt-700">sick</span>
+                <div>
+                    <div class="font-bold text-cobalt-900">Absences</div>
+                    <div class="text-xs text-slate-500">Consulter et justifier les absences.</div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <script>
+        document.querySelectorAll('[data-calendar-dialog]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const dialog = document.getElementById(button.dataset.calendarDialog);
+                if (dialog) dialog.showModal();
+            });
+        });
+
+        document.querySelectorAll('[data-calendar-day-dialog]').forEach((dialog) => {
+            dialog.addEventListener('click', (event) => {
+                if (event.target === dialog) dialog.close();
+            });
+        });
+    </script>
+</main>
+</body>
+</html>

@@ -44,6 +44,9 @@ public class JournalAudit {
     @Column(columnDefinition = "TEXT")
     private String details;
 
+    @Column
+    private boolean sensible;
+
     @CreationTimestamp
     @Column(name = "date_action", updatable = false)
     private LocalDateTime dateAction;

@@ -38,28 +38,35 @@ public class DossierSalarierControlleur {
     private final CoordonneesEmployeRepository coordonneesRepo;
     private final AuditService auditService;
 
-    @GetMapping("/{id}")
+        @GetMapping("/{id}")
     public String voirDossier(@PathVariable Integer id, Model model, Principal principal) {
         Employe employe = employerRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employé introuvable avec l'ID : " + id));
 
-        // Référentiel central
+        // 1. RÉFÉRENTIEL CENTRAL (Ton travail)
         model.addAttribute("employe", employe);
-        model.addAttribute("contrats", contratRepo.findByEmployeIdEmployerOrderByDateDebutDesc(id)); // Trié par date
+        model.addAttribute("coordonnees", coordonneesRepo.findByEmploye(employe).orElse(new CoordonneesEmploye()));
         model.addAttribute("documents", documentRepo.findByEmployeIdEmployerOrderByDateDepotDesc(id));
         
-        // Coordonnées
-        model.addAttribute("coordonnees", coordonneesRepo.findByEmploye(employe).orElse(new CoordonneesEmploye()));
-        
-        // Journal d'audit
-        model.addAttribute("historiqueAudit", journalAuditRepo.findByEntiteCibleAndIdEntiteCibleOrderByDateActionDesc("employer", id));
+        // 2. HISTORIQUE DE CARRIÈRE (Travail du binôme)
+        List<com.example.sirh.model.Contrat> tousLesContrats = contratRepo.findByEmployeIdEmployerOrderByDateDebutDesc(id);
+        model.addAttribute("contrats", tousLesContrats); // Pour la timeline HTML
 
-        // Gestion de la validité des documents
+        // 3. SITUATION PROFESSIONNELLE ACTUELLE (Travail du binôme)
+        // On cherche le premier contrat avec le statut "Actif"
+        com.example.sirh.model.Contrat contratActuel = tousLesContrats.stream()
+                .filter(c -> c.getStatut() != null && "Actif".equalsIgnoreCase(c.getStatut().getLibelle()))
+                .findFirst()
+                .orElse(null);
+        model.addAttribute("contratActuel", contratActuel); // Pour les petites cartes en haut
+
+        // 4. GESTION DE LA VALIDITÉ DES DOCUMENTS (Ton travail - à décommenter)
         LocalDate today = LocalDate.now();
         List<Document> docsExpires = documentRepo.findByEmployeIdEmployerAndDateExpirationBefore(id, today);
         model.addAttribute("alerteDocuments", docsExpires);
 
-        // Traçabilité : On trace la consultation
+        // 5. JOURNAL D'AUDIT (Ton travail)
+        model.addAttribute("historiqueAudit", journalAuditRepo.findByEntiteCibleAndIdEntiteCibleOrderByDateActionDesc("employer", id));
         auditService.enregistrerAction(principal.getName(), "CONSULTATION_DOSSIER", "employer", id, "Consultation du dossier complet");
 
         return "dossier/dossier-salarie";

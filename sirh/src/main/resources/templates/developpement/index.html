@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div>
+        <h2 class="text-2xl font-bold text-cobalt-900">Développement des compétences</h2>
+        <p class="text-sm text-slate-600 mt-1">Gestion des objectifs, compétences, évaluations et formations.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+        <a th:href="@{/developpement/competences}" class="bg-white border border-neutral-border rounded-lg p-5 hover:border-cobalt-700">
+            <span class="text-xs uppercase text-slate-500 font-bold">Compétences</span>
+            <p class="text-3xl font-bold text-cobalt-900 mt-2" th:text="${nombreCompetences}">0</p>
+        </a>
+        <a th:href="@{/developpement/employes}" class="bg-white border border-neutral-border rounded-lg p-5 hover:border-cobalt-700">
+            <span class="text-xs uppercase text-slate-500 font-bold">Compétences employés</span>
+            <p class="text-3xl font-bold text-cobalt-900 mt-2" th:text="${nombreCompetencesEmployes}">0</p>
+        </a>
+        <a th:href="@{/developpement/objectifs}" class="bg-white border border-neutral-border rounded-lg p-5 hover:border-cobalt-700">
+            <span class="text-xs uppercase text-slate-500 font-bold">Objectifs</span>
+            <p class="text-3xl font-bold text-cobalt-900 mt-2" th:text="${nombreObjectifs}">0</p>
+        </a>
+        <a th:href="@{/developpement/evaluations}" class="bg-white border border-neutral-border rounded-lg p-5 hover:border-cobalt-700">
+            <span class="text-xs uppercase text-slate-500 font-bold">Évaluations</span>
+            <p class="text-3xl font-bold text-cobalt-900 mt-2" th:text="${nombreEvaluations}">0</p>
+        </a>
+        <a th:href="@{/developpement/formations}" class="bg-white border border-neutral-border rounded-lg p-5 hover:border-cobalt-700">
+            <span class="text-xs uppercase text-slate-500 font-bold">Formations</span>
+            <p class="text-3xl font-bold text-cobalt-900 mt-2" th:text="${nombreFormations}">0</p>
+        </a>
+    </div>
+</main>
+</body>
+</html>

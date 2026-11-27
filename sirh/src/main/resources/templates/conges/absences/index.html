@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <!-- En-tête -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Absences</h1>
+            <p class="text-sm text-slate-600 mt-1">Saisie, justification et suivi des absences.</p>
+        </div>
+        <div class="flex items-center gap-2 self-start md:self-auto shrink-0">
+            <a th:href="@{/conges/calendrier}"
+               class="h-9 px-4 rounded bg-white border border-neutral-border text-slate-700 hover:bg-slate-50 text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">calendar_month</span>
+                Calendrier
+            </a>
+            <a th:href="@{/conges/absences/nouveau}"
+               class="h-9 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                Nouvelle absence
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold shadow-sm" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold shadow-sm" th:text="${erreur}"></div>
+
+    <!-- Filtres -->
+    <form method="get" th:action="@{/conges/absences}" th:object="${filter}"
+          class="bg-surface-card rounded-lg border border-neutral-border shadow-sm">
+        <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+            <div class="sm:col-span-2 lg:col-span-2">
+                <label for="employeId" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Salarié</label>
+                <select id="employeId" th:field="*{employeId}"
+                        class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+                    <option value="">Tous</option>
+                    <option th:each="e : ${employes}" th:value="${e.idEmployer}"
+                            th:text="${e.matricule + ' — ' + e.candidature.candidat.prenom + ' ' + e.candidature.candidat.nom}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="typeId" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Type</label>
+                <select id="typeId" th:field="*{typeId}"
+                        class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+                    <option value="">Tous</option>
+                    <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.libelle}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="statut" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Statut</label>
+                <select id="statut" th:field="*{statut}"
+                        class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+                    <option value="">Tous</option>
+                    <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="debut" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Du</label>
+                <input id="debut" type="date" th:field="*{debut}"
+                       class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+            </div>
+            <div>
+                <label for="fin" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5">Au</label>
+                <input id="fin" type="date" th:field="*{fin}"
+                       class="w-full h-9 border border-neutral-border rounded px-3 text-sm bg-white focus:outline-none focus:border-cobalt-700">
+            </div>
+        </div>
+
+        <!-- Barre d'actions du formulaire -->
+        <div class="flex flex-wrap items-center justify-start sm:justify-end gap-2 px-4 py-3 border-t border-neutral-border">
+            <a th:href="@{/absences/export-csv}"
+               class="h-8 px-3 rounded bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">download</span>
+                Export CSV
+            </a>
+            <a th:href="@{/conges/absences}"
+               class="h-8 px-3 rounded bg-white border border-neutral-border text-slate-600 hover:bg-slate-50 text-xs font-semibold inline-flex items-center">
+                Réinitialiser
+            </a>
+            <button type="submit"
+                    class="h-8 px-4 rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">filter_alt</span>
+                Filtrer
+            </button>
+        </div>
+    </form>
+
+    <!-- Tableau -->
+    <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="sirh-table w-full">
+                <thead>
+                    <tr>
+                        <th>Salarié</th>
+                        <th>Type</th>
+                        <th>Période</th>
+                        <th class="text-center">Jours</th>
+                        <th>Source</th>
+                        <th>Statut</th>
+                        <th class="text-center">Justificatifs</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(absences)}">
+                        <td colspan="8" class="td-empty py-8 text-center text-slate-500 italic">Aucune absence trouvée pour les filtres appliqués.</td>
+                    </tr>
+                    <tr th:each="a : ${absences}">
+                        <td>
+                            <div class="font-semibold text-cobalt-900"
+                                 th:text="${a.employe.candidature.candidat.prenom + ' ' + a.employe.candidature.candidat.nom}"></div>
+                            <div class="text-[11px] text-slate-500 font-mono" th:text="${a.employe.matricule}"></div>
+                        </td>
+                        <td class="text-sm" th:text="${a.typeConge.libelle}"></td>
+                        <td class="text-sm text-slate-700 whitespace-nowrap">
+                            <span th:text="${#temporals.format(a.dateDebut, 'dd/MM/yyyy')}"></span>
+                            <span class="text-slate-400 mx-1">→</span>
+                            <span th:text="${#temporals.format(a.dateFin, 'dd/MM/yyyy')}"></span>
+                        </td>
+                        <td class="text-center font-semibold whitespace-nowrap" th:text="${@formatDuree.jours(a.nombreJours)}"></td>
+                        <td class="text-[11px] text-slate-600 uppercase tracking-wider" th:text="${a.source}"></td>
+                        <td th:replace="~{conges/fragments/statut :: badge(${a.statut})}"></td>
+                        <td class="text-center text-xs whitespace-nowrap"
+                            th:with="liste=${justificatifsParAbsence[a.id]}">
+                            <span class="font-semibold" th:text="${liste != null ? #lists.size(liste) : 0}"></span>
+                            <span class="text-slate-500">justificatif(s)</span>
+                        </td>
+                        <td class="text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <a th:href="@{/conges/absences/{id}(id=${a.id})}"
+                                   class="inline-flex items-center gap-1 h-7 px-2.5 rounded bg-white border border-slate-300 text-cobalt-700 hover:bg-slate-50 text-xs font-semibold whitespace-nowrap">
+                                    <span class="material-symbols-outlined text-[14px]">visibility</span>
+                                    Consulter
+                                </a>
+                                <form th:action="@{/absences/{id}/justifier(id=${a.id})}" method="post" class="m-0">
+                                    <button type="submit" title="Justifier" aria-label="Justifier"
+                                            class="inline-flex items-center justify-center h-7 w-7 rounded bg-emerald-600 hover:bg-emerald-700 text-white">
+                                        <span class="material-symbols-outlined text-[16px]">check</span>
+                                    </button>
+                                </form>
+                                <form th:action="@{/absences/{id}/non-justifiee(id=${a.id})}" method="post" class="m-0">
+                                    <button type="submit" title="Non justifiée" aria-label="Non justifiée"
+                                            class="inline-flex items-center justify-center h-7 w-7 rounded bg-white border border-red-200 text-red-600 hover:bg-red-50">
+                                        <span class="material-symbols-outlined text-[16px]">close</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

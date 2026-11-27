@@ -27,29 +27,105 @@
                 </button>
             </div>
 
-            <!-- Menu -->
-            <nav class="px-2 pt-4 flex flex-col gap-1 overflow-y-auto flex-1">
+            <!-- Menu Scrollable -->
+            <nav class="px-2 pt-2 pb-4 flex flex-col gap-0.5 overflow-y-auto flex-1 custom-scrollbar">
 
-                <a sec:authorize="!hasRole('ADMIN')" th:href="@{/utilisateur}" data-path="/utilisateur"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                <!-- TABLEAU DE BORD (Actif) -->
+                <a sec:authorize="isAuthenticated()" th:href="@{/utilisateur}" data-path="/utilisateur"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-cobalt-800 bg-cobalt-50 text-cobalt-900 font-medium text-sm transition-colors mt-2"
                     title="Tableau de bord">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">grid_view</span>
+                    <span class="material-symbols-outlined text-[20px] text-cobalt-800 shrink-0">grid_view</span>
                     <span class="sidebar-text whitespace-nowrap">Tableau de bord</span>
                 </a>
 
-                <a sec:authorize="hasAnyRole('ADMIN')" th:href="@{/admin}" data-path="/admin"
+                <!-- SECTION : MON ESPACE -->
+                <div class="px-3 pt-5 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider sidebar-text">Mon Espace</div>
+                
+                <a sec:authorize="isAuthenticated()" th:href="@{/mes-conges}" data-path="/mes-conges"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Utilisateurs">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">manage_accounts</span>
-                    <span class="sidebar-text whitespace-nowrap">Utilisateurs</span>
+                    title="Mes congés">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">beach_access</span>
+                    <span class="sidebar-text whitespace-nowrap">Mes congés</span>
                 </a>
- 
-                <a sec:authorize="hasAnyRole('MANAGER', 'RH')" th:href="@{/demandes}" data-path="/demandes"
+                <a sec:authorize="isAuthenticated()" th:href="@{/mes-demandes}" data-path="/mes-demandes"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Demandes">
+                    title="Mes demandes">
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">assignment</span>
-                    <span class="sidebar-text whitespace-nowrap">Demandes</span>
+                    <span class="sidebar-text whitespace-nowrap">Mes demandes</span>
                 </a>
+
+                <!-- SECTION : RECRUTEMENT -->
+                <div class="px-3 pt-5 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider sidebar-text">Recrutement</div>
+
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/demandes}" data-path="/demandes"
+                    class="sidebar-nav-link flex items-center justify-between px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Demandes">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">work_outline</span>
+                        <span class="sidebar-text whitespace-nowrap">Demandes</span>
+                    </div>
+                    <!-- Badge statique de 5 selon la demande -->
+                    <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full sidebar-text">5</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/offres}" data-path="/offres"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Offres">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">campaign</span>
+                    <span class="sidebar-text whitespace-nowrap">Offres</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/candidatures}" data-path="/candidatures"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Candidatures">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">person_add</span>
+                    <span class="sidebar-text whitespace-nowrap">Candidatures</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG','FINANCE')" th:href="@{/propositions}" data-path="/propositions"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Propositions">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">handshake</span>
+                    <span class="sidebar-text whitespace-nowrap">Propositions</span>
+                </a>
+                <a sec:authorize="hasAnyRole('FINANCE', 'DG', 'RH')" th:href="@{/demandes/validations}" data-path="/demandes/validations"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Validations">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">fact_check</span>
+                    <span class="sidebar-text whitespace-nowrap">Validations</span>
+                </a>
+
+                <!-- SECTION : CONGÉS & TEMPS -->
+                <div class="px-3 pt-5 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider sidebar-text">Congés & Temps</div>
+
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/calendrier}" data-path="/conges/calendrier"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Calendrier">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">calendar_month</span>
+                    <span class="sidebar-text whitespace-nowrap">Calendrier</span>
+                </a>
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/conges/validations}" data-path="/conges/validations"
+                    class="sidebar-nav-link flex items-center justify-between px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Validations">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">rule</span>
+                        <span class="sidebar-text whitespace-nowrap">Validations</span>
+                    </div>
+                    <!-- Badge statique de 2 selon la demande -->
+                    <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full sidebar-text">2</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/absences}" data-path="/conges/absences"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Absences">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">sick</span>
+                    <span class="sidebar-text whitespace-nowrap">Absences</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/conges/droits}" data-path="/conges/droits"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Règles & Politiques">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">policy</span>
+                    <span class="sidebar-text whitespace-nowrap">Règles & Politiques</span>
+                </a>
+
+                <!-- SECTION : COLLABORATEURS -->
+                <div class="px-3 pt-5 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider sidebar-text">Collaborateurs</div>
 
                 <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/employes}" data-path="/employes"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
@@ -57,7 +133,27 @@
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">group</span>
                     <span class="sidebar-text whitespace-nowrap">Employés</span>
                 </a>
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/developpement/employes}" data-path="/developpement/employes"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Entretiens & Carrières">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">trending_up</span>
+                    <span class="sidebar-text whitespace-nowrap">Entretiens & Carrières</span>
+                </a>
+                <a sec:authorize="hasAnyRole('MANAGER', 'RH', 'DG')" th:href="@{/discipline}" data-path="/discipline"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Discipline">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">gavel</span>
+                    <span class="sidebar-text whitespace-nowrap">Discipline</span>
+                </a>
+                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/offboarding}" data-path="/offboarding"
+                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
+                    title="Départs">
+                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">logout</span>
+                    <span class="sidebar-text whitespace-nowrap">Départs</span>
+                </a>
 
+                <!-- SECTION : ORGANISATION -->
+                <div class="px-3 pt-5 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider sidebar-text">Organisation</div>
 
                 <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/departements}" data-path="/departements"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
@@ -65,91 +161,15 @@
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">domain</span>
                     <span class="sidebar-text whitespace-nowrap">Départements</span>
                 </a>
-
                 <a sec:authorize="hasAnyRole('RH', 'FINANCE', 'DG')" th:href="@{/postes}" data-path="/postes"
                     class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Postes">
+                    title="Postes & Grilles">
                     <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">work</span>
-                    <span class="sidebar-text whitespace-nowrap">Postes</span>
+                    <span class="sidebar-text whitespace-nowrap">Postes & Grilles</span>
                 </a>
 
-                <a sec:authorize="hasAnyRole('RH', 'FINANCE', 'DG')" th:href="@{/grilles}" data-path="/grilles"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Grilles">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">payments</span>
-                    <span class="sidebar-text whitespace-nowrap">Grilles</span>
-                </a>
-
-                <a sec:authorize="hasAnyRole('RH', 'DG')" th:href="@{/offres}" data-path="/offres"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Offres">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">campaign</span>
-                    <span class="sidebar-text whitespace-nowrap">Offres</span>
-                </a>
-
-                <a sec:authorize="hasAnyRole('RH', 'DG','FINANCE')" th:href="@{/propositions}" data-path="/propositions"
-                    class="sidebar-nav-link flex items-center gap-3 px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Propositions">
-                    <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">handshake</span>
-                    <span class="sidebar-text whitespace-nowrap">Propositions</span>
-                </a>
-
-                <a sec:authorize="hasAnyRole('FINANCE', 'DG', 'RH')" th:href="@{/demandes/validations}"
-                    data-path="/demandes/validations"
-                    class="sidebar-nav-link flex items-center justify-between px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                    title="Validations">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">fact_check</span>
-                        <span class="sidebar-text whitespace-nowrap">Validations</span>
-                    </div>
-                    <span th:if="${validationsEnAttenteCount != null and validationsEnAttenteCount > 0}"
-                        class="bg-cobalt-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full sidebar-text">
-                        <span th:text="${validationsEnAttenteCount}"></span>
-                    </span>
-                </a>
-                <!-- Configuration (sous-menu) -->
-                <div sec:authorize="hasAnyRole('RH', 'DG')" class="sidebar-submenu-group" data-submenu-group="configuration">
-
-                    <button type="button"
-                        class="sidebar-nav-link submenu-toggle flex items-center justify-between w-full px-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                        data-submenu-target="configuration" title="Configuration">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[20px] text-slate-500 shrink-0">settings</span>
-                            <span class="sidebar-text whitespace-nowrap">Configuration</span>
-                        </div>
-                        <span
-                            class="material-symbols-outlined text-[18px] text-slate-400 sidebar-text transition-transform duration-200 submenu-chevron">expand_more</span>
-                    </button>
-
-                    <div class="submenu-items hidden" data-submenu="configuration">
-                        <a sec:authorize="hasRole('RH')" th:href="@{/types-contrat}" data-path="/types-contrat"
-                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                            title="Types de contrat">
-                            <span
-                                class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">description</span>
-                            <span class="sidebar-text whitespace-nowrap">Types de contrat</span>
-                        </a>
-                        <a th:href="@{/temps-travail/regimes}" data-path="/temps-travail"
-                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                            title="Temps de travail">
-                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">schedule</span>
-                            <span class="sidebar-text whitespace-nowrap">Temps de travail</span>
-                        </a>
-                        <a th:href="@{/temps-travail/plannings}" data-path="/temps-travail/plannings"
-                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                            title="Plannings">
-                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">calendar_month</span>
-                            <span class="sidebar-text whitespace-nowrap">Plannings</span>
-                        </a>
-                        <a th:href="@{/temps-travail/pointages}" data-path="/temps-travail/pointages"
-                            class="sidebar-nav-link flex items-center gap-3 pl-10 pr-3 py-2 border-l-4 border-transparent text-slate-700 font-medium text-sm hover:bg-slate-50 hover:text-cobalt-900 transition-colors"
-                            title="Pointages">
-                            <span class="material-symbols-outlined text-[18px] text-slate-500 shrink-0">fingerprint</span>
-                            <span class="sidebar-text whitespace-nowrap">Pointages</span>
-                        </a>
-                    </div>
-                </div>
             </nav>
+
         </div>
 
         <!-- Profil Utilisateur -->

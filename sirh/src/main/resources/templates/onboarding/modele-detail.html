@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <a th:href="@{/onboarding/modeles}" class="text-xs font-semibold text-cobalt-700 hover:underline">← Tous les modèles</a>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight mt-2" th:text="${modele.nom}">Modèle d’onboarding</h1>
+            <p class="text-sm text-slate-600 mt-1">Les changements s’appliquent aux nouveaux onboardings, pas aux parcours déjà créés.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span th:if="${modele.actif}" class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">Modèle actif</span>
+            <form th:unless="${modele.actif}" th:action="@{/onboarding/modeles/{id}/activer(id=${modele.id})}" method="post">
+                <button type="submit" class="h-9 px-4 rounded bg-cobalt-800 text-white hover:bg-cobalt-900 text-xs font-semibold">Activer pour les futurs parcours</button>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-700 border border-red-200 text-sm font-semibold" th:text="${erreur}"></div>
+
+    <section class="bg-white rounded-lg border border-neutral-border shadow-sm p-5">
+        <h2 class="text-base font-bold text-cobalt-900 mb-3">Nom du modèle</h2>
+        <form th:action="@{/onboarding/modeles/{id}/renommer(id=${modele.id})}" method="post" class="flex flex-col sm:flex-row gap-3 sm:items-end">
+            <label class="flex-1 text-xs font-semibold text-slate-600">Nom
+                <input type="text" name="nom" maxlength="100" required th:value="${modele.nom}"
+                       class="mt-1 w-full h-10 px-3 rounded border border-neutral-border text-sm text-slate-800">
+            </label>
+            <button type="submit" class="h-10 px-4 rounded border border-neutral-border text-cobalt-800 hover:bg-slate-50 font-semibold text-sm">Enregistrer</button>
+        </form>
+    </section>
+
+    <section class="bg-white rounded-lg border border-neutral-border shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-neutral-border">
+            <h2 class="text-base font-bold text-cobalt-900">Tâches du parcours</h2>
+            <p class="text-xs text-slate-500 mt-1">Définissez le responsable, le délai après le début, l’obligation et le document éventuel.</p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(taches)}" class="px-5 pt-5 text-sm text-slate-500 italic">Aucune tâche. Un modèle doit contenir au moins une tâche pour être activé.</div>
+
+        <div th:each="tache : ${taches}" class="p-5 border-b border-slate-100">
+            <form th:action="@{/onboarding/modeles/{id}/taches/{idTache}(id=${modele.id},idTache=${tache.id})}" method="post" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3 items-end">
+                <label class="text-xs font-semibold text-slate-600 xl:col-span-2">Titre
+                    <input type="text" name="titre" maxlength="255" required th:value="${tache.titre}" class="mt-1 w-full h-9 px-2 rounded border border-neutral-border text-sm text-slate-800">
+                </label>
+                <label class="text-xs font-semibold text-slate-600">Responsable
+                    <select name="idRoleResponsable" required class="mt-1 w-full h-9 px-2 rounded border border-neutral-border bg-white text-sm text-slate-800">
+                        <option th:each="role : ${roles}" th:value="${role.idRole}" th:selected="${role.idRole == tache.roleResponsable.idRole}" th:text="${role.libelle}"></option>
+                    </select>
+                </label>
+                <label class="text-xs font-semibold text-slate-600">Délai (jours)
+                    <input type="number" name="delaiJours" min="0" required th:value="${tache.delaiJours}" class="mt-1 w-full h-9 px-2 rounded border border-neutral-border text-sm text-slate-800">
+                </label>
+                <label class="text-xs font-semibold text-slate-600">Ordre
+                    <input type="number" name="ordre" min="1" required th:value="${tache.ordre}" class="mt-1 w-full h-9 px-2 rounded border border-neutral-border text-sm text-slate-800">
+                </label>
+                <label class="text-xs font-semibold text-slate-600">Document requis
+                    <select name="idTypeDocumentRequis" class="mt-1 w-full h-9 px-2 rounded border border-neutral-border bg-white text-sm text-slate-800">
+                        <option value="">Aucun</option>
+                        <option th:each="type : ${typesDocument}" th:value="${type.idTypeDocument}"
+                                th:selected="${tache.typeDocumentRequis != null and type.idTypeDocument == tache.typeDocumentRequis.idTypeDocument}"
+                                th:text="${type.libelle}"></option>
+                    </select>
+                </label>
+                <div class="md:col-span-2 xl:col-span-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
+                        <input type="checkbox" name="obligatoire" value="true" th:checked="${tache.obligatoire}" class="rounded border-slate-300 text-cobalt-700">
+                        Tâche obligatoire
+                    </label>
+                    <button type="submit" class="h-8 px-3 rounded bg-cobalt-800 text-white hover:bg-cobalt-900 text-xs font-semibold">Enregistrer la tâche</button>
+                </div>
+            </form>
+            <form th:action="@{/onboarding/modeles/{id}/taches/{idTache}/supprimer(id=${modele.id},idTache=${tache.id})}" method="post" class="mt-2 flex justify-end">
+                <button type="submit" class="h-8 px-3 rounded border border-red-200 text-red-700 hover:bg-red-50 text-xs font-semibold">Supprimer</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="bg-white rounded-lg border border-neutral-border shadow-sm p-5">
+        <h2 class="text-base font-bold text-cobalt-900 mb-1">Ajouter une tâche</h2>
+        <p class="text-xs text-slate-500 mb-4">La tâche sera copiée dans chaque nouvel onboarding créé à partir de ce modèle.</p>
+        <form th:action="@{/onboarding/modeles/{id}/taches(id=${modele.id})}" method="post" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3 items-end">
+            <label class="text-xs font-semibold text-slate-600 xl:col-span-2">Titre
+                <input type="text" name="titre" maxlength="255" required class="mt-1 w-full h-9 px-2 rounded border border-neutral-border text-sm text-slate-800">
+            </label>
+            <label class="text-xs font-semibold text-slate-600">Responsable
+                <select name="idRoleResponsable" required class="mt-1 w-full h-9 px-2 rounded border border-neutral-border bg-white text-sm text-slate-800">
+                    <option value="" disabled selected>Choisir un rôle</option>
+                    <option th:each="role : ${roles}" th:value="${role.idRole}" th:text="${role.libelle}"></option>
+                </select>
+            </label>
+            <label class="text-xs font-semibold text-slate-600">Délai (jours)
+                <input type="number" name="delaiJours" min="0" value="0" required class="mt-1 w-full h-9 px-2 rounded border border-neutral-border text-sm text-slate-800">
+            </label>
+            <label class="text-xs font-semibold text-slate-600">Ordre
+                <input type="number" name="ordre" min="1" th:value="${taches.size() + 1}" required class="mt-1 w-full h-9 px-2 rounded border border-neutral-border text-sm text-slate-800">
+            </label>
+            <label class="text-xs font-semibold text-slate-600">Document requis
+                <select name="idTypeDocumentRequis" class="mt-1 w-full h-9 px-2 rounded border border-neutral-border bg-white text-sm text-slate-800">
+                    <option value="">Aucun</option>
+                    <option th:each="type : ${typesDocument}" th:value="${type.idTypeDocument}" th:text="${type.libelle}"></option>
+                </select>
+            </label>
+            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 md:col-span-2">
+                <input type="checkbox" name="obligatoire" value="true" checked class="rounded border-slate-300 text-cobalt-700">
+                Tâche obligatoire
+            </label>
+            <div class="md:col-span-2 xl:col-span-6">
+                <button type="submit" class="h-9 px-4 rounded bg-cobalt-800 text-white hover:bg-cobalt-900 text-xs font-semibold">Ajouter la tâche</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

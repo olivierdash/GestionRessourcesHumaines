@@ -1,8 +1,4 @@
 
-\set ON_ERROR_STOP on
-
-BEGIN;
-
 -- Candidats / candidatures supplémentaires (poste Data Analyst)
 INSERT INTO demande_recrutement (id_demande_recrutement, id_manager, id_poste, effectif, id_etat_demande, id_motif_demande, id_type_contrat, id_statut_demande_recrutement, commentaires)
 VALUES (2, 2, 2, 2, 5, 1, 1, 3, 'Recrutement Data Analyst');
@@ -90,5 +86,3 @@ SELECT setval(pg_get_serial_sequence('onboarding_tache', 'id_tache'), COALESCE(M
 SELECT setval(pg_get_serial_sequence('coordonnees_employe', 'id_coordonnees'), COALESCE(MAX(id_coordonnees), 1)) FROM coordonnees_employe;
 SELECT setval(pg_get_serial_sequence('document', 'id_document'), COALESCE(MAX(id_document), 1)) FROM document;
 SELECT setval(pg_get_serial_sequence('journal_audit', 'id_audit'), COALESCE(MAX(id_audit), 1)) FROM journal_audit;
-
-COMMIT;

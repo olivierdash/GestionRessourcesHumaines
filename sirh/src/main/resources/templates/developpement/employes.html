@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+    <h2 class="text-2xl font-bold text-cobalt-900">Compétences des employés</h2>
+    <div th:if="${success}" class="p-3 rounded bg-emerald-50 text-emerald-800 border border-emerald-200" th:text="${success}"></div>
+
+    <form th:action="@{/developpement/employes}" method="post"
+          class="bg-white border border-neutral-border rounded-lg p-5 grid md:grid-cols-3 gap-4">
+        <select name="idEmploye" required class="h-10 px-3 border border-neutral-border rounded">
+            <option value="">Employé</option>
+            <option th:each="employe : ${employes}" th:value="${employe.idEmployer}"
+                    th:text="${employe.matricule}"></option>
+        </select>
+        <select name="idCompetence" required class="h-10 px-3 border border-neutral-border rounded">
+            <option value="">Compétence</option>
+            <option th:each="competence : ${competences}" th:value="${competence.id}"
+                    th:text="${competence.libelle}"></option>
+        </select>
+        <input name="niveauAcquis" type="number" min="0" max="10" required placeholder="Niveau acquis"
+               class="h-10 px-3 border border-neutral-border rounded">
+        <input name="dateAcquisition" type="date" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+               class="h-10 px-3 border border-neutral-border rounded">
+        <select name="sourceEvaluation" class="h-10 px-3 border border-neutral-border rounded">
+            <option value="">Source</option>
+            <option>ENTRETIEN</option><option>TEST</option><option>FORMATION</option>
+            <option>AUTO_EVALUATION</option><option>MANAGER</option>
+        </select>
+        <button type="submit" class="h-10 px-4 rounded bg-cobalt-700 text-white font-semibold">Enregistrer</button>
+        <textarea name="commentaire" maxlength="500" placeholder="Commentaire"
+                  class="md:col-span-3 p-3 border border-neutral-border rounded min-h-20"></textarea>
+    </form>
+
+    <div class="bg-white border border-neutral-border rounded-lg overflow-x-auto">
+        <table class="sirh-table">
+            <thead><tr><th>Employé</th><th>Compétence</th><th>Niveau acquis</th><th>Source</th><th>Date</th></tr></thead>
+            <tbody>
+                <tr th:if="${competencesEmployes.isEmpty()}"><td colspan="5" class="td-empty">Aucune compétence enregistrée.</td></tr>
+                <tr th:each="item : ${competencesEmployes}">
+                    <td th:text="${item.employe.matricule}"></td>
+                    <td th:text="${item.competence.libelle}"></td>
+                    <td th:text="${item.niveauAcquis}"></td>
+                    <td th:text="${item.sourceEvaluation}"></td>
+                    <td th:text="${#temporals.format(item.dateAcquisition, 'dd/MM/yyyy')}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

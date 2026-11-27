@@ -57,11 +57,22 @@
                             <!-- CV -->
                             <div>
                                 <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">CV</span>
-                                <a th:if="${candidat.cvUrl != null}" th:href="${candidat.cvUrl}" target="_blank" 
-                                   class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors shadow-sm mt-0.5">
-                                    <span class="material-symbols-outlined text-[14px] mr-1">download</span>
-                                    Télécharger
-                                </a>
+                                <div th:if="${candidat.cvUrl != null}" class="flex items-center gap-2 mt-0.5">
+                                    <a th:href="@{/candidats/{id}/cv(id=${candidat.idCandidat})}"
+                                       target="_blank" rel="noopener"
+                                       th:attr="data-preview-title=${'CV - ' + candidat.nom + ' ' + candidat.prenom},
+                                                data-preview-download=@{/candidats/{id}/cv/telecharger(id=${candidat.idCandidat})}"
+                                       onclick="return openFilePreviewFromLink(this, event)"
+                                       class="inline-flex items-center justify-center h-7 px-3 rounded bg-cobalt-700 border border-cobalt-700 text-white hover:bg-cobalt-800 text-xs font-semibold transition-colors shadow-sm">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">visibility</span>
+                                        Consulter
+                                    </a>
+                                    <a th:href="@{/candidats/{id}/cv/telecharger(id=${candidat.idCandidat})}"
+                                       class="inline-flex items-center justify-center h-7 px-3 rounded bg-white border border-neutral-border text-cobalt-700 hover:bg-slate-50 text-xs font-semibold transition-colors shadow-sm">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">download</span>
+                                        Télécharger
+                                    </a>
+                                </div>
                                 <span th:if="${candidat.cvUrl == null}" class="text-xs text-slate-400 italic block mt-1">Aucun CV</span>
                             </div>
 

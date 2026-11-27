@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr"
+      th:replace="~{layout :: layout(content=~{::mainContent})}">
+<body>
+<main th:fragment="mainContent" class="w-full flex flex-col gap-6">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-cobalt-900 tracking-tight">Mes absences</h1>
+            <p class="text-sm text-slate-600 mt-1">Déclarez une absence et déposez un justificatif si nécessaire.</p>
+        </div>
+        <a th:href="@{/mes-conges}" class="text-sm text-cobalt-700 font-semibold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Mes congés
+        </a>
+    </div>
+
+    <div th:if="${succes}" class="p-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="p-4 rounded bg-red-50 text-red-600 border border-red-200 text-sm font-semibold" th:text="${erreur}"></div>
+    <div th:if="${errors != null and !errors.isEmpty()}" class="p-4 rounded bg-red-50 text-red-700 border border-red-200 text-sm font-semibold">
+        <ul class="list-disc list-inside text-xs font-medium">
+            <li th:each="e : ${errors}" th:text="${e.value}"></li>
+        </ul>
+    </div>
+
+    <div class="bg-surface-card rounded-lg border border-neutral-border shadow-sm p-6">
+        <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-4">Déclarer une absence</h2>
+        <form th:action="@{/mes-conges/absences}" method="post" th:object="${absence}"
+              class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div class="md:col-span-1">
+                <label for="idTypeConge" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Type <span class="text-red-500">*</span></label>
+                <select id="idTypeConge" th:field="*{idTypeConge}" required
+                        class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+                    <option value="">Sélectionner</option>
+                    <option th:each="type : ${types}" th:value="${type.id}" th:text="${type.libelle}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="dateDebut" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Début <span class="text-red-500">*</span></label>
+                <input id="dateDebut" type="date" th:field="*{dateDebut}" required
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+            <div>
+                <label for="dateFin" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Fin <span class="text-red-500">*</span></label>
+                <input id="dateFin" type="date" th:field="*{dateFin}" required
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700">
+            </div>
+            <div>
+                <button type="submit"
+                        class="h-10 w-full rounded bg-cobalt-700 hover:bg-cobalt-800 text-white text-xs font-semibold shadow-sm">
+                    Déclarer
+                </button>
+            </div>
+            <div class="md:col-span-4">
+                <label for="motif" class="block text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">Motif</label>
+                <input id="motif" type="text" th:field="*{motif}" maxlength="500"
+                       class="w-full h-10 border border-neutral-border rounded px-3 text-sm focus:outline-none focus:border-cobalt-700 focus:ring-1 focus:ring-cobalt-700"
+                       placeholder="Facultatif">
+            </div>
+        </form>
+    </div>
+
+    <div>
+        <h2 class="text-sm font-bold text-cobalt-900 uppercase tracking-wider mb-3">Historique de mes absences</h2>
+        <div class="bg-surface-card rounded-lg border border-neutral-border overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="sirh-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Période</th>
+                            <th>Jours</th>
+                            <th>Statut</th>
+                            <th>Justificatifs</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(absences)}">
+                            <td colspan="6" class="td-empty py-8 text-center text-slate-500 italic">Aucune absence déclarée.</td>
+                        </tr>
+                        <tr th:each="a : ${absences}">
+                            <td class="font-semibold text-cobalt-900" th:text="${a.typeConge.libelle}"></td>
+                            <td class="text-sm text-slate-700 whitespace-nowrap">
+                                <span th:text="${#temporals.format(a.dateDebut, 'dd/MM/yyyy')}"></span>
+                                <span class="text-slate-400 mx-1">→</span>
+                                <span th:text="${#temporals.format(a.dateFin, 'dd/MM/yyyy')}"></span>
+                            </td>
+                            <td class="font-semibold" th:text="${@formatDuree.jours(a.nombreJours)}"></td>
+                            <td th:replace="~{conges/fragments/statut :: badge(${a.statut})}"></td>
+                            <td>
+                                <div class="flex flex-col gap-1">
+                                    <a th:each="j : ${justificatifsParAbsence[a.id]}"
+                                       th:href="@{/justificatifs/{id}/apercu(id=${j.id})}"
+                                       target="_blank" rel="noopener"
+                                       th:attr="data-preview-title=${j.nomFichier},
+                                                data-preview-download=@{/justificatifs/{id}(id=${j.id})}"
+                                       onclick="return openFilePreviewFromLink(this, event)"
+                                       class="text-xs text-cobalt-700 font-semibold hover:underline"
+                                       th:text="${j.nomFichier + ' (' + j.statut + ')'}"></a>
+                                    <span th:if="${#lists.isEmpty(justificatifsParAbsence[a.id])}"
+                                          class="text-xs text-slate-400 italic">Aucun</span>
+                                    <form th:if="${a.statut.name() != 'ANNULEE'}"
+                                          th:action="@{/mes-conges/absences/{id}/justificatifs(id=${a.id})}"
+                                          method="post" enctype="multipart/form-data"
+                                          class="flex items-center gap-1 mt-1">
+                                        <input type="file" name="fichier" required accept=".pdf,.jpg,.jpeg,.png"
+                                               class="text-[10px] w-40">
+                                        <button type="submit" class="text-[10px] font-bold text-cobalt-700 uppercase">Déposer</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td class="text-right">
+                                <form th:if="${a.statut.name() != 'ANNULEE' and a.source.name() == 'SAISIE_MANUELLE'}"
+                                      th:action="@{/mes-conges/absences/{id}/annuler(id=${a.id})}" method="post">
+                                    <input type="hidden" name="motif" value="Annulation par le salarié">
+                                    <button type="submit"
+                                            class="h-7 px-3 rounded bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold">
+                                        Annuler
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -16,4 +16,8 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
     Optional<Utilisateur> findByEmail(String email);
     List<Utilisateur> findByRole_LibelleIgnoreCase(String libelle);
     List<Utilisateur> findByRole_LibelleIn(List<String> libelles);
+
+    Optional<Utilisateur> findByEmployeIdEmployer(Integer idEmploye);
+
+    boolean existsByEmployeIdEmployer(Integer idEmploye);
 }

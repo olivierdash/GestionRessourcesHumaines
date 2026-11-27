@@ -4,10 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
-@Entity @Table(name = "poste")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Entity
+@Table(name = "poste")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Poste {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_poste")
     private Integer idPoste;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -17,8 +23,8 @@ public class Poste {
     private LocalDate dateEffet;
     @Column(nullable = false)
     private String intitule;
-    @ManyToOne
-    @JoinColumn (name = "id_lieu",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_lieu")
     private Lieu lieu;
     @Column(name = "duree_hebdo")
     private Integer dureeHebdo;
